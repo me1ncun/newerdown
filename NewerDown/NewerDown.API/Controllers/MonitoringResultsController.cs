@@ -9,17 +9,15 @@ namespace NewerDown.Controllers;
 [Route("/api")]
 public class MonitoringResultsController : ControllerBase
 {
-    private readonly ILogger<MonitoringResultsController> logger;
     private readonly IMonitoringResultService _service;
     
     public MonitoringResultsController(
-        IMonitoringResultService service,
-        ILogger<MonitoringResultsController> logger)
+        IMonitoringResultService service)
     {
         _service = service;
-        this.logger = logger;
     }
     
+    [Authorize]
     [HttpGet("results")]
     public async Task<IActionResult> GetMonitoringResults(
         [FromQuery] string? filter = null,
@@ -30,6 +28,7 @@ public class MonitoringResultsController : ControllerBase
             return Ok(results);
     }
 
+    [Authorize]
     [HttpGet("results/stats/{days}")]
     public async Task<IActionResult> GetMonitoringResultsByDays(int days)
     {

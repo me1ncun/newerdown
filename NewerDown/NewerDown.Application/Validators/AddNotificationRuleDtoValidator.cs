@@ -9,9 +9,6 @@ public class AddNotificationRuleDtoValidator : AbstractValidator<AddNotification
     {
         RuleFor(x => x.ServiceId)
             .NotEmpty().WithMessage("ServiceId is required.");
-        
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("UserId is required.");
 
         RuleFor(x => x.Channel)
             .IsInEnum().WithMessage("Channel must be a valid NotificationChannel enum value.");

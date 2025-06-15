@@ -1,7 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text;
+using Azure.Messaging.ServiceBus;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using NewerDown.Domain.Entities;
 using NewerDown.Infrastructure.Data;
+using NewerDown.Infrastructure.Queuing;
 
 namespace NewerDown.Infrastructure.Extensions.DependencyInjection;
 
@@ -13,6 +19,56 @@ public static class ServicesExtensions
         {
             options.UseAzureSql(configuration["DatabaseConnection"]);
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtKey"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+        
+        return services;
+    }
+
+    public static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddIdentityServer(options =>
+            {
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+                options.EmitStaticAudienceClaim = true;
+            })
+            .AddAspNetIdentity<User>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<ServiceBusClient>(sp =>
+        {
+            return new ServiceBusClient(configuration["ServiceBusConnection"]);
+        });
+
+        services.AddSingleton<IQueueSenderFactory, QueueSenderFactory>();
 
         return services;
     }

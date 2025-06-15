@@ -6,25 +6,22 @@ using NewerDown.Shared.Validations;
 
 namespace NewerDown.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("/api")]
 public class ServicesController : ControllerBase
 {
-    private readonly ILogger<ServicesController> _logger;
     private readonly IServicesService _service;
     private readonly IFluentValidator _validator;
 
     public ServicesController(
-        ILogger<ServicesController> logger,
         IServicesService service,
         IFluentValidator validator)
     {
-        _logger = logger;
         _service = service;
         _validator = validator;
     }
 
+    [Authorize]
     [HttpGet("services")]
     public async Task<IActionResult> GetServices()
     {
@@ -32,6 +29,7 @@ public class ServicesController : ControllerBase
         return Ok(services);
     }
 
+    [Authorize]
     [HttpGet("services/{id}")]
     public async Task<IActionResult> GetServiceById(Guid id)
     {
@@ -39,6 +37,7 @@ public class ServicesController : ControllerBase
         return Ok(service);
     }
 
+    [Authorize]
     [HttpPost("services")]
     public async Task<IActionResult> CreateService([FromBody] AddServiceDto serviceDto)
     {
@@ -52,6 +51,7 @@ public class ServicesController : ControllerBase
         return Ok();
     }
     
+    [Authorize]
     [HttpPut("services/{id}")]
     public async Task<IActionResult> UpdateService(Guid id, [FromBody] UpdateServiceDto serviceDto)
     {
@@ -65,6 +65,7 @@ public class ServicesController : ControllerBase
         return Ok();
     }
     
+    [Authorize]
     [HttpDelete("services/{id}")]
     public async Task<IActionResult> DeleteService(Guid id)
     {

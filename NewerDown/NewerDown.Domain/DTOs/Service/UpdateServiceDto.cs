@@ -11,6 +11,4 @@ public class UpdateServiceDto
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
-    
-    public Guid UserId { get; set; }
 }

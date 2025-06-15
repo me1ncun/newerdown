@@ -13,6 +13,4 @@ public class AddNotificationRuleDto
     public bool NotifyOnFailure { get; set; } 
     
     public bool NotifyOnRecovery { get; set; }
-    
-    public Guid UserId { get; set; }
 }

@@ -21,6 +21,8 @@ public static class ApplicationExtensions
         services.AddScoped<IMonitoringResultService, MonitoringResultService>();
         services.AddScoped<INotificationRuleService, NotificationRuleService>();
         services.AddScoped<IServicesService, ServicesService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

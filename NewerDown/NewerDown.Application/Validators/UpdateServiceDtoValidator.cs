@@ -9,9 +9,6 @@ public class UpdateServiceDtoValidator : AbstractValidator<UpdateServiceDto>
     {
         RuleFor(x => x.Url)
             .NotEmpty().WithMessage("Url is required.");
-
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("UserId is required.");
         
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Memory;
 using NewerDown.Application.Constants;
 using NewerDown.Domain.Interfaces;
 

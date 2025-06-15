@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using NewerDown.Application.Constants;
 using NewerDown.Domain.DTOs.Notifications;
 using NewerDown.Domain.Entities;
@@ -16,15 +17,18 @@ public class NotificationRuleService : INotificationRuleService
     private readonly IMapper _mapper;
     private readonly ApplicationDbContext _context;
     private readonly ICacheService _cacheService;
+    private readonly IUserService _userService;
     
     public NotificationRuleService(
         ApplicationDbContext context,
         IMapper mapper,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        IUserService userService)
     {
         _context = context;
         _mapper = mapper;
         _cacheService = cacheService;
+        _userService = userService;
     }
 
     public async Task<IEnumerable<NotificationRuleDto>> GetAllAsync()
@@ -33,7 +37,10 @@ public class NotificationRuleService : INotificationRuleService
         if (cached is not null)
             return cached;
         
-        var notificationRules = await _context.NotificationRules.ToListAsync();
+        var notificationRules = await _context.NotificationRules
+            .Where(x => x.UserId == _userService.GetUserId())
+            .ToListAsync();
+        
         var result = _mapper.Map<IEnumerable<NotificationRuleDto>>(notificationRules);
         await _cacheService.SetAsync(CacheKey, result, TimeSpan.FromMinutes(CacheConstants.DefaultCacheDurationInMinutes));
         
@@ -44,7 +51,7 @@ public class NotificationRuleService : INotificationRuleService
     {
         var notificationRule = await _context.NotificationRules
             .FirstOrDefaultAsync(nr => nr.ServiceId == notificationRuleDto.ServiceId 
-                                       && nr.UserId == notificationRuleDto.UserId);
+                                       && nr.UserId == _userService.GetUserId());
         
         if (notificationRule is not null)
             throw new EntityAlreadyExistsException(nameof(NotificationRule));

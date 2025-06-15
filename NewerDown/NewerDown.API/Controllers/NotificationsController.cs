@@ -6,25 +6,22 @@ using NewerDown.Shared.Validations;
 
 namespace NewerDown.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("/api")]
 public class NotificationsController : ControllerBase
 {
-    private readonly ILogger<NotificationsController> _logger;
     private readonly INotificationRuleService _service;
     private readonly IFluentValidator _validator;
 
     public NotificationsController(
-        ILogger<NotificationsController> logger,
         INotificationRuleService service,
         IFluentValidator validator)
     {
-        _logger = logger;
         _service = service;
         _validator = validator;
     }
 
+    [Authorize]
     [HttpGet("notifications/rules")]
     public async Task<IActionResult> GetNotificationRules()
     {
@@ -32,6 +29,7 @@ public class NotificationsController : ControllerBase
         return Ok(rules);
     }
 
+    [Authorize]
     [HttpPost("notifications/rules")]
     public async Task<IActionResult> CreateNotificationRule([FromBody] AddNotificationRuleDto ruleDto)
     {
@@ -45,6 +43,7 @@ public class NotificationsController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
     [HttpDelete("notifications/rules/{id}")]
     public async Task<IActionResult> DeleteNotificationRule(Guid id)
     {

@@ -1,8 +1,7 @@
-﻿using Azure.Identity;
-using FluentValidation;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using NewerDown.Application;
 using NewerDown.Domain.Entities;
+using NewerDown.Extensions;
 using NewerDown.Infrastructure;
 using NewerDown.Infrastructure.Data;
 using NewerDown.Infrastructure.Extensions;
@@ -25,28 +24,9 @@ public class Startup
         services.AddIdentity<User, Role>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-        
-        services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(
-                policy =>
-                {
-                    policy.WithOrigins("http://example.com")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-        });
-        
-        services.AddIdentityServer(options =>
-            {
-                options.Events.RaiseErrorEvents = true;
-                options.Events.RaiseInformationEvents = true;
-                options.Events.RaiseFailureEvents = true;
-                options.Events.RaiseSuccessEvents = true;
-                options.EmitStaticAudienceClaim = true;
-            })
-            .AddAspNetIdentity<User>();
+
+        services.AddSwaggerDocumentation();
+        services.AddCORS();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -54,6 +34,8 @@ public class Startup
         services.AddSignalR().AddAzureSignalR(Configuration["SignalRConnection"]);;
         
         services.AddDistributedMemoryCache();
+        
+        services.AddHttpContextAccessor();
         
         services.AddApplicationInsightsTelemetry(options =>
         {

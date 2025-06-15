@@ -16,15 +16,18 @@ public class ServicesService : IServicesService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly IUserService _userService;
     
     public ServicesService(
         ApplicationDbContext context,
         IMapper mapper,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        IUserService userService)
     {
         _context = context;
         _mapper = mapper;
         _cacheService = cacheService;
+        _userService = userService;
     }
 
     public async Task<IEnumerable<ServiceDto>> GetAllServices()
@@ -33,7 +36,10 @@ public class ServicesService : IServicesService
         if (cached is not null)
             return cached;
         
-        var services = await _context.Services.ToListAsync();
+        var services = await _context.Services
+            .Where(x => x.UserId == _userService.GetUserId())
+            .ToListAsync();
+        
         var result = _mapper.Map<IEnumerable<ServiceDto>>(services);
         await _cacheService.SetAsync(CacheKey, result, TimeSpan.FromMinutes(CacheConstants.DefaultCacheDurationInMinutes));
         
@@ -42,7 +48,7 @@ public class ServicesService : IServicesService
     
     public async Task CreateServiceAsync(AddServiceDto serviceDto)
     {
-        var service = await GetServiceByUserIdAsync(serviceDto.UserId, serviceDto.Name);
+        var service = await GetServiceByUserIdAsync(serviceDto.Name);
         if (service is not null)
             throw new EntityAlreadyExistsException(nameof(Service));
         
@@ -52,9 +58,11 @@ public class ServicesService : IServicesService
 
     public async Task UpdateServiceAsync(Guid serviceId, UpdateServiceDto serviceDto)
     {
-        await GetServiceByUserIdAsync(serviceDto.UserId, serviceDto.Name);
-        // do entity update
-        _context.Services.Update(_mapper.Map<Service>(serviceDto));
+       var service =  await GetServiceByUserIdAsync(serviceDto.Name);
+       if (service is null)
+           throw new EntityNotFoundException(nameof(Service));
+        
+        _mapper.Map(serviceDto, service);
         await _context.SaveChangesAsync();
     }
     
@@ -79,10 +87,10 @@ public class ServicesService : IServicesService
         return _mapper.Map<ServiceDto>(service);
     }
     
-    private async Task<ServiceDto> GetServiceByUserIdAsync(Guid userId, string name)
+    private async Task<ServiceDto> GetServiceByUserIdAsync(string name)
     {
         var service = await _context.Services
-            .FirstOrDefaultAsync(s => s.UserId == userId 
+            .FirstOrDefaultAsync(s => s.UserId == _userService.GetUserId() 
                                       && s.Name == name);
         
         return _mapper.Map<ServiceDto>(service);
