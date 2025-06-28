@@ -26,7 +26,7 @@ public class CacheService : ICacheService
         await _cache.SetStringAsync(key, json, new DistributedCacheEntryOptions().SetAbsoluteExpiration(duration ?? TimeSpan.FromMinutes(CacheConstants.DefaultCacheDurationInMinutes)));
     }
 
-    public async Task<T> GetAsync<T>(string key)
+    public async Task<T?> GetAsync<T>(string key)
     {
         var json = await _cache.GetStringAsync(key);
 

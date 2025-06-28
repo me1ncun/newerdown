@@ -6,6 +6,7 @@ using NewerDown.Shared.Validations;
 
 namespace NewerDown.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("/api")]
 public class ServicesController : ControllerBase
@@ -20,25 +21,30 @@ public class ServicesController : ControllerBase
         _service = service;
         _validator = validator;
     }
-
-    [Authorize]
+    
     [HttpGet("services")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(IEnumerable<ServiceDto>))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetServices()
     {
         var services = await _service.GetAllServices();
+        
         return Ok(services);
     }
-
-    [Authorize]
+    
     [HttpGet("services/{id}")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(ServiceDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetServiceById(Guid id)
     {
         var service = await _service.GetServiceByIdAsync(id);
+        
         return Ok(service);
     }
-
-    [Authorize]
+    
     [HttpPost("services")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> CreateService([FromBody] AddServiceDto serviceDto)
     {
         var validationResult = await _validator.ValidateAsync(serviceDto);
@@ -48,11 +54,13 @@ public class ServicesController : ControllerBase
         }
         
         await _service.CreateServiceAsync(serviceDto);
+        
         return Ok();
     }
     
-    [Authorize]
     [HttpPut("services/{id}")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> UpdateService(Guid id, [FromBody] UpdateServiceDto serviceDto)
     {
         var validationResult = await _validator.ValidateAsync(serviceDto);
@@ -62,14 +70,17 @@ public class ServicesController : ControllerBase
         }
         
         await _service.UpdateServiceAsync(id, serviceDto);
+        
         return Ok();
     }
     
-    [Authorize]
     [HttpDelete("services/{id}")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> DeleteService(Guid id)
     {
         await _service.DeleteServiceAsync(id);
+        
         return Ok();
     }
 }

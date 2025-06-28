@@ -3,6 +3,11 @@ using NewerDown.Infrastructure.Extensions;
 
 namespace NewerDown.Infrastructure.Queuing;
 
+public interface IQueueSender
+{
+    Task SendAsync<T>(T value, Guid sessionId = default, string contentType = null, bool useXml = false);
+}
+
 public class QueueSender : IQueueSender
 {
     private readonly ServiceBusSender _senderClient;
@@ -19,11 +24,11 @@ public class QueueSender : IQueueSender
         return _senderClient.SendMessageAsync(message);
     }
 
-    protected ServiceBusMessage CreateMessage<T>(T value, Guid sessionId, string contentType, bool useXml = false)
+    private ServiceBusMessage CreateMessage<T>(T value, Guid sessionId, string contentType, bool useXml = false)
     {
         var message = new ServiceBusMessage
         {
-            ContentType = contentType ?? value.GetType().Name
+            ContentType = contentType
         };
 
         message.SetBody(value);

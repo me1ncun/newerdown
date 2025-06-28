@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NewerDown.Domain.DTOs.MonitoringResults;
 using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Controllers;
@@ -17,8 +18,9 @@ public class MonitoringResultsController : ControllerBase
         _service = service;
     }
     
-    [Authorize]
     [HttpGet("results")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(IEnumerable<MonitoringResultDto>))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetMonitoringResults(
         [FromQuery] string? filter = null,
         [FromQuery] int page = 1,
@@ -27,12 +29,13 @@ public class MonitoringResultsController : ControllerBase
             var results = await _service.GetMonitoringResultsAsync(filter, page, pageSize);
             return Ok(results);
     }
-
-    [Authorize]
+    
     [HttpGet("results/stats/{days}")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(IEnumerable<MonitoringResultDto>))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetMonitoringResultsByDays(int days)
     {
         var results = await _service.GetMonitoringResultsByDaysAsync(days);
-        return Ok();
+        return Ok(results);
     }
 }

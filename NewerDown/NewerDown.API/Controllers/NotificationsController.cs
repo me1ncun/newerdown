@@ -6,6 +6,7 @@ using NewerDown.Shared.Validations;
 
 namespace NewerDown.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("/api")]
 public class NotificationsController : ControllerBase
@@ -20,17 +21,20 @@ public class NotificationsController : ControllerBase
         _service = service;
         _validator = validator;
     }
-
-    [Authorize]
+    
     [HttpGet("notifications/rules")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(IEnumerable<NotificationRuleDto>))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetNotificationRules()
     {
         var rules = await _service.GetAllAsync();
+        
         return Ok(rules);
     }
-
-    [Authorize]
+    
     [HttpPost("notifications/rules")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> CreateNotificationRule([FromBody] AddNotificationRuleDto ruleDto)
     {
         var validationResult = await _validator.ValidateAsync(ruleDto);
@@ -40,14 +44,17 @@ public class NotificationsController : ControllerBase
         }
         
         await _service.CreateNotificationRuleAsync(ruleDto);
+        
         return Ok();
     }
-
-    [Authorize]
+    
     [HttpDelete("notifications/rules/{id}")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> DeleteNotificationRule(Guid id)
     {
         await _service.DeleteNotificationRuleAsync(id);
+        
         return Ok();
     }
 }

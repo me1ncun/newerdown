@@ -1,4 +1,5 @@
 ﻿using NewerDown.Domain.DTOs.Service;
+using NewerDown.Domain.Entities;
 
 namespace NewerDown.Domain.Interfaces;
 

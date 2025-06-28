@@ -2,6 +2,8 @@
 
 public class EmailDto
 {
+    public EmailDto() { }
+    
     public EmailDto(string emailAddress, string userName, DateTime receivedDate)
     {
         EmailAddress = emailAddress;

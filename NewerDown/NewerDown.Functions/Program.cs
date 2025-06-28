@@ -14,7 +14,18 @@ var kvUri = Environment.GetEnvironmentVariable("AzureKeyVault");
 
 builder.Configuration.AddAzureKeyVault(new Uri(kvUri ?? "https://kv-newerdown.vault.azure.net/"), new DefaultAzureCredential());
 
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddOptions<EmailSettings>()
+    .Configure<IConfiguration>((settings, config) =>
+    {
+        settings.Host = config["SmtpHost"];
+        settings.Port = int.Parse(config["SmtpPort"]);
+        settings.UserName = config["SmtpUsername"];
+        settings.Password = config["SmtpPassword"];
+        settings.FromEmail = config["SmtpFromEmail"];
+        settings.FromName = config["SmtpFromName"];
+        settings.EnableSsl = true;
+    });
+
 builder.Services.AddTransient<IEmailService, EmailService>();
 
  /*builder.Services

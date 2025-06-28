@@ -26,7 +26,7 @@ public class Startup
             .AddDefaultTokenProviders();
 
         services.AddSwaggerDocumentation();
-        services.AddCORS();
+        StartupExtensions.AddCors(services);
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

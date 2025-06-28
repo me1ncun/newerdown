@@ -7,18 +7,18 @@ using NewerDown.Infrastructure.Extensions;
 
 namespace NewerDown.Functions.Functions;
 
-public class EmailSender
+public class SendEmailsFunction
 {
-    private readonly ILogger<EmailSender> _logger;
+    private readonly ILogger<SendEmailsFunction> _logger;
     private readonly IEmailService _emailService;
     
-    public EmailSender(ILogger<EmailSender> logger, IEmailService emailService)
+    public SendEmailsFunction(ILogger<SendEmailsFunction> logger, IEmailService emailService)
     {
         _logger = logger;
         _emailService = emailService;
     }
     
-    [Function(nameof(EmailSender))]
+    [Function(nameof(SendEmailsFunction))]
     public async Task Run([ServiceBusTrigger("emails", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message)
     {
        var email = message.GetBody<EmailDto>();

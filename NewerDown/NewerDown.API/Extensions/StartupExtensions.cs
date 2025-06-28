@@ -34,7 +34,7 @@ public static class StartupExtensions
         return services;
     }
 
-    public static IServiceCollection AddCORS(this IServiceCollection services)
+    public static IServiceCollection AddCors(this IServiceCollection services)
     {
         services.AddCors(options =>
         {

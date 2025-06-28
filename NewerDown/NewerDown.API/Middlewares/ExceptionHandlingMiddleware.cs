@@ -27,11 +27,11 @@ public class ExceptionHandlingMiddleware
 
             var problemDetails = new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Server Error"
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Error occurred",
             };
 
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
             await context.Response.WriteAsJsonAsync(problemDetails);
         }

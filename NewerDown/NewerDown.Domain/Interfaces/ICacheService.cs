@@ -3,6 +3,6 @@
 public interface ICacheService
 {
     Task SetAsync<T>(string key, T value, TimeSpan? duration = null);
-    Task<T> GetAsync<T>(string key);
+    Task<T?> GetAsync<T>(string key);
     Task RemoveAsync(string key);
 }

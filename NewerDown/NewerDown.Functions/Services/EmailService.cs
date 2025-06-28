@@ -6,6 +6,11 @@ using NewerDown.Functions.Models;
 
 namespace NewerDown.Functions.Services;
 
+public interface IEmailService
+{
+    Task SendEmailAsync(string toEmail, string subject);
+}
+
 public class EmailService : IEmailService
 {
     private readonly EmailSettings _emailSettings;

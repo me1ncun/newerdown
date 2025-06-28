@@ -4,9 +4,9 @@ namespace NewerDown.Domain.DTOs.Notifications;
 
 public class NotificationRuleDto
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     
-    public int ServiceId { get; set; }
+    public Guid ServiceId { get; set; }
     
     public NotificationChannel Channel { get; set; }   
     

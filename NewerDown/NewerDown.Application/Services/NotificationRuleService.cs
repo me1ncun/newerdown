@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using NewerDown.Application.Constants;
+using NewerDown.Application.Extensions;
 using NewerDown.Domain.DTOs.Notifications;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Exceptions;
@@ -41,7 +42,7 @@ public class NotificationRuleService : INotificationRuleService
             .Where(x => x.UserId == _userService.GetUserId())
             .ToListAsync();
         
-        var result = _mapper.Map<IEnumerable<NotificationRuleDto>>(notificationRules);
+        var result = _mapper.Map<List<NotificationRuleDto>>(notificationRules);
         await _cacheService.SetAsync(CacheKey, result, TimeSpan.FromMinutes(CacheConstants.DefaultCacheDurationInMinutes));
         
         return result;
@@ -49,31 +50,28 @@ public class NotificationRuleService : INotificationRuleService
     
     public async Task CreateNotificationRuleAsync(AddNotificationRuleDto notificationRuleDto)
     {
-        var notificationRule = await _context.NotificationRules
-            .FirstOrDefaultAsync(nr => nr.ServiceId == notificationRuleDto.ServiceId 
-                                       && nr.UserId == _userService.GetUserId());
+        (await _context.NotificationRules.FirstOrDefaultAsync(nr => nr.ServiceId == notificationRuleDto.ServiceId 
+                                                                    && nr.UserId == _userService.GetUserId())).ThrowIfNull(nameof(NotificationRule));
+
+        var notificationRule = _mapper.Map<NotificationRule>(notificationRuleDto);
+        notificationRule.UserId = _userService.GetUserId();
         
-        if (notificationRule is not null)
-            throw new EntityAlreadyExistsException(nameof(NotificationRule));
-        
-        _context.NotificationRules.Add(_mapper.Map<NotificationRule>(notificationRuleDto));
+        _context.NotificationRules.Add(notificationRule);
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteNotificationRuleAsync(Guid id)
     {
         var notificationRule = await GetNotificationRuleByIdAsync(id);
+        
         _context.NotificationRules.Remove(notificationRule);
         await _context.SaveChangesAsync();
     }
     
-    private async Task<NotificationRule> GetNotificationRuleByIdAsync(Guid id)
+    public async Task<NotificationRule> GetNotificationRuleByIdAsync(Guid id)
     {
-        var notificationRule = await _context.NotificationRules
-            .FirstOrDefaultAsync(nr => nr.Id == id);
-        
-        if (notificationRule is null)
-            throw new EntityNotFoundException(nameof(NotificationRule));
+        var notificationRule = (await _context.NotificationRules
+            .FirstOrDefaultAsync(nr => nr.Id == id)).ThrowIfNull(nameof(NotificationRule));
         
         return notificationRule;
     }

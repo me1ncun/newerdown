@@ -1,6 +1,6 @@
 ﻿namespace NewerDown.Functions.Functions;
 
-public class NotificationSender
+public class SendNotificationsFunction
 {
     
 }
