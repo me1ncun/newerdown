@@ -38,11 +38,11 @@ public class AuthService : IAuthService
 
     private static ClaimsIdentity GenerateClaims(User user)
     {
-        var claims = new ClaimsIdentity();
-        claims.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
-        claims.AddClaim(new Claim(ClaimTypes.Email, user.Email));
-        claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-
-        return claims;
+        return new ClaimsIdentity(new[]
+        {
+            new Claim("username", user.UserName),
+            new Claim("email", user.Email),
+            new Claim("userId", user.Id.ToString())
+        });
     }
 }

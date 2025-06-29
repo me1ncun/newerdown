@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewerDown.Domain.DTOs.MonitoringResults;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Domain.Paging;
 
 namespace NewerDown.Controllers;
 
@@ -19,7 +21,7 @@ public class MonitoringResultsController : ControllerBase
     }
     
     [HttpGet("results")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(IEnumerable<MonitoringResultDto>))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(PagedResponse<MonitoringResultDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetMonitoringResults(
         [FromQuery] string? filter = null,

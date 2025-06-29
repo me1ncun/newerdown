@@ -3,9 +3,9 @@ using NewerDown.Domain.DTOs.Service;
 
 namespace NewerDown.Application.Validators;
 
-public class UpdateServiceDtoValidator : AbstractValidator<UpdateServiceDto>
+public class AddServiceValidator : AbstractValidator<AddServiceDto>
 {
-    public UpdateServiceDtoValidator()
+    public AddServiceValidator()
     {
         RuleFor(x => x.Url)
             .NotEmpty().WithMessage("Url is required.");

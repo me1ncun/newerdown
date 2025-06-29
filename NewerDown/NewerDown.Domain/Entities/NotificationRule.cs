@@ -9,11 +9,9 @@ public class NotificationRule
     
     public Guid ServiceId { get; set; }
     
-    public Service Service { get; set; }
-    
     public NotificationChannel Channel { get; set; }   
     
-    public string Target { get; set; }      
+    public string Target { get; set; } = string.Empty;    
     
     public bool NotifyOnFailure { get; set; } 
     
@@ -23,6 +21,8 @@ public class NotificationRule
     
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
+    
+    public virtual Service Service { get; set; }
 }
 
 public enum NotificationChannel

@@ -6,7 +6,7 @@ public class AddNotificationRuleDto
 {
     public Guid ServiceId { get; set; }
     
-    public NotificationChannel Channel { get; set; }   
+    public NotificationChannel? Channel { get; set; }   
     
     public string Target { get; set; }      
     
