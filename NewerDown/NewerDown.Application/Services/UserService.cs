@@ -16,7 +16,7 @@ public class UserService : IUserService
 
     public Guid GetUserId()
     {
-        var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = _httpContextAccessor.HttpContext?.User.FindFirst("userId")?.Value;
         
         return Guid.TryParse(userId, out var id)
             ? id

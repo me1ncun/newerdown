@@ -1,7 +1,7 @@
 using Azure.Identity;
 using NewerDown;
 
-public class Program
+public partial class Program : IApiMarker
 {
     public static void Main(string[] args)
     {

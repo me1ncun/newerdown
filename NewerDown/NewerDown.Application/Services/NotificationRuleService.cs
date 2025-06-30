@@ -50,11 +50,16 @@ public class NotificationRuleService : INotificationRuleService
     
     public async Task CreateNotificationRuleAsync(AddNotificationRuleDto notificationRuleDto)
     {
-        (await _context.NotificationRules.FirstOrDefaultAsync(nr => nr.ServiceId == notificationRuleDto.ServiceId 
-                                                                    && nr.UserId == _userService.GetUserId())).ThrowIfNull(nameof(NotificationRule));
+        var currentUserId = _userService.GetUserId();
+        var exists = await _context.NotificationRules.FirstOrDefaultAsync(nr => nr.ServiceId == notificationRuleDto.ServiceId 
+                                                                    && nr.UserId == currentUserId);
+
+        if (exists is not null)
+            throw new EntityAlreadyExistsException();
 
         var notificationRule = _mapper.Map<NotificationRule>(notificationRuleDto);
-        notificationRule.UserId = _userService.GetUserId();
+        notificationRule.Id = Guid.NewGuid();
+        notificationRule.UserId = currentUserId;
         
         _context.NotificationRules.Add(notificationRule);
         await _context.SaveChangesAsync();

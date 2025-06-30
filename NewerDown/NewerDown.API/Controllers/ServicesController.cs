@@ -53,9 +53,9 @@ public class ServicesController : ControllerBase
             return BadRequest(validationResult.Errors);
         }
         
-        await _service.CreateServiceAsync(serviceDto);
+        var result = await _service.CreateServiceAsync(serviceDto);
         
-        return Ok();
+        return Ok(result);
     }
     
     [HttpPut("services/{id}")]

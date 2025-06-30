@@ -29,6 +29,7 @@ public class ExceptionHandlingMiddleware
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Error occurred",
+                Detail = exception.Message,
             };
 
             context.Response.StatusCode = StatusCodes.Status400BadRequest;

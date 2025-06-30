@@ -17,12 +17,15 @@ public class NotificationRule
     
     public bool NotifyOnRecovery { get; set; }
     
+    public bool IsActive { get; set; } = true;
+    
     public Guid UserId { get; set; }
     
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
     
-    public virtual Service Service { get; set; }
+    /*
+    public virtual Service Service { get; set; }*/
 }
 
 public enum NotificationChannel

@@ -7,7 +7,7 @@ public interface IServicesService
 {
     Task<IEnumerable<ServiceDto>> GetAllServices();
     Task<ServiceDto> GetServiceByIdAsync(Guid id);
-    Task CreateServiceAsync(AddServiceDto serviceDto);
+    Task<Guid> CreateServiceAsync(AddServiceDto serviceDto);
     Task UpdateServiceAsync(Guid serviceId, UpdateServiceDto serviceDto);
     Task DeleteServiceAsync(Guid id);
 }

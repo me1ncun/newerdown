@@ -47,15 +47,18 @@ public class ServicesService : IServicesService
         return result;
     }
 
-    public async Task CreateServiceAsync(AddServiceDto serviceDto)
+    public async Task<Guid> CreateServiceAsync(AddServiceDto serviceDto)
     {
         var serviceExists = await GetServiceByNameAsync(serviceDto.Name);
 
         var service = _mapper.Map<Service>(serviceDto);
         service.UserId = _userService.GetUserId();
+        service.Id = Guid.NewGuid();
 
         _context.Services.Add(service);
         await _context.SaveChangesAsync();
+
+        return service.Id;
     }
 
     public async Task UpdateServiceAsync(Guid serviceId, UpdateServiceDto serviceDto)
