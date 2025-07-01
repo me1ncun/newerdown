@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>fe2e530a-5ae6-48ad-a164-0c3690825beb</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\EFHandlers\" />
+      <Folder Include="Data\Migrations\" />
+      <Folder Include="Options\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Azure.Identity" Version="1.14.0" />
+      <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.19.0" />
+      <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+      <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="7.2.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.5" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NewerDown.Domain\NewerDown.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
