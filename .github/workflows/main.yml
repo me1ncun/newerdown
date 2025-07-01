@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: linux-latest
     permissions:
       contents: read
 
@@ -60,7 +60,7 @@ jobs:
         run: dotnet test NewerDown/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj --no-build
 
   deploy:
-    runs-on: windows-latest
+    runs-on: linux-latest
     needs: build
     permissions:
       id-token: write 
