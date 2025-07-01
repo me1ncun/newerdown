@@ -34,15 +34,15 @@ jobs:
           docker info
 
       - name: Restore dependencies
-        run: dotnet restore ../../NewerDown.sln
+        run: dotnet restore NewerDown/NewerDown.sln
 
       - name: Build
-        run: dotnet build --no-restore ../../NewerDown.sln --no-restore
+        run: dotnet build --no-restore NewerDown/NewerDown.sln --no-restore
         
       - name: Execute unit tests
-        run: dotnet test ../../NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj --no-build
+        run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj --no-build
         
       - name: Execute integration tests
-        run: dotnet test ../../NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj --no-build
+        run: dotnet test NewerDown/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj --no-build
         
       
