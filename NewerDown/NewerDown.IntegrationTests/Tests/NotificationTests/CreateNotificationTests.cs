@@ -56,14 +56,14 @@ public class CreateNotificationTests : IAsyncLifetime, IClassFixture<CustomWebAp
         };
 
         // Act
-        var response = await authenticatedClient.PostAsJsonAsync("/api/services", service);
-        var httpResponse = await authenticatedClient.PostAsJsonAsync("/api/notifications/rules", request);
+        var postServiceHttpResponse = await authenticatedClient.PostAsJsonAsync("/api/services", service);
+        var postRuleHttpResponse = await authenticatedClient.PostAsJsonAsync("/api/notifications/rules", request);
 
         // Assert
-        var result = await httpResponse.Content.ReadAsStringAsync();
-        httpResponse.EnsureSuccessStatusCode();
+        postServiceHttpResponse.EnsureSuccessStatusCode();
+        postRuleHttpResponse.EnsureSuccessStatusCode();
 
-        var responseBody = await httpResponse.Content.ReadAsStringAsync();
+        var responseBody = await postRuleHttpResponse.Content.ReadAsStringAsync();
         responseBody.Should().BeNullOrEmpty();
     }
 }

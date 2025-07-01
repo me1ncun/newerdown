@@ -1,0 +1,49 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - all
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged 
+        ports:
+          - 2375:2375
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.0
+
+      - name: Enable Docker CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          docker --version
+
+      - name: Restore dependencies
+        run: dotnet restore ../../NewerDown.sln
+
+      - name: Build
+        run: dotnet build --no-restore ../../NewerDown.sln --no-restore
+        
+      - name: Execute unit tests
+        run: dotnet test ../../NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj --no-build
+        
+      - name: Execute integration tests
+        run: dotnet test ../../NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj --no-build
+        
+      
