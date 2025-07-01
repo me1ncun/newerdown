@@ -1,30 +1,19 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.IntegrationTests.Helpers;
-using NewerDown.IntegrationTests.Services;
 using NewerDown.Shared.Validations;
 
 namespace NewerDown.IntegrationTests.Tests.ServiceTests;
 
-[Collection("Test collection")]
-public class UpdateServiceTests : IAsyncLifetime, IClassFixture<CustomWebApplicationFactory>
+
+public class UpdateServiceTests : BaseIntegrationTest
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly AuthenticationService _authenticationService;
-
-    public UpdateServiceTests(CustomWebApplicationFactory factory)
+    public UpdateServiceTests(CustomWebApplicationFactory factory) : base(factory)
     {
-        _factory = factory;
-        _authenticationService = factory.Services.GetRequiredService<AuthenticationService>();
     }
-    
-    public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync() => await _factory.ResetDatabaseAsync();
-    
     [Fact]
     public async Task UpdateService_ShouldSucceed_WhenRequestIsValid()
     {

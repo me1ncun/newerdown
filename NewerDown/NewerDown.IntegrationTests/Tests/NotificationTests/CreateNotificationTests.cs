@@ -1,32 +1,17 @@
 ﻿using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using NewerDown.Domain.DTOs.Notifications;
 using NewerDown.Domain.Entities;
 using NewerDown.IntegrationTests.Helpers;
-using NewerDown.IntegrationTests.Services;
 
 namespace NewerDown.IntegrationTests.Tests.NotificationTests;
 
-[CollectionDefinition("Test collection")]
-public class SharedTestCollection : ICollectionFixture<CustomWebApplicationFactory>;
-
-[Collection("Test collection")]
-public class CreateNotificationTests : IAsyncLifetime, IClassFixture<CustomWebApplicationFactory>
+public class CreateNotificationTests : BaseIntegrationTest
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly AuthenticationService _authenticationService;
-
-    public CreateNotificationTests(CustomWebApplicationFactory factory)
+    public CreateNotificationTests(CustomWebApplicationFactory factory) : base(factory)
     {
-        _factory = factory;
-        _authenticationService = factory.Services.GetRequiredService<AuthenticationService>();
     }
-    
-    public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync() => await _factory.ResetDatabaseAsync();
-    
     [Fact]
     public async Task CreateNotification_ShouldSucceed_WhenRequestIsValid()
     {

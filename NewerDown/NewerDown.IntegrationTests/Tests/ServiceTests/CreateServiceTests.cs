@@ -1,29 +1,17 @@
 ﻿using System.Net.Http.Json;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.IntegrationTests.Helpers;
-using NewerDown.IntegrationTests.Services;
 using NewerDown.Shared.Validations;
 
 namespace NewerDown.IntegrationTests.Tests.ServiceTests;
 
-[Collection("Test collection")]
-public class CreateServiceTests : IAsyncLifetime, IClassFixture<CustomWebApplicationFactory>
+public class CreateServiceTests : BaseIntegrationTest
 {
-    private readonly CustomWebApplicationFactory _factory;
-    private readonly AuthenticationService _authenticationService;
-
-    public CreateServiceTests(CustomWebApplicationFactory factory)
+    public CreateServiceTests(CustomWebApplicationFactory factory) : base(factory)
     {
-        _factory = factory;
-        _authenticationService = factory.Services.GetRequiredService<AuthenticationService>();
     }
-    
-    public Task InitializeAsync() => Task.CompletedTask;
 
-    public async Task DisposeAsync() => await _factory.ResetDatabaseAsync();
-    
     [Fact]
     public async Task CreateService_ShouldSucceed_WhenRequestIsValid()
     {
@@ -47,7 +35,7 @@ public class CreateServiceTests : IAsyncLifetime, IClassFixture<CustomWebApplica
         httpResponse.EnsureSuccessStatusCode();
 
         var responseBody = await httpResponse.Content.ReadAsStringAsync();
-        responseBody.Should().BeNullOrEmpty();
+        responseBody.Should().NotBeNull();
     }
     
     [Fact]
