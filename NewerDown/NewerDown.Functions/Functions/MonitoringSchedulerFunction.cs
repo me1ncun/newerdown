@@ -28,7 +28,7 @@ public class MonitoringSchedulerFunction
     public async Task<IEnumerable<string>> Run([TimerTrigger("0 */1 * * * *")] TimerInfo timer)
     {
         var services = await _context.Services
-            .Where(s => s.IsActive && s.CheckIntervalSeconds <= 60)
+            .Where(s => s.IsActive)
             .ToListAsync();
 
         return services.Select(service =>

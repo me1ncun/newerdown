@@ -16,17 +16,20 @@ public class AccountController : ControllerBase
     private readonly SignInManager<User> _signInManager;
     private readonly ISignInService _signInService;
     private readonly IUserService _userService;
+    private readonly IUserPhotoProvider _userPhotoProvider;
 
     public AccountController(
         SignInManager<User> signInManager,
         ILogger<AccountController> logger,
         ISignInService signInService,
-        IUserService userService)
+        IUserService userService,
+        IUserPhotoProvider userPhotoProvider)
     {
         _logger = logger;
         _signInManager = signInManager;
         _signInService = signInService;
         _userService = userService;
+        _userPhotoProvider = userPhotoProvider;
     }
 
     [AllowAnonymous]
@@ -83,5 +86,25 @@ public class AccountController : ControllerBase
         var userId = _userService.GetUserId();
         
         return Ok(userId);
+    }
+    
+    [HttpPost("account/upload-photo")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+    public async Task<IActionResult> UploadPhoto(IFormFile file)
+    {
+        await _userPhotoProvider.UploadPhotoAsync(file);
+        
+        return Ok("Photo uploaded successfully.");
+    }
+    
+    [HttpDelete("account/delete-photo")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+    public async Task<IActionResult> DeletePhoto()
+    {
+        await _userPhotoProvider.DeletePhotoAsync();
+        
+        return Ok("Photo deleted successfully.");
     }
 }

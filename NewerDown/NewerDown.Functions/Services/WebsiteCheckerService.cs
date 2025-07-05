@@ -6,7 +6,7 @@ namespace NewerDown.Functions.Services;
 
 public interface IWebsiteCheckerService
 {
-    Task<MonitoringResult> CheckWebsiteAsync(Guid serviceId);
+    Task CheckWebsiteAsync(Guid serviceId);
 }
 
 public class WebsiteCheckerService : IWebsiteCheckerService
@@ -22,7 +22,7 @@ public class WebsiteCheckerService : IWebsiteCheckerService
         _context = context;
     }
 
-    public async Task<MonitoringResult> CheckWebsiteAsync(Guid serviceId)
+    public async Task CheckWebsiteAsync(Guid serviceId)
     {
         var result = new MonitoringResult
         {
@@ -57,7 +57,8 @@ public class WebsiteCheckerService : IWebsiteCheckerService
             result.IsAlive = false;
             result.Error = ex.Message;
         }
-
-        return result;
+        
+        _context.MonitoringResults.Add(result);
+        await _context.SaveChangesAsync();
     }
 }

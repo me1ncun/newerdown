@@ -8,15 +8,12 @@ namespace NewerDown.Application.UnitTests.Validators;
 
 public class AddServiceValidatorTests
 {
-    private Mock<IScopedTimeProvider> _scopedTimeProvider;
-    
     private AddServiceValidator _validator;
 
     [SetUp]
     public void Setup()
     {
         _validator = new();
-        _scopedTimeProvider = new ();
     }
 
     [Test]
@@ -27,9 +24,7 @@ public class AddServiceValidatorTests
         {
             Name = "Test Service",
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = _scopedTimeProvider.Object.UtcNow(),
         };
 
         // Act
@@ -47,9 +42,7 @@ public class AddServiceValidatorTests
         {
             Name = string.Empty,
             Url = string.Empty,
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = _scopedTimeProvider.Object.UtcNow(),
         };
 
         // Act

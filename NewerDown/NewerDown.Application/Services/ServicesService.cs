@@ -4,7 +4,6 @@ using NewerDown.Application.Constants;
 using NewerDown.Application.Extensions;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Entities;
-using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
 
@@ -18,17 +17,20 @@ public class ServicesService : IServicesService
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
     private readonly IUserService _userService;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     public ServicesService(
         ApplicationDbContext context,
         IMapper mapper,
         ICacheService cacheService,
-        IUserService userService)
+        IUserService userService,
+        IHttpClientFactory httpClientFactory)
     {
         _context = context;
         _mapper = mapper;
         _cacheService = cacheService;
         _userService = userService;
+        _httpClientFactory = httpClientFactory;
     }
 
     public async Task<IEnumerable<ServiceDto>> GetAllServices()
@@ -54,6 +56,9 @@ public class ServicesService : IServicesService
         var service = _mapper.Map<Service>(serviceDto);
         service.UserId = _userService.GetUserId();
         service.Id = Guid.NewGuid();
+        
+        if (!await IsServiceSiteValid(service))
+            throw new HttpRequestException("The provided URL is not reachable or valid.");
 
         _context.Services.Add(service);
         await _context.SaveChangesAsync();
@@ -87,6 +92,13 @@ public class ServicesService : IServicesService
             .FirstOrDefaultAsync(s => s.Id == id)).ThrowIfNull(nameof(Service));
 
         return _mapper.Map<ServiceDto>(service);
+    }
+
+    private async Task<bool> IsServiceSiteValid(Service service)
+    {
+        var client = _httpClientFactory.CreateClient();
+        var result = await client.GetAsync(service.Url);
+        return result.IsSuccessStatusCode;
     }
 
     private async Task<ServiceDto> GetServiceByNameAsync(string name)

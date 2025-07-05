@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NewerDown.Domain.DTOs.Notifications;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Enums;
 using NewerDown.IntegrationTests.Helpers;
 
 namespace NewerDown.IntegrationTests.Tests.NotificationTests;
@@ -25,7 +26,6 @@ public class CreateNotificationTests : BaseIntegrationTest
             Id = Guid.NewGuid(),
             Name = "Test Service",
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
             CreatedAt = DateTime.Now,
             UserId = Guid.Parse(currentUserId)

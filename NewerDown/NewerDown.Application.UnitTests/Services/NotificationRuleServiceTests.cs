@@ -5,6 +5,7 @@ using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
 using NewerDown.Domain.DTOs.Notifications;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Enums;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;

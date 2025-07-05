@@ -15,6 +15,7 @@ public class ServicesServiceTests
 {
     private Mock<ICacheService> _cacheServiceMock;
     private Mock<IUserService> _userServiceMock;
+    private Mock<IHttpClientFactory> _httpClientFactoryMock;
     
     private ApplicationDbContext _context;
     private ServicesService _servicesService;
@@ -26,6 +27,7 @@ public class ServicesServiceTests
     {
         _cacheServiceMock = new();
         _userServiceMock = new();
+        _httpClientFactoryMock = new();
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -45,7 +47,8 @@ public class ServicesServiceTests
             _context,
             mapper,
             _cacheServiceMock.Object,
-            _userServiceMock.Object);
+            _userServiceMock.Object,
+            _httpClientFactoryMock.Object);
     }
 
     [TearDown]

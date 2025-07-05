@@ -2,6 +2,7 @@
 using NewerDown.Application.Validators;
 using NewerDown.Domain.DTOs.Notifications;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Enums;
 
 namespace NewerDown.Application.UnitTests.Validators;
 

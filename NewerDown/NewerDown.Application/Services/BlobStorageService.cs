@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using NewerDown.Application.Time;
 using NewerDown.Domain.DTOs.File;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
 
@@ -35,7 +36,6 @@ public class BlobStorageService : IBlobStorageService
     
     public async Task<FileAttachmentResponseDto> UploadFileAsync(IFormFile file)
     {
-        
         string? connectionString = _configuration.GetValue<string>("BlobConnection");
         string? containerName = _configuration.GetValue<string>("BlobContainerName");
         BlobContainerClient blobContainerClient = new BlobContainerClient(connectionString, containerName);
@@ -49,6 +49,7 @@ public class BlobStorageService : IBlobStorageService
 
         var fileAttachmentDto = new FileAttachmentDto()
         {
+            Id = Guid.NewGuid(),
             Uri = blobContainerClient.Uri.AbsoluteUri,
             FileName = file.FileName,
             FilePath = $"{blobContainerClient.Uri}/{file.FileName}",
@@ -70,5 +71,34 @@ public class BlobStorageService : IBlobStorageService
             Status = "Success",
             Error = false
         };
+    }
+    
+    public async Task<FileAttachment> GetFileAttachmentByIdAsync(Guid? fileAttachmentId)
+    {
+        var fileAttachment = await _context.FileAttachments.FindAsync(fileAttachmentId);
+        if (fileAttachment is null)
+        {
+            _logger.LogWarning("File attachment with ID {FileAttachmentId} not found.", fileAttachmentId);
+            throw new EntityNotFoundException($"File attachment was not found by id: {fileAttachmentId}.");
+        }
+        
+        return fileAttachment;
+    }
+    
+    public async Task DeleteFileAsync(Guid? fileAttachmentId)
+    {
+        var fileAttachment = await GetFileAttachmentByIdAsync(fileAttachmentId);
+        
+        string? connectionString = _configuration.GetValue<string>("BlobConnection");
+        string? containerName = _configuration.GetValue<string>("BlobContainerName");
+        BlobContainerClient blobContainerClient = new BlobContainerClient(connectionString, containerName);
+        
+        var blobClient = blobContainerClient.GetBlobClient(fileAttachment.FileName);
+        await blobClient.DeleteIfExistsAsync();
+        
+        _context.FileAttachments.Remove(fileAttachment);
+        await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("File with ID {FileAttachmentId} deleted successfully.", fileAttachmentId);
     }
 }

@@ -10,8 +10,6 @@ public class Service
     
     public string Url { get; set; }
     
-    public int CheckIntervalSeconds { get; set; }
-    
     public bool IsActive { get; set; }
     
     public DateTime CreatedAt { get; set; }
@@ -20,8 +18,4 @@ public class Service
     
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
-    
-    public List<MonitoringResult> Results { get; set; }
-    
-    public List<NotificationRule> NotificationRules { get; set; }
 }

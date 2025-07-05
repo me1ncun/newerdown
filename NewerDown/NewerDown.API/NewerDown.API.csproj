@@ -30,10 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Hubs\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\NewerDown.Application\NewerDown.Application.csproj" />
       <ProjectReference Include="..\NewerDown.Domain\NewerDown.Domain.csproj" />
       <ProjectReference Include="..\NewerDown.Infrastructure\NewerDown.Infrastructure.csproj" />

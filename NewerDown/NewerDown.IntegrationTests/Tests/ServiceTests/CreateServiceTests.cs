@@ -23,9 +23,7 @@ public class CreateServiceTests : BaseIntegrationTest
         {
             Name = "Test Service",
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = DateTime.Now,
         };
 
         // Act
@@ -48,9 +46,7 @@ public class CreateServiceTests : BaseIntegrationTest
         var service = new AddServiceDto()
         {
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = DateTime.Now,
         };
 
         // Act

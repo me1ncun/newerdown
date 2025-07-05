@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.Services;
+using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.UnitTests.Services;
 
@@ -10,6 +12,7 @@ public class UserServiceTests
 {
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     
+    private ApplicationDbContext _context;
     private UserService userService;
     
     private readonly Guid currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
@@ -19,7 +22,20 @@ public class UserServiceTests
     {
         _httpContextAccessorMock = new();
         
-        userService = new UserService(_httpContextAccessorMock.Object);
+        userService = new UserService(_httpContextAccessorMock.Object, _context);
+        
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        
+        _context = new ApplicationDbContext(options);
+        _context.Database.EnsureCreated();
+    }
+    
+    [TearDown]
+    public void TearDown()
+    {
+        _context.Dispose();
     }
     
     [Test]

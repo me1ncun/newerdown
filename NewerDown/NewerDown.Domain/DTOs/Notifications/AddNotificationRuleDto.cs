@@ -1,4 +1,4 @@
-﻿using NewerDown.Domain.Entities;
+﻿using NewerDown.Domain.Enums;
 
 namespace NewerDown.Domain.DTOs.Notifications;
 

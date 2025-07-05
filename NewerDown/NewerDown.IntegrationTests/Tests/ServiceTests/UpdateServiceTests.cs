@@ -25,18 +25,14 @@ public class UpdateServiceTests : BaseIntegrationTest
         {
             Name = "Test Service",
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = DateTime.Now,
         };
         
         var addService = new AddServiceDto()
         {
             Name = "Test Service",
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = DateTime.Now,
         };
         
         var request = JsonSerializer.Serialize(updateService);
@@ -66,18 +62,14 @@ public class UpdateServiceTests : BaseIntegrationTest
         var updateService = new UpdateServiceDto()
         {
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = DateTime.Now,
         };
         
         var addService = new AddServiceDto()
         {
             Name = "Test Service",
             Url = "https://example.com",
-            CheckIntervalSeconds = 2,
             IsActive = true,
-            CreatedAt = DateTime.Now,
         };
         
         var request = JsonSerializer.Serialize(updateService);

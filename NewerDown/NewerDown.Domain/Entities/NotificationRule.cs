@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using NewerDown.Domain.Enums;
 
 namespace NewerDown.Domain.Entities;
 
@@ -11,33 +11,18 @@ public class NotificationRule
     
     public NotificationChannel Channel { get; set; }   
     
-    public string Target { get; set; } = string.Empty;    
+    public string? Target { get; set; }   
     
     public bool NotifyOnFailure { get; set; } 
     
     public bool NotifyOnRecovery { get; set; }
     
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
     
     public Guid UserId { get; set; }
     
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }
     
-    public virtual Service Service { get; set; }
-}
-
-public enum NotificationChannel
-{
-    [Description("Email")] 
-    Email,
-    
-    [Description("SMS")] 
-    SMS,
-    
-    [Description("Push Notification")] 
-    PushNotification,
-    
-    [Description("Telegram")] 
-    Telegram
+    public Service Service { get; set; }
 }

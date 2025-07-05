@@ -6,9 +6,5 @@ public class UpdateServiceDto
 
     public string Url { get; set; }
 
-    public int CheckIntervalSeconds { get; set; }
-
     public bool IsActive { get; set; }
-
-    public DateTime CreatedAt { get; set; }
 }
