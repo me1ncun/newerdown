@@ -7,5 +7,7 @@ public enum QueueType
     [QueueName("emails")]
     Emails,
     [QueueName("notifications")]
-    Notifications
+    Notifications,
+    [QueueName("monitoring")]
+    Monitoring
 }

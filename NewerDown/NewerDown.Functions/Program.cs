@@ -1,10 +1,15 @@
 ﻿using Azure.Identity;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NewerDown.Application.Services;
+using NewerDown.Domain.Entities;
+using NewerDown.Domain.Interfaces;
 using NewerDown.Functions.Models;
 using NewerDown.Functions.Services;
+using NewerDown.Infrastructure.Data;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -27,9 +32,16 @@ builder.Services.AddOptions<EmailSettings>()
     });
 
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IWebsiteCheckerService, WebsiteCheckerService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
 
- /*builder.Services
-     .AddApplicationInsightsTelemetryWorkerService()
-     .ConfigureFunctionsApplicationInsights();*/
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseAzureSql(builder.Configuration["DatabaseConnection"]);
+});
+
+/*builder.Services
+    .AddApplicationInsightsTelemetryWorkerService()
+    .ConfigureFunctionsApplicationInsights();*/
 
 builder.Build().Run();

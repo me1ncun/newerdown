@@ -1,4 +1,4 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿/*using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NewerDown.Domain.DTOs.Email;
@@ -27,4 +27,4 @@ public class SendEmailsFunction
        
        _logger.LogInformation("Processing email for {EmailAddress}", email.EmailAddress);
     }
-}
+}*/

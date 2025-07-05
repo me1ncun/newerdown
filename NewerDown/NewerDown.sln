@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewerDown.API", "NewerDown.API\NewerDown.API.csproj", "{8B53FB9E-718D-4BC6-9E07-098B76C948E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewerDown.Application", "NewerDown.Application\NewerDown.Application.csproj", "{38F4D582-33E5-4D96-9F2B-55A72DD22FA2}"
@@ -54,5 +57,11 @@ Global
 		{C715C09F-6445-4615-A78B-F4DBBB67652A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C715C09F-6445-4615-A78B-F4DBBB67652A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C715C09F-6445-4615-A78B-F4DBBB67652A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {055F30EF-C26D-44D8-9E2D-D7B765C46145}
 	EndGlobalSection
 EndGlobal
