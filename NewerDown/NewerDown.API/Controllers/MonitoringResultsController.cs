@@ -14,8 +14,7 @@ public class MonitoringResultsController : ControllerBase
 {
     private readonly IMonitoringResultService _service;
     
-    public MonitoringResultsController(
-        IMonitoringResultService service)
+    public MonitoringResultsController(IMonitoringResultService service)
     {
         _service = service;
     }

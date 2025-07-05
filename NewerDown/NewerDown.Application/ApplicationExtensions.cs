@@ -24,6 +24,7 @@ public static class ApplicationExtensions
         services.AddScoped<IServicesService, ServicesService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IBlobStorageService, BlobStorageService>();
 
         services.AddScoped<IScopedTimeProvider, ScopedTimeProvider>();
 

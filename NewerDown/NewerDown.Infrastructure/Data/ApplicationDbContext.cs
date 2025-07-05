@@ -14,4 +14,5 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Service> Services { get; set; }
     public DbSet<MonitoringResult> MonitoringResults { get; set; }
     public DbSet<NotificationRule> NotificationRules { get; set; }
+    public DbSet<FileAttachment> FileAttachments { get; set; }
 }
