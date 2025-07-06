@@ -19,6 +19,7 @@ public class BlobStorageService : IBlobStorageService
     private readonly ILogger<BlobStorageService> _logger;
     private readonly IMapper _mapper;
     private readonly IScopedTimeProvider _timeProvider;
+    private readonly BlobContainerClient _blobContainerClient;
     
     public BlobStorageService(
         IConfiguration configuration,
@@ -32,27 +33,26 @@ public class BlobStorageService : IBlobStorageService
         _logger = logger;
         _mapper = mapper;
         _timeProvider = timeProvider;
+        _blobContainerClient = new BlobContainerClient(_configuration["BlobConnection"], _configuration["BlobContainerName"]);
     }
     
     public async Task<FileAttachmentResponseDto> UploadFileAsync(IFormFile file)
     {
-        string? connectionString = _configuration.GetValue<string>("BlobConnection");
-        string? containerName = _configuration.GetValue<string>("BlobContainerName");
-        BlobContainerClient blobContainerClient = new BlobContainerClient(connectionString, containerName);
-
+        var extension = Path.GetExtension(file.FileName);
+        var fileName = $"{Guid.NewGuid()}{extension}";
         using (var stream = new MemoryStream())
         {
             await file.CopyToAsync(stream);
             stream.Position = 0;
-            await blobContainerClient.UploadBlobAsync(file.FileName, stream);
+            await _blobContainerClient.UploadBlobAsync(fileName, stream);
         }
-
+        
         var fileAttachmentDto = new FileAttachmentDto()
         {
             Id = Guid.NewGuid(),
-            Uri = blobContainerClient.Uri.AbsoluteUri,
-            FileName = file.FileName,
-            FilePath = $"{blobContainerClient.Uri}/{file.FileName}",
+            Uri = _blobContainerClient.Uri.AbsoluteUri,
+            FileName = fileName,
+            FilePath = $"{_blobContainerClient.Uri}/{fileName}",
             ContentType = file.ContentType,
             Size = file.Length
         };
@@ -63,7 +63,7 @@ public class BlobStorageService : IBlobStorageService
         _context.FileAttachments.Add(fileAttachment);
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("File uploaded successfully: {FileName}", file.FileName);
+        _logger.LogInformation("File uploaded successfully: {FileName}", fileName);
         
         return new FileAttachmentResponseDto
         {
@@ -89,11 +89,7 @@ public class BlobStorageService : IBlobStorageService
     {
         var fileAttachment = await GetFileAttachmentByIdAsync(fileAttachmentId);
         
-        string? connectionString = _configuration.GetValue<string>("BlobConnection");
-        string? containerName = _configuration.GetValue<string>("BlobContainerName");
-        BlobContainerClient blobContainerClient = new BlobContainerClient(connectionString, containerName);
-        
-        var blobClient = blobContainerClient.GetBlobClient(fileAttachment.FileName);
+        var blobClient = _blobContainerClient.GetBlobClient(fileAttachment.FileName);
         await blobClient.DeleteIfExistsAsync();
         
         _context.FileAttachments.Remove(fileAttachment);

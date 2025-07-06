@@ -1,4 +1,5 @@
 ﻿using Azure.Identity;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,10 @@ using NewerDown.Infrastructure.Data;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
+
+builder.Services
+    .AddApplicationInsightsTelemetryWorkerService()
+    .ConfigureFunctionsApplicationInsights();
 
 var kvUri = Environment.GetEnvironmentVariable("AzureKeyVault");
 
@@ -39,9 +44,5 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseAzureSql(builder.Configuration["DatabaseConnection"]);
 });
-
-/*builder.Services
-    .AddApplicationInsightsTelemetryWorkerService()
-    .ConfigureFunctionsApplicationInsights();*/
 
 builder.Build().Run();

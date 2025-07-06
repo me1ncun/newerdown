@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>NewerDown</RootNamespace>
         <UserSecretsId>1504864b-882b-454e-9e3a-0c7f745c7bda</UserSecretsId>
+        <ApplicationInsightsResourceId>/subscriptions/0e2f36fa-f3b6-4db7-90d6-57305db43331/resourceGroups/NEWERDOWN/providers/microsoft.insights/components/appi-newerdown</ApplicationInsightsResourceId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,6 +26,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.23.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.4" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.4" />
     </ItemGroup>
@@ -40,6 +42,15 @@
       <Content Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\ServiceDependencies\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Properties\serviceDependencies.json" />
+      <None Remove="Properties\serviceDependencies.local.json" />
     </ItemGroup>
 
 </Project>

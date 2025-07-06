@@ -161,23 +161,20 @@ public class NotificationRuleServiceTests
     public async Task CreateNotificationRuleAsync_ShouldAddNotificationRule_WhenServiceRuleExists()
     {
         // Arrange
-        var existingRule = new NotificationRule
+        var service = new Service()
         {
             Id = Guid.NewGuid(),
-            ServiceId = Guid.NewGuid(),
+            Name = "Test Service",
+            Url = "https://example.com",
             UserId = currentUserId,
-            Channel = NotificationChannel.Email,
-            Target = "existing@example.com",
-            NotifyOnFailure = true,
-            NotifyOnRecovery = false
         };
 
-        await _context.NotificationRules.AddAsync(existingRule);
+        await _context.Services.AddAsync(service);
         await _context.SaveChangesAsync();
 
         var dto = new AddNotificationRuleDto
         {
-            ServiceId = existingRule.ServiceId,
+            ServiceId = service.Id,
             Channel = NotificationChannel.PushNotification,
             Target = "new@example.com",
             NotifyOnFailure = false,
@@ -192,7 +189,7 @@ public class NotificationRuleServiceTests
             .Where(x => x.UserId == currentUserId && x.ServiceId == dto.ServiceId)
             .ToListAsync();
 
-        Assert.That(rules.Count, Is.EqualTo(2));
+        Assert.That(rules.Count, Is.EqualTo(1));
         Assert.That(rules.Any(r => r.Target == "new@example.com"));
     }
     

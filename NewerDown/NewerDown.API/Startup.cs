@@ -7,6 +7,7 @@ using NewerDown.Infrastructure.Data;
 using NewerDown.Infrastructure.Extensions;
 using NewerDown.Middlewares;
 using NewerDown.Shared;
+using Microsoft.Extensions.Configuration;
 
 namespace NewerDown;
 
@@ -21,12 +22,21 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddLogging(builder =>
+        {
+            builder.AddApplicationInsights(Configuration["ApplicationInsightsInstrumentationKey"]);
+        });
+        services.AddApplicationInsightsTelemetry(options =>
+        {
+            options.ConnectionString = Configuration["ApplicationInsightsConnection"];
+        });
+        
         services.AddIdentity<User, Role>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
         services.AddSwaggerDocumentation();
-        StartupExtensions.AddCors(services);
+        services.AddCORS();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -36,11 +46,6 @@ public class Startup
         services.AddDistributedMemoryCache();
         
         services.AddHttpContextAccessor();
-        
-        services.AddApplicationInsightsTelemetry(options =>
-        {
-            options.ConnectionString = Configuration["ApplicationInsightsConnection"];
-        });
 
         services.AddSharedServices(Configuration);
         services.AddApplicationServices(Configuration);

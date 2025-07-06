@@ -44,7 +44,7 @@ public class UserServiceTests
         // Arrange
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, currentUserId.ToString())
+            new Claim("userId", currentUserId.ToString())
         };
         
         var identity = new ClaimsIdentity(claims, "TestAuth");
