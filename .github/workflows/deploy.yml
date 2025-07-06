@@ -43,13 +43,13 @@ jobs:
         run: dotnet build --no-restore NewerDown/NewerDown.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish NewerDown/NewerDown.sln -c Release -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publish
 
       - name: Execute unit tests
         run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj --no-build
@@ -83,4 +83,4 @@ jobs:
         with:
           app-name: 'app-newerdown'
           slot-name: 'Production'
-          package: .
+          package: ./publish
