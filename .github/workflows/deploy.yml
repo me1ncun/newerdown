@@ -1,0 +1,86 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - all
+
+jobs:
+  build:
+    runs-on: linux-latest
+    permissions:
+      contents: read
+
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged 
+        ports:
+          - 2375:2375
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Enable Docker CLI
+        run: |
+          sudo systemctl start docker
+          docker version
+          docker info
+
+      - name: Restore dependencies
+        run: dotnet restore NewerDown/NewerDown.sln
+
+      - name: Build
+        run: dotnet build --no-restore NewerDown/NewerDown.sln --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Execute unit tests
+        run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj --no-build
+
+      - name: Execute integration tests
+        run: dotnet test NewerDown/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj --no-build
+
+  deploy:
+    runs-on: linux-latest
+    needs: build
+    permissions:
+      id-token: write 
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'app-newerdown'
+          slot-name: 'Production'
+          package: .
