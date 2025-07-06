@@ -43,7 +43,7 @@ public class ServicesController : ControllerBase
     }
     
     [HttpPost("services")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(Guid))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> CreateService([FromBody] AddServiceDto serviceDto)
     {

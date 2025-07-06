@@ -69,7 +69,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpPost("account/change-password")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
     {
@@ -89,7 +89,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpPost("account/upload-photo")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> UploadPhoto(IFormFile file)
     {
@@ -99,7 +99,7 @@ public class AccountController : ControllerBase
     }
     
     [HttpDelete("account/delete-photo")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> DeletePhoto()
     {
