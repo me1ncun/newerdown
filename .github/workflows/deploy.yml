@@ -52,10 +52,10 @@ jobs:
           path: ./publish
 
       - name: Execute unit tests
-        run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj --no-build
+        run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
 
       - name: Execute integration tests
-        run: dotnet test NewerDown/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj --no-build
+        run: dotnet test NewerDown/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj
 
   deploy:
     runs-on: ubuntu-latest
