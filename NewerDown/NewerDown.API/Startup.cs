@@ -7,7 +7,6 @@ using NewerDown.Infrastructure.Data;
 using NewerDown.Infrastructure.Extensions;
 using NewerDown.Middlewares;
 using NewerDown.Shared;
-using Microsoft.Extensions.Configuration;
 
 namespace NewerDown;
 
@@ -61,10 +60,11 @@ public class Startup
         if (env.IsDevelopment() || env.IsProduction())
         {
             app.ApplyMigrations();
-            app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseDeveloperExceptionPage();
 
         app.UseHttpsRedirection();
 
