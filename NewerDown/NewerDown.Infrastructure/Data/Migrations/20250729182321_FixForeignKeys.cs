@@ -3,18 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NewerDown.Infrastructure.Data.Migrations
+namespace NewerDown.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateUserFK : Migration
+    public partial class FixForeignKeys : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_FileAttachments_FileAttachmentId",
-                table: "AspNetUsers");
-
             migrationBuilder.AlterColumn<Guid>(
                 name: "FileAttachmentId",
                 table: "AspNetUsers",
@@ -22,22 +18,11 @@ namespace NewerDown.Infrastructure.Data.Migrations
                 nullable: true,
                 oldClrType: typeof(Guid),
                 oldType: "uniqueidentifier");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_FileAttachments_FileAttachmentId",
-                table: "AspNetUsers",
-                column: "FileAttachmentId",
-                principalTable: "FileAttachments",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_FileAttachments_FileAttachmentId",
-                table: "AspNetUsers");
-
             migrationBuilder.AlterColumn<Guid>(
                 name: "FileAttachmentId",
                 table: "AspNetUsers",
@@ -47,14 +32,6 @@ namespace NewerDown.Infrastructure.Data.Migrations
                 oldClrType: typeof(Guid),
                 oldType: "uniqueidentifier",
                 oldNullable: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_FileAttachments_FileAttachmentId",
-                table: "AspNetUsers",
-                column: "FileAttachmentId",
-                principalTable: "FileAttachments",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }

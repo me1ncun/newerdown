@@ -9,11 +9,11 @@ using NewerDown.Infrastructure.Data;
 
 #nullable disable
 
-namespace NewerDown.Infrastructure.Data.Migrations
+namespace NewerDown.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250607062234_Initial")]
-    partial class Initial
+    [Migration("20250729182321_FixForeignKeys")]
+    partial class FixForeignKeys
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,34 +24,6 @@ namespace NewerDown.Infrastructure.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -156,57 +128,142 @@ namespace NewerDown.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("NewerDown.Domain.Entities.MonitoringResult", b =>
+            modelBuilder.Entity("NewerDown.Domain.Entities.Alert", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CheckedAt")
+                    b.Property<DateTime?>("LastTriggeredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Error")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsAlive")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("ResponseTimeMs")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("StatusCode")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("MonitoringResults");
-                });
-
-            modelBuilder.Entity("NewerDown.Domain.Entities.NotificationRule", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Channel")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("NotifyOnFailure")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("NotifyOnRecovery")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid>("MonitorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Target")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UserId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonitorId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("Alerts");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.FileAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Uri")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileAttachments");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.Incident", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsAcknowledged")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MonitorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ResolutionComment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RootCause")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonitorId");
+
+                    b.ToTable("Incidents");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.IncidentComment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("IncidentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IncidentId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("IncidentComments");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.Integration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EndpointUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -215,24 +272,22 @@ namespace NewerDown.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceId");
-
                     b.HasIndex("UserId");
 
-                    b.ToTable("NotificationRules");
+                    b.ToTable("Integrations");
                 });
 
-            modelBuilder.Entity("NewerDown.Domain.Entities.Service", b =>
+            modelBuilder.Entity("NewerDown.Domain.Entities.Monitor", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CheckIntervalSeconds")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("IntervalSeconds")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -241,9 +296,12 @@ namespace NewerDown.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("Target")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -252,7 +310,63 @@ namespace NewerDown.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Services");
+                    b.ToTable("Monitors");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.MonitorCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CheckedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MonitorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double?>("ResponseTimeMs")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonitorId");
+
+                    b.ToTable("MonitorChecks");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("NewerDown.Domain.Entities.User", b =>
@@ -274,6 +388,9 @@ namespace NewerDown.Infrastructure.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<Guid?>("FileAttachmentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -310,6 +427,8 @@ namespace NewerDown.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FileAttachmentId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -323,7 +442,7 @@ namespace NewerDown.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("NewerDown.Domain.Entities.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -350,7 +469,7 @@ namespace NewerDown.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("NewerDown.Domain.Entities.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -372,59 +491,119 @@ namespace NewerDown.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NewerDown.Domain.Entities.MonitoringResult", b =>
+            modelBuilder.Entity("NewerDown.Domain.Entities.Alert", b =>
                 {
-                    b.HasOne("NewerDown.Domain.Entities.Service", "Service")
-                        .WithMany("Results")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("NewerDown.Domain.Entities.NotificationRule", b =>
-                {
-                    b.HasOne("NewerDown.Domain.Entities.Service", "Service")
-                        .WithMany("NotificationRules")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("NewerDown.Domain.Entities.Monitor", "Monitor")
+                        .WithMany("Alerts")
+                        .HasForeignKey("MonitorId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("NewerDown.Domain.Entities.User", "User")
-                        .WithMany("NotificationRules")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Service");
+                    b.HasOne("NewerDown.Domain.Entities.User", null)
+                        .WithMany("Alerts")
+                        .HasForeignKey("UserId1");
+
+                    b.Navigation("Monitor");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("NewerDown.Domain.Entities.Service", b =>
+            modelBuilder.Entity("NewerDown.Domain.Entities.Incident", b =>
                 {
+                    b.HasOne("NewerDown.Domain.Entities.Monitor", "Monitor")
+                        .WithMany()
+                        .HasForeignKey("MonitorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Monitor");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.IncidentComment", b =>
+                {
+                    b.HasOne("NewerDown.Domain.Entities.Incident", "Incident")
+                        .WithMany("Comments")
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("NewerDown.Domain.Entities.User", "User")
-                        .WithMany("Services")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Incident");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.Integration", b =>
+                {
+                    b.HasOne("NewerDown.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("NewerDown.Domain.Entities.Service", b =>
+            modelBuilder.Entity("NewerDown.Domain.Entities.Monitor", b =>
                 {
-                    b.Navigation("NotificationRules");
+                    b.HasOne("NewerDown.Domain.Entities.User", "User")
+                        .WithMany("Monitors")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("Results");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.MonitorCheck", b =>
+                {
+                    b.HasOne("NewerDown.Domain.Entities.Monitor", "Monitor")
+                        .WithMany("Checks")
+                        .HasForeignKey("MonitorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Monitor");
                 });
 
             modelBuilder.Entity("NewerDown.Domain.Entities.User", b =>
                 {
-                    b.Navigation("NotificationRules");
+                    b.HasOne("NewerDown.Domain.Entities.FileAttachment", "FileAttachment")
+                        .WithMany()
+                        .HasForeignKey("FileAttachmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Services");
+                    b.Navigation("FileAttachment");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.Incident", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.Monitor", b =>
+                {
+                    b.Navigation("Alerts");
+
+                    b.Navigation("Checks");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Alerts");
+
+                    b.Navigation("Monitors");
                 });
 #pragma warning restore 612, 618
         }

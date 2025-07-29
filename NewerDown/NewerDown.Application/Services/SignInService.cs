@@ -42,7 +42,7 @@ public class SignInService : ISignInService
 
     public async Task<string> LoginUserAsync(LoginUserDto request)
     {
-        var user = await _userManager.FindByNameAsync(request.UserName);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
             throw new InvalidOperationException("Invalid username or password.");

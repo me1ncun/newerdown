@@ -38,7 +38,7 @@ public class AlertService : IAlertService
             return cached;
         
         var alerts = await _context.Alerts
-            .Where(x => x.UserId == _userService.GetUserId())
+            .Where(x => x.MonitorId == _userService.GetUserId())
             .ToListAsync();
         
         var result = _mapper.Map<List<AlertDto>>(alerts);
@@ -55,14 +55,14 @@ public class AlertService : IAlertService
     public async Task CreateAlertAsync(AddAlertDto alertDto)
     {
         var currentUserId = _userService.GetUserId();
-        var exists = await _context.Alerts.FirstOrDefaultAsync(a => a.UserId == currentUserId);
+        var exists = await _context.Alerts.FirstOrDefaultAsync(a => a.MonitorId == currentUserId);
 
         if (exists is not null)
             throw new EntityAlreadyExistsException();
 
         var alert = _mapper.Map<Alert>(alertDto);
         alert.Id = Guid.NewGuid();
-        alert.UserId = currentUserId;
+        alert.MonitorId = currentUserId;
         
         _context.Alerts.Add(alert);
         await _context.SaveChangesAsync();

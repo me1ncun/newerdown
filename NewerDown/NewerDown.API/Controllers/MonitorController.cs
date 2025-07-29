@@ -77,7 +77,7 @@ public class MonitorController : ControllerBase
         return Ok("Monitor created successfully");
     }
     
-    [HttpPost("{id:guid}/pause")]
+    [HttpPost("{id:guid}/resume")]
     public IActionResult ResumeMonitor(Guid id)
     {
         // Logic to create a monitor
