@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.WebJobs;
@@ -25,7 +25,7 @@ public class MonitoringSchedulerFunction
 
     [Function(nameof(MonitoringSchedulerFunction))]
     [ServiceBusOutput("monitoring", Connection = "ServiceBusConnection")]
-    public async Task<IEnumerable<string>> Run([TimerTrigger("0 */1 * * * *")] TimerInfo timer)
+    public async Task<IEnumerable<string>> Run([TimerTrigger("0 #1#1 * * * *")] TimerInfo timer)
     {
         var services = await _context.Services
             .Where(s => s.IsActive)
@@ -39,4 +39,4 @@ public class MonitoringSchedulerFunction
             }
         ).ToArray();
     }
-}
+}*/

@@ -3,12 +3,12 @@ using NewerDown.Domain.DTOs.Service;
 
 namespace NewerDown.Application.Validators;
 
-public class UpdateServiceValidator : AbstractValidator<UpdateMonitorDto>
+public class AddServiceValidator : AbstractValidator<AddMonitorDto>
 {
-    public UpdateServiceValidator()
+    public AddServiceValidator()
     {
-        RuleFor(x => x.Url)
-            .NotEmpty().WithMessage("Url is required.");
+        RuleFor(x => x.Target)
+            .NotEmpty().WithMessage("Target is required.");
         
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")

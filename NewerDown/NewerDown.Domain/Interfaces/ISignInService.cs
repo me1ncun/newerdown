@@ -6,7 +6,7 @@ namespace NewerDown.Domain.Interfaces;
 
 public interface ISignInService
 {
-    Task<string> LoginUserAsync(LoginAccountDto request);
+    Task<string> LoginUserAsync(LoginUserDto request);
     Task ChangePasswordAsync(ChangePasswordDto request);
-    Task RegisterUserAsync(RegisterAccountDto request);
+    Task RegisterUserAsync(RegisterUserDto request);
 }

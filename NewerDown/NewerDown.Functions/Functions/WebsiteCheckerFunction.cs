@@ -1,4 +1,4 @@
-using System.Text;
+/*using System.Text;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -41,4 +41,4 @@ public class WebsiteCheckerFunction
         
         _logger.LogInformation("Website check completed for service ID: {ServiceId}", serviceId);
     }
-}
+}*/

@@ -19,13 +19,12 @@ public static class ApplicationExtensions
         services.AddSingleton<ICacheService, CacheService>();
         
         services.AddScoped<ISignInService, SignInService>();
-        services.AddScoped<IMonitoringResultService, MonitoringResultService>();
-        services.AddScoped<INotificationRuleService, NotificationRuleService>();
-        services.AddScoped<IServicesService, ServicesService>();
+        services.AddScoped<IAlertService, AlertService>();
+        services.AddScoped<IMonitorService, MonitorService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IBlobStorageService, BlobStorageService>();
-        
+        services.AddScoped<IIncidentService, IncidentService>();
         
         services.AddScoped<IUserPhotoProvider, UserPhotoProvider>();
 

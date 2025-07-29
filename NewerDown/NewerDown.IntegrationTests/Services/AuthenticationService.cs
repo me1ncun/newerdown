@@ -14,7 +14,7 @@ public class AuthenticationService
 
     public async Task CreateUser()
     {
-        var request = new RegisterAccountDto()
+        var request = new RegisterUserDto()
         {
             Email = "test@example.com",
             UserName = "testuser",

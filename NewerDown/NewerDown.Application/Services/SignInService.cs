@@ -40,7 +40,7 @@ public class SignInService : ISignInService
         _queueSenderFactory = senderFactory;
     }
 
-    public async Task<string> LoginUserAsync(LoginAccountDto request)
+    public async Task<string> LoginUserAsync(LoginUserDto request)
     {
         var user = await _userManager.FindByNameAsync(request.UserName);
         if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
@@ -51,7 +51,7 @@ public class SignInService : ISignInService
         return _authService.GenerateToken(user);
     }
 
-    public async Task RegisterUserAsync(RegisterAccountDto request)
+    public async Task RegisterUserAsync(RegisterUserDto request)
     {
         var user = _mapper.Map<User>(request);
 

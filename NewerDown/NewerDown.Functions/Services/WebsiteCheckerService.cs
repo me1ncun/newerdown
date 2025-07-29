@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿/*using System.Diagnostics;
 using NewerDown.Domain.Entities;
 using NewerDown.Infrastructure.Data;
 
@@ -24,7 +24,7 @@ public class WebsiteCheckerService : IWebsiteCheckerService
 
     public async Task CheckWebsiteAsync(Guid serviceId)
     {
-        var result = new MonitoringResult
+        var result = new MonitorCheck
         {
             Id = Guid.NewGuid(),
             ServiceId = serviceId,
@@ -61,4 +61,4 @@ public class WebsiteCheckerService : IWebsiteCheckerService
         _context.MonitoringResults.Add(result);
         await _context.SaveChangesAsync();
     }
-}
+}*/

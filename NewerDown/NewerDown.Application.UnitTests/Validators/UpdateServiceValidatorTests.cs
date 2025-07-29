@@ -20,7 +20,7 @@ public class UpdateServiceValidatorTests
     public async Task ValidateAsync_AllFieldsValid_ReturnsNoErrors()
     {
         // Arrange
-        var dto = new UpdateServiceDto()
+        var dto = new UpdateMonitorDto()
         {
             Name = "Test Service",
             Url = "https://example.com",
@@ -38,7 +38,7 @@ public class UpdateServiceValidatorTests
     public async Task ValidateAsync_EmptyFields_ReturnsValidationErrors()
     {
         // Arrange
-        var dto = new UpdateServiceDto()
+        var dto = new UpdateMonitorDto()
         {
             Name = string.Empty,
             Url = string.Empty,

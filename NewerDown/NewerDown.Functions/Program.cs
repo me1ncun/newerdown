@@ -1,4 +1,4 @@
-﻿using Azure.Identity;
+﻿/*using Azure.Identity;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -45,4 +45,4 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseAzureSql(builder.Configuration["DatabaseConnection"]);
 });
 
-builder.Build().Run();
+builder.Build().Run();*/
