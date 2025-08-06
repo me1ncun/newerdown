@@ -42,7 +42,7 @@ public class AuthService : IAuthService
         {
             new Claim("username", user.UserName),
             new Claim("email", user.Email),
-            new Claim("userId", user.Id.ToString())
+            new Claim("userId", user.Id.ToString()),
         });
     }
 }

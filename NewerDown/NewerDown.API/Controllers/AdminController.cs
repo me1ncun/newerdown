@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NewerDown.Domain.Enums;
+using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Controllers;
 
@@ -6,13 +9,23 @@ namespace NewerDown.Controllers;
 [Route("api/admin")]
 public class AdminController : ControllerBase
 {
-    [HttpGet("users")]
-    public IActionResult GetUsers()
+    private readonly IAdminService _adminService;
+    
+    public AdminController(IAdminService adminService)
     {
-        // Logic to get all users
-        return Ok("List of users retrieved successfully");
+        _adminService = adminService;
     }
     
+    [Authorize(Roles = nameof(RoleType.Administrator))]
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _adminService.GetAllUsersAsync();
+        
+        return Ok(users);
+    }
+    
+    [Authorize(Roles = nameof(RoleType.Administrator))]
     [HttpGet("monitors")]
     public IActionResult GetMonitors()
     {
@@ -20,25 +33,11 @@ public class AdminController : ControllerBase
         return Ok("List of monitors retrieved successfully");
     }
     
+    [Authorize(Roles = nameof(RoleType.Administrator))]
     [HttpGet("logs")]
     public IActionResult GetSystemLogs()
     {
         // Logic to get all logs
         return Ok("List of logs retrieved successfully");
     }
-    
-    [HttpPost("toggle-maintenance")]
-    public IActionResult ToggleMaintenanceMode([FromBody] bool enable)
-    {
-        // Logic to toggle maintenance mode
-        if (enable)
-        {
-            return Ok("Maintenance mode enabled");
-        }
-        else
-        {
-            return Ok("Maintenance mode disabled");
-        }
-    }
-    
 }

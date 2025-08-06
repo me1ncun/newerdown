@@ -5,6 +5,7 @@ using NewerDown.Application.Extensions;
 using NewerDown.Domain.DTOs.Account;
 using NewerDown.Domain.DTOs.Email;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Enums;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Extensions;
@@ -54,6 +55,13 @@ public class SignInService : ISignInService
     public async Task RegisterUserAsync(RegisterUserDto request)
     {
         var user = _mapper.Map<User>(request);
+        
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
+        if (existingUser != null)
+        {
+            _logger.LogWarning("User with email {email} already exists.", request.Email);
+            throw new InvalidAccessException("User with this email already exists.");
+        }
 
         var result = await _userManager.CreateAsync(user, request.Password);
         if (!result.Succeeded)
@@ -67,6 +75,7 @@ public class SignInService : ISignInService
         _logger.LogInformation("User {name} registered successfully.", request.UserName);
         
         await _signInManager.SignInAsync(user, isPersistent: false);
+        await _userManager.AddToRoleAsync(user, nameof(RoleType.Administrator));
         
         var sender = _queueSenderFactory.Create(QueueType.Emails.GetQueueName());
         var email = new EmailDto(user.Email, user.UserName, DateTime.UtcNow);

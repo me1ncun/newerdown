@@ -25,6 +25,7 @@ public static class ApplicationExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IBlobStorageService, BlobStorageService>();
         services.AddScoped<IIncidentService, IncidentService>();
+        services.AddScoped<IAdminService, AdminService>();
         
         services.AddScoped<IUserPhotoProvider, UserPhotoProvider>();
 

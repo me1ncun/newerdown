@@ -30,7 +30,7 @@ public class Startup
             options.ConnectionString = Configuration["ApplicationInsightsConnection"];
         });
         
-        services.AddIdentity<User, Role>()
+        services.AddIdentity<User, IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 

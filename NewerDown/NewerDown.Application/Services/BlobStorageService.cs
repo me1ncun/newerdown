@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -47,12 +48,14 @@ public class BlobStorageService : IBlobStorageService
             await _blobContainerClient.UploadBlobAsync(fileName, stream);
         }
         
+        var sasToken = GetSasToken(fileName);
+        
         var fileAttachmentDto = new FileAttachmentDto()
         {
             Id = Guid.NewGuid(),
             Uri = _blobContainerClient.Uri.AbsoluteUri,
             FileName = fileName,
-            FilePath = $"{_blobContainerClient.Uri}/{fileName}",
+            FilePath = $"{_blobContainerClient.Uri}/{fileName}?{sasToken}",
             ContentType = file.ContentType,
             Size = file.Length
         };
@@ -71,6 +74,24 @@ public class BlobStorageService : IBlobStorageService
             Status = "Success",
             Error = false
         };
+    }
+
+    private string GetSasToken(string fileName)
+    {
+        var azureStorageAccount = _configuration.GetSection("AzureStorageAccount").Value;
+        var azureStorageAccessKey = _configuration["AzureStorageAccessKey"];
+        
+        Azure.Storage.Sas.BlobSasBuilder blobSasBuilder = new Azure.Storage.Sas.BlobSasBuilder()
+        {
+            BlobContainerName = _configuration["BlobContainerName"],
+            BlobName = fileName,
+            ExpiresOn = DateTime.UtcNow.AddMinutes(2),
+        };
+        
+        blobSasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
+        
+        var sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(azureStorageAccount, azureStorageAccessKey)).ToString();
+        return sasToken;
     }
     
     public async Task<FileAttachment> GetFileAttachmentByIdAsync(Guid? fileAttachmentId)

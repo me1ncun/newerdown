@@ -1,41 +1,46 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NewerDown.Domain.DTOs.Account;
 using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/users/me")]
 public class UserController : ControllerBase
 {
     private readonly ISignInService _signInService;
     private readonly IUserPhotoProvider _userPhotoProvider;
+    private readonly IUserService _userService;
     
-    public UserController(ISignInService signInService, IUserPhotoProvider userPhotoProvider)
+    public UserController(
+        ISignInService signInService,
+        IUserPhotoProvider userPhotoProvider,
+        IUserService userService)
     {
         _signInService = signInService;
         _userPhotoProvider = userPhotoProvider;
+        _userService = userService;
     }
     
     [HttpGet]
-    public IActionResult GetCurrentUser([FromBody] object registrationData)
+    public async Task<IActionResult> GetCurrentUser()
     {
-        return Ok("Registration successful");
+        var user = await _userService.GetCurrentUserAsync();
+        
+        return Ok(user);
     }
     
-    [HttpPut("{id:guid}")]
-    public IActionResult UpdateUser(Guid id, [FromBody] object loginData)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteUser()
     {
-        return Ok("Login successful");
+        await _userService.DeleteUserAsync();
+        
+        return Ok();
     }
     
-    [HttpDelete("{id:guid}")]
-    public IActionResult DeleteUser(Guid id, [FromBody] object loginData)
-    {
-        return Ok("Login successful");
-    }
-    
-    [HttpPost("account/change-password")]
+    [HttpPost("change-password")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
@@ -45,20 +50,20 @@ public class UserController : ControllerBase
         return Ok("Password changed successfully.");
     }
     
-    [HttpPost("account/upload-photo")]
+    [HttpPost("upload-photo")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> UploadPhoto(IFormFile file)
+    public async Task<IActionResult> UploadUserPhoto(IFormFile file)
     {
         await _userPhotoProvider.UploadPhotoAsync(file);
         
         return Ok("Photo uploaded successfully.");
     }
     
-    [HttpDelete("account/delete-photo")]
+    [HttpDelete("delete-photo")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> DeletePhoto()
+    public async Task<IActionResult> DeleteUserPhoto()
     {
         await _userPhotoProvider.DeletePhotoAsync();
         

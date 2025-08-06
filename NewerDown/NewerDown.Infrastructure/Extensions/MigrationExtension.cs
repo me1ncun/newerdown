@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NewerDown.Infrastructure.Data;
+using NewerDown.Infrastructure.Helpers;
 
 namespace NewerDown.Infrastructure.Extensions;
 
@@ -14,5 +15,7 @@ public static class MigrationExtension
         using ApplicationDbContext context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         context.Database.Migrate();
+        
+        RoleInitializer.SeedRolesAsync(scope.ServiceProvider).GetAwaiter().GetResult();
     }
 }
