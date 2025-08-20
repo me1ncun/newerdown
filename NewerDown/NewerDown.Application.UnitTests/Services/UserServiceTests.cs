@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -10,6 +11,7 @@ namespace NewerDown.Application.UnitTests.Services;
 [TestFixture]
 public class UserServiceTests
 {
+    private Mock<IMapper> _mapperMock;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     
     private ApplicationDbContext _context;
@@ -21,8 +23,9 @@ public class UserServiceTests
     public void Setup()
     {
         _httpContextAccessorMock = new();
+        _mapperMock = new ();
         
-        userService = new UserService(_httpContextAccessorMock.Object, _context);
+        userService = new UserService(_httpContextAccessorMock.Object, _context, _mapperMock.Object);
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
