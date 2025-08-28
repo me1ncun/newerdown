@@ -18,7 +18,10 @@ public partial class Program : IApiMarker
                 
                 var builtConfig = config.Build();
                 
-                config.AddAzureKeyVault(new Uri(builtConfig["AzureKeyVault:VaultUri"] ?? throw new ArgumentException("Key Vault Url didn't set")), new DefaultAzureCredential());
+                config.AddAzureKeyVault(new Uri(Environment.GetEnvironmentVariable("KEY_VAULT_URL") 
+                                                ?? builtConfig["AzureKeyVault:VaultUri"]
+                                                ?? throw new ArgumentException("Key Vault Url didn't set")),
+                    new DefaultAzureCredential());
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {
