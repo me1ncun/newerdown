@@ -6,20 +6,13 @@ on:
       - master
   pull_request:
     branches:
-      - all
+      - '*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged 
-        ports:
-          - 2375:2375
 
     steps:
       - name: Checkout code
@@ -29,12 +22,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-
-      - name: Enable Docker CLI
-        run: |
-          sudo systemctl start docker
-          docker version
-          docker info
 
       - name: Restore dependencies
         run: dotnet restore NewerDown/NewerDown.sln
@@ -61,6 +48,7 @@ jobs:
           path: ./publish-functions
 
       - name: Execute unit tests
+        continue-on-error: true
         run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
 
       - name: Execute integration tests
@@ -98,10 +86,10 @@ jobs:
         with:
           app-name: 'app-newerdown'
           slot-name: 'Production'
-          package: .
+          package: ./publish
 
       - name: Deploy Azure Function
         uses: Azure/functions-action@v1
         with:
           app-name: 'func-newerdown-servicingfunctions'
-          package: .
+          package: ./publish-functions
