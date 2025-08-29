@@ -1,0 +1,101 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'app/backend/**'
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'app/backend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore app/backend/NewerDown.sln
+
+      - name: Build
+        run: dotnet build --no-restore app/backend/NewerDown.sln --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish
+
+      - name: Publish Azure Function
+        run: dotnet publish app/backend/NewerDown.Functions/NewerDown.Functions.csproj -c Release -o ./publish-functions
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ./publish
+
+      - name: Upload Azure Function artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: function-app
+          path: ./publish-functions
+
+      - name: Execute unit tests
+        continue-on-error: true
+        run: dotnet test app/backend/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
+
+      - name: Execute integration tests
+        continue-on-error: true
+        run: dotnet test app/backend/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write 
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+          path: ./publish
+
+      - name: Download Azure Function artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: function-app
+          path: ./publish-functions
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'app-newerdown'
+          slot-name: 'Production'
+          package: ./publish
+
+      - name: Deploy Azure Function
+        uses: Azure/functions-action@v1
+        with:
+          app-name: 'func-newerdown-servicingfunctions'
+          package: ./publish-functions
