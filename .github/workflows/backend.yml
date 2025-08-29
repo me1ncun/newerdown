@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'app/backend/**'
   pull_request:
     branches:
       - '*'
+    paths:
+      - 'app/backend/**'
 
 jobs:
   build:
@@ -24,16 +28,16 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore NewerDown/NewerDown.sln
+        run: dotnet restore app/backend/NewerDown.sln
 
       - name: Build
-        run: dotnet build --no-restore NewerDown/NewerDown.sln --configuration Release
+        run: dotnet build --no-restore app/backend/NewerDown.sln --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish NewerDown/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish
+        run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish
 
       - name: Publish Azure Function
-        run: dotnet publish NewerDown/NewerDown.Functions/NewerDown.Functions.csproj -c Release -o ./publish-functions
+        run: dotnet publish app/backend/NewerDown.Functions/NewerDown.Functions.csproj -c Release -o ./publish-functions
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -49,11 +53,11 @@ jobs:
 
       - name: Execute unit tests
         continue-on-error: true
-        run: dotnet test NewerDown/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
+        run: dotnet test app/backend/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
 
       - name: Execute integration tests
         continue-on-error: true
-        run: dotnet test NewerDown/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj
+        run: dotnet test app/backend/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj
 
   deploy:
     runs-on: ubuntu-latest
