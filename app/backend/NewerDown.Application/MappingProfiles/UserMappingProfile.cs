@@ -13,5 +13,7 @@ public class UserMappingProfile : Profile
         
         CreateMap<User, UserDto>()
             .ForMember(x => x.FilePath, opt => opt.MapFrom(src => src.FileAttachment.FilePath));
+
+        CreateMap<UpdateUserDto, User>();
     }
 }
