@@ -17,18 +17,18 @@ public class AlertService : IAlertService
     private readonly IMapper _mapper;
     private readonly ApplicationDbContext _context;
     private readonly ICacheService _cacheService;
-    private readonly IUserService _userService;
+    private readonly IUserContextService _userContextService;
     
     public AlertService(
         ApplicationDbContext context,
         IMapper mapper,
         ICacheService cacheService,
-        IUserService userService)
+        IUserContextService userContextService)
     {
         _context = context;
         _mapper = mapper;
         _cacheService = cacheService;
-        _userService = userService;
+        _userContextService = userContextService;
     }
 
     public async Task<IEnumerable<AlertDto>> GetAllAsync()
@@ -38,7 +38,7 @@ public class AlertService : IAlertService
             return cached;
         
         var alerts = await _context.Alerts
-            .Where(x => x.MonitorId == _userService.GetUserId())
+            .Where(x => x.MonitorId == _userContextService.GetUserId())
             .ToListAsync();
         
         var result = _mapper.Map<List<AlertDto>>(alerts);
@@ -54,7 +54,7 @@ public class AlertService : IAlertService
 
     public async Task CreateAlertAsync(AddAlertDto alertDto)
     {
-        var currentUserId = _userService.GetUserId();
+        var currentUserId = _userContextService.GetUserId();
         var exists = await _context.Alerts.FirstOrDefaultAsync(a => a.MonitorId == currentUserId);
 
         if (exists is not null)

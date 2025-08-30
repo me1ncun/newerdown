@@ -10,17 +10,20 @@ namespace NewerDown.Application.Services;
 public class UserPhotoProvider : IUserPhotoProvider
 {
     private readonly IUserService _userService;
+    private readonly IUserContextService _userContextService;
     private readonly IBlobStorageService _blobStorageService;
     private readonly ILogger<UserPhotoProvider> _logger;
     private readonly ApplicationDbContext _context;
     
     public UserPhotoProvider(
         IUserService userService,
+        IUserContextService userContextService,
         IBlobStorageService blobStorageService,
         ILogger<UserPhotoProvider> logger,
         ApplicationDbContext context)
     {
         _userService = userService;
+        _userContextService = userContextService;
         _blobStorageService = blobStorageService;
         _logger = logger;
         _context = context;
@@ -28,7 +31,7 @@ public class UserPhotoProvider : IUserPhotoProvider
 
     public async Task UploadPhotoAsync(IFormFile file)
     {
-        var userId = _userService.GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
         
         var uploadedPhoto = await _blobStorageService.UploadFileAsync(file);
@@ -43,7 +46,7 @@ public class UserPhotoProvider : IUserPhotoProvider
     
     public async Task<string> GetPhotoUrlAsync()
     {
-        var userId = _userService.GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
         if (user.FileAttachmentId == Guid.Empty)
         {
@@ -57,7 +60,7 @@ public class UserPhotoProvider : IUserPhotoProvider
     
     public async Task DeletePhotoAsync()
     {
-        var userId = _userService.GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
         
         if (user.FileAttachmentId == Guid.Empty)

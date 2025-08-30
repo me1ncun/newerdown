@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using NewerDown.Application.Constants;
 using NewerDown.Application.Extensions;
 using NewerDown.Domain.DTOs.Service;
-using NewerDown.Domain.Entities;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
 using Monitor = NewerDown.Domain.Entities.Monitor;
@@ -17,20 +16,20 @@ public class MonitorService : IMonitorService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
-    private readonly IUserService _userService;
+    private readonly IUserContextService _userContextService;
     private readonly IHttpClientFactory _httpClientFactory;
 
     public MonitorService(
         ApplicationDbContext context,
         IMapper mapper,
         ICacheService cacheService,
-        IUserService userService,
+        IUserContextService userContextService,
         IHttpClientFactory httpClientFactory)
     {
         _context = context;
         _mapper = mapper;
         _cacheService = cacheService;
-        _userService = userService;
+        _userContextService = userContextService;
         _httpClientFactory = httpClientFactory;
     }
 
@@ -41,7 +40,7 @@ public class MonitorService : IMonitorService
             return cached;
 
         var monitors = await _context.Monitors
-            .Where(x => x.UserId == _userService.GetUserId())
+            .Where(x => x.UserId == _userContextService.GetUserId())
             .ToListAsync();
 
         var result = _mapper.Map<List<MonitorDto>>(monitors);
@@ -55,7 +54,7 @@ public class MonitorService : IMonitorService
         var monitorExists = await GetServiceByNameAsync(monitorDto.Name);
 
         var monitor = _mapper.Map<Monitor>(monitorDto);
-        monitor.UserId = _userService.GetUserId();
+        monitor.UserId = _userContextService.GetUserId();
         monitor.Id = Guid.NewGuid();
         
         if (!await IsServiceSiteValid(monitor))
@@ -71,7 +70,7 @@ public class MonitorService : IMonitorService
     {
         var monitor = await GetMonitorByIdAsync(serviceId);
 
-        monitor.UserId = _userService.GetUserId();
+        monitor.UserId = _userContextService.GetUserId();
 
         _mapper.Map(monitorDto, monitor);
         await _context.SaveChangesAsync();
@@ -105,7 +104,7 @@ public class MonitorService : IMonitorService
     private async Task<MonitorDto> GetServiceByNameAsync(string name)
     {
         var monitor = await _context.Monitors
-            .FirstOrDefaultAsync(s => s.UserId == _userService.GetUserId()
+            .FirstOrDefaultAsync(s => s.UserId == _userContextService.GetUserId()
                                       && s.Name == name);
 
         return _mapper.Map<MonitorDto>(monitor);

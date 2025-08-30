@@ -14,15 +14,18 @@ public class UserController : ControllerBase
     private readonly ISignInService _signInService;
     private readonly IUserPhotoProvider _userPhotoProvider;
     private readonly IUserService _userService;
+    private readonly IUserContextService _userContextService;
     
     public UserController(
         ISignInService signInService,
         IUserPhotoProvider userPhotoProvider,
-        IUserService userService)
+        IUserService userService,
+        IUserContextService userContextService)
     {
         _signInService = signInService;
         _userPhotoProvider = userPhotoProvider;
         _userService = userService;
+        _userContextService = userContextService;
     }
     
     [HttpGet]
@@ -30,7 +33,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var user = await _userService.GetCurrentUserAsync();
+        var user = await _userContextService.GetCurrentUserAsync();
         
         return Ok(user);
     }

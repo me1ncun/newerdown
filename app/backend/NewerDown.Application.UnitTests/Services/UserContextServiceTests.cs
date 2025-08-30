@@ -1,21 +1,20 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.Services;
-using NewerDown.Infrastructure.Data;
+using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Application.UnitTests.Services;
 
 [TestFixture]
-public class UserServiceTests
+public class UserContextServiceTests
 {
     private Mock<IMapper> _mapperMock;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
+    private Mock<IUserService> _userServiceMock;
     
-    private ApplicationDbContext _context;
-    private UserService userService;
+    private UserContextService userContextService;
     
     private readonly Guid currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
     
@@ -24,21 +23,9 @@ public class UserServiceTests
     {
         _httpContextAccessorMock = new();
         _mapperMock = new ();
+        _userServiceMock = new();
         
-        userService = new UserService(_httpContextAccessorMock.Object, _context, _mapperMock.Object);
-        
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        
-        _context = new ApplicationDbContext(options);
-        _context.Database.EnsureCreated();
-    }
-    
-    [TearDown]
-    public void TearDown()
-    {
-        _context.Dispose();
+        userContextService = new UserContextService(_httpContextAccessorMock.Object, _mapperMock.Object, _userServiceMock.Object);
     }
     
     [Test]
@@ -56,7 +43,7 @@ public class UserServiceTests
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(new DefaultHttpContext { User = principal });
         
         // Act
-        var result = userService.GetUserId();
+        var result = userContextService.GetUserId();
         
         // Assert
         Assert.That(result, Is.EqualTo(currentUserId));

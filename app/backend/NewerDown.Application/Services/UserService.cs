@@ -1,7 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Entities;
@@ -13,37 +10,18 @@ namespace NewerDown.Application.Services;
 
 public class UserService : IUserService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserContextService _userContextService;
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
     public UserService(
-        IHttpContextAccessor httpContextAccessor,
+        IUserContextService userContextService,
         ApplicationDbContext context,
         IMapper mapper)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _userContextService = userContextService;
         _context = context;
         _mapper = mapper;
-    }
-
-    public Guid GetUserId()
-    {
-        var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
-        return Guid.TryParse(userId, out var id)
-            ? id
-            : throw new UnauthorizedAccessException("User is not authenticated.");
-    }
-    
-    public async Task<UserDto?> GetCurrentUserAsync()
-    {
-        var userId = GetUserId();
-        var user = await GetUserByIdAsync(userId);
-        if (user == null)
-            throw new EntityNotFoundException("User not found.");
-        
-        return _mapper.Map<UserDto>(user);
     }
  
     public async Task<User?> GetUserByIdAsync(Guid userId)
@@ -66,7 +44,7 @@ public class UserService : IUserService
     
     public async Task<UserDto> UpdateUserAsync(UpdateUserDto request)
     {
-        var userId = GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = await GetUserByIdAsync(userId);
         if (user == null)
             throw new EntityNotFoundException("User not found.");
@@ -81,7 +59,7 @@ public class UserService : IUserService
     
     public async Task DeleteUserAsync()
     {
-        var userId = GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = _context.Users.FirstOrDefault(x => x.Id == userId);
         if (user == null)
             throw new EntityNotFoundException("User not found.");
