@@ -35,7 +35,17 @@ public class UserService : IUserService
             ? id
             : throw new UnauthorizedAccessException("User is not authenticated.");
     }
-
+    
+    public async Task<UserDto?> GetCurrentUserAsync()
+    {
+        var userId = GetUserId();
+        var user = await GetUserByIdAsync(userId);
+        if (user == null)
+            throw new EntityNotFoundException("User not found.");
+        
+        return _mapper.Map<UserDto>(user);
+    }
+ 
     public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         var user = await _context.Users
@@ -53,11 +63,18 @@ public class UserService : IUserService
 
         return _mapper.Map<List<UserDto>>(await users);
     }
-
-    public async Task<UserDto?> GetCurrentUserAsync()
+    
+    public async Task<UserDto> UpdateUserAsync(UpdateUserDto request)
     {
         var userId = GetUserId();
         var user = await GetUserByIdAsync(userId);
+        if (user == null)
+            throw new EntityNotFoundException("User not found.");
+        
+        _mapper.Map(request, user);
+        
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
         
         return _mapper.Map<UserDto>(user);
     }

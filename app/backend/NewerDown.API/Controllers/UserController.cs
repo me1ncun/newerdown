@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewerDown.Domain.DTOs.Account;
+using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Controllers;
@@ -25,6 +26,8 @@ public class UserController : ControllerBase
     }
     
     [HttpGet]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetCurrentUser()
     {
         var user = await _userService.GetCurrentUserAsync();
@@ -33,11 +36,23 @@ public class UserController : ControllerBase
     }
     
     [HttpDelete]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> DeleteUser()
     {
         await _userService.DeleteUserAsync();
         
         return Ok();
+    }
+    
+    [HttpPatch]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
+    {
+        var user = await _userService.UpdateUserAsync(request);
+        
+        return Ok(user);
     }
     
     [HttpPost("change-password")]
