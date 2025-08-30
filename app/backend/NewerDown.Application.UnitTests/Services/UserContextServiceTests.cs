@@ -1,9 +1,10 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.Services;
-using NewerDown.Domain.Interfaces;
+using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.UnitTests.Services;
 
@@ -12,8 +13,8 @@ public class UserContextServiceTests
 {
     private Mock<IMapper> _mapperMock;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
-    private Mock<IUserService> _userServiceMock;
     
+    private ApplicationDbContext _context;
     private UserContextService userContextService;
     
     private readonly Guid currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
@@ -23,9 +24,21 @@ public class UserContextServiceTests
     {
         _httpContextAccessorMock = new();
         _mapperMock = new ();
-        _userServiceMock = new();
         
-        userContextService = new UserContextService(_httpContextAccessorMock.Object, _mapperMock.Object, _userServiceMock.Object);
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        
+        _context = new ApplicationDbContext(options);
+        _context.Database.EnsureCreated();
+        
+        userContextService = new UserContextService(_context, _httpContextAccessorMock.Object, _mapperMock.Object);
+    }
+    
+    [TearDown]
+    public void TearDown()
+    {
+        _context.Dispose();
     }
     
     [Test]

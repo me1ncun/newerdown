@@ -1,26 +1,28 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.Services;
 
 public class UserContextService : IUserContextService
 {
+    private readonly ApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
-    private readonly IUserService _userService;
 
     public UserContextService(
+        ApplicationDbContext context,
         IHttpContextAccessor httpContextAccessor,
-        IMapper mapper,
-        IUserService userService)
+        IMapper mapper)
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
-        _userService = userService;
+        _context = context;
     }
 
     public Guid GetUserId()
@@ -35,7 +37,10 @@ public class UserContextService : IUserContextService
     public async Task<UserDto?> GetCurrentUserAsync()
     {
         var userId = GetUserId();
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = await _context.Users
+            .Include(x => x.FileAttachment)
+            .FirstOrDefaultAsync(x => x.Id == userId);
+        
         if (user == null)
             throw new EntityNotFoundException("User not found.");
         
