@@ -5,11 +5,7 @@ namespace NewerDown.Domain.Interfaces;
 
 public interface IUserService
 {
-    Guid GetUserId();
-    
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
-    
-    Task<UserDto?> GetCurrentUserAsync();
     
     Task<User?> GetUserByIdAsync(Guid userId);
     

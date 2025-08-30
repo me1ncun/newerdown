@@ -21,7 +21,7 @@ public class SignInService : ISignInService
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
-    private readonly IUserService _userService;
+    private readonly IUserContextService _userContextService;
     private readonly IMapper _mapper;
     private readonly ILogger<SignInService> _logger;
     private readonly SignInManager<User> _signInManager;
@@ -31,7 +31,7 @@ public class SignInService : ISignInService
     public SignInService(
         UserManager<User> userManager,
         ITokenService tokenService,
-        IUserService userService,
+        IUserContextService userContextService,
         IMapper mapper,
         ILogger<SignInService> logger,
         SignInManager<User> signInManager,
@@ -40,7 +40,7 @@ public class SignInService : ISignInService
     {
         _userManager = userManager;
         _tokenService = tokenService;
-        _userService = userService;
+        _userContextService = userContextService;
         _mapper = mapper;
         _logger = logger;
         _signInManager = signInManager;
@@ -128,7 +128,7 @@ public class SignInService : ISignInService
 
     public async Task ChangePasswordAsync(ChangePasswordDto request)
     {
-        var userId = _userService.GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = (await _userManager.FindByIdAsync(userId.ToString())).ThrowIfNull(nameof(User));
 
         var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);

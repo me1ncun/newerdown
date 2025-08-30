@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
 using NewerDown.Application.Validators;
@@ -22,6 +21,7 @@ public static class ApplicationExtensions
         services.AddScoped<IAlertService, AlertService>();
         services.AddScoped<IMonitorService, MonitorService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserContextService, UserContextService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IBlobStorageService, BlobStorageService>();
         services.AddScoped<IIncidentService, IncidentService>();
