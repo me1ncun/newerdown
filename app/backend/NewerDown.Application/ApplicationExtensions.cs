@@ -22,7 +22,7 @@ public static class ApplicationExtensions
         services.AddScoped<IAlertService, AlertService>();
         services.AddScoped<IMonitorService, MonitorService>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IBlobStorageService, BlobStorageService>();
         services.AddScoped<IIncidentService, IncidentService>();
         services.AddScoped<IAdminService, AdminService>();
