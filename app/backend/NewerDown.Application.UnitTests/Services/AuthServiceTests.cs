@@ -38,7 +38,7 @@ public class AuthServiceTests
         };
 
         // Act
-        var token = _authService.GenerateToken(user);
+        var token = _authService.GenerateAccessToken(user);
 
         // Assert
         Assert.That(token, Is.Not.Null);
