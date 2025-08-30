@@ -3,7 +3,7 @@ using NewerDown.Domain.Entities;
 
 namespace NewerDown.Domain.Interfaces;
 
-public interface IAuthService
+public interface ITokenService
 {
     string GenerateAccessToken(IEnumerable<Claim> claims);
     

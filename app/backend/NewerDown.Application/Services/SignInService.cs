@@ -20,7 +20,7 @@ namespace NewerDown.Application.Services;
 public class SignInService : ISignInService
 {
     private readonly UserManager<User> _userManager;
-    private readonly IAuthService _authService;
+    private readonly ITokenService _tokenService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly ILogger<SignInService> _logger;
@@ -30,7 +30,7 @@ public class SignInService : ISignInService
 
     public SignInService(
         UserManager<User> userManager,
-        IAuthService authService,
+        ITokenService tokenService,
         IUserService userService,
         IMapper mapper,
         ILogger<SignInService> logger,
@@ -39,7 +39,7 @@ public class SignInService : ISignInService
         ApplicationDbContext context)
     {
         _userManager = userManager;
-        _authService = authService;
+        _tokenService = tokenService;
         _userService = userService;
         _mapper = mapper;
         _logger = logger;
@@ -67,9 +67,9 @@ public class SignInService : ISignInService
         }
         authClaims.AddRange(GenerateClaims(user));
         
-        var token = _authService.GenerateAccessToken(authClaims);
+        var token = _tokenService.GenerateAccessToken(authClaims);
         
-        string refreshToken = _authService.GenerateRefreshToken();
+        string refreshToken = _tokenService.GenerateRefreshToken();
         
         var tokenInfo = _context.TokenInfos.FirstOrDefault(a => a.Username == user.UserName);
         if (tokenInfo == null)
@@ -141,7 +141,7 @@ public class SignInService : ISignInService
     
     public async Task<TokenDto> RefreshTokenAsync(TokenDto tokenDto)
     {
-        var principal = _authService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
+        var principal = _tokenService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
         var username = principal.Identity?.Name;
 
         var tokenInfo = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
@@ -152,8 +152,8 @@ public class SignInService : ISignInService
             throw new InvalidAccessException("Invalid refresh token. Please login again.");
         }
 
-        var newAccessToken = _authService.GenerateAccessToken(principal.Claims.ToList());
-        var newRefreshToken = _authService.GenerateRefreshToken();
+        var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
 
         tokenInfo.RefreshToken = newRefreshToken;
         await _context.SaveChangesAsync();
