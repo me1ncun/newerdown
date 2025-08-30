@@ -370,6 +370,30 @@ namespace NewerDown.Infrastructure.Migrations
                     b.ToTable("MonitorChecks");
                 });
 
+            modelBuilder.Entity("NewerDown.Domain.Entities.TokenInfo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TokenInfos");
+                });
+
             modelBuilder.Entity("NewerDown.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")

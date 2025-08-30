@@ -28,10 +28,11 @@ public static class ServicesExtensions
     public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddAuthentication(x =>
+            .AddAuthentication(options =>
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(x =>
             {
@@ -39,9 +40,12 @@ public static class ServicesExtensions
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = configuration["JWT:ValidAudience"],
+                    ValidIssuer = configuration["JWT:ValidIssuer"],
+                    ClockSkew = TimeSpan.Zero,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtKey"])),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
                     RoleClaimType = ClaimTypes.Role
                 };
             });

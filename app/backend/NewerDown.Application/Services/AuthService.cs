@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -17,32 +18,59 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
     
-    public string GenerateToken(User user)
+    public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["JwtKey"]);
-        var credentials = new SigningCredentials(
-            new SymmetricSecurityKey(key),
-            SecurityAlgorithms.HmacSha256Signature);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = GenerateClaims(user),
-            Expires = DateTime.UtcNow.AddMinutes(15),
-            SigningCredentials = credentials,
+            Issuer = _configuration["JWT:ValidIssuer"],
+            Audience = _configuration["JWT:ValidAudience"],
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.Now.AddMinutes(15),
+            SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         };
 
-        var token = handler.CreateToken(tokenDescriptor);
-        return handler.WriteToken(token);
-    }
+        var token = tokenHandler.CreateToken(tokenDescriptor);
 
-    private static ClaimsIdentity GenerateClaims(User user)
+        return tokenHandler.WriteToken(token);
+    }
+    
+    public string GenerateRefreshToken()
     {
-        return new ClaimsIdentity(new[]
+        var randomNumber = new byte[32];
+        
+        using var randomNumberGenerator = RandomNumberGenerator.Create();
+        randomNumberGenerator.GetBytes(randomNumber);
+        
+        return Convert.ToBase64String(randomNumber);
+    }
+    
+    public ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
+    {
+        var tokenValidationParameters = new TokenValidationParameters
         {
-            new Claim("username", user.UserName),
-            new Claim("email", user.Email),
-            new Claim("userId", user.Id.ToString()),
-        });
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = _configuration["JWT:ValidAudience"],
+            ValidIssuer = _configuration["JWT:ValidIssuer"],
+            ValidateLifetime = false, 
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]))
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(accessToken, tokenValidationParameters, out SecurityToken securityToken);
+        
+        var jwtSecurityToken = securityToken as JwtSecurityToken;
+        if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals
+                (SecurityAlgorithms.HmacSha256,StringComparison.InvariantCultureIgnoreCase))
+        {
+            throw new SecurityTokenException("Invalid token");
+        }
+        
+        return principal;
     }
 }
