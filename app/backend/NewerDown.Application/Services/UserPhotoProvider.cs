@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using NewerDown.Application.Errors;
 using NewerDown.Application.Extensions;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Domain.Result;
 using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.Services;
@@ -44,28 +46,28 @@ public class UserPhotoProvider : IUserPhotoProvider
         await _context.SaveChangesAsync();
     }
     
-    public async Task<string> GetPhotoUrlAsync()
+    public async Task<Result<string>> GetPhotoUrlAsync()
     {
         var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
         if (user.FileAttachmentId == Guid.Empty)
         {
-            throw new EntityNotFoundException("User does not have a photo.");
+            return Result<string>.Failure(PhotoErrors.UserPhotoNotFound);
         }
 
         var fileAttachment = await _blobStorageService.GetFileAttachmentByIdAsync(user.FileAttachmentId);
         
-        return fileAttachment.Uri;
+        return Result<string>.Success(fileAttachment.Uri);
     }
     
-    public async Task DeletePhotoAsync()
+    public async Task<Result> DeletePhotoAsync()
     {
         var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
         
         if (user.FileAttachmentId == Guid.Empty)
         {
-            throw new EntityNotFoundException("User does not have a photo to delete.");
+            return Result.Failure(PhotoErrors.UserPhotoNotFound);
         }
 
         await _blobStorageService.DeleteFileAsync(user.FileAttachmentId);
@@ -74,5 +76,7 @@ public class UserPhotoProvider : IUserPhotoProvider
         
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
+        
+        return Result.Success();
     }
 }

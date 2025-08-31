@@ -2,6 +2,7 @@
 using NewerDown.Domain.DTOs.Account;
 using NewerDown.Domain.DTOs.Token;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Extensions;
 
 namespace NewerDown.Controllers;
 
@@ -27,13 +28,13 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("signup")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]
+    [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(void))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> SignUp([FromBody] RegisterUserDto registerUser)
     {
-        await _signInService.SignUpUserAsync(registerUser);
+        var result = await _signInService.SignUpUserAsync(registerUser);
         
-        return Ok();
+        return result.ToDefaultApiResponse();
     }
     
     [HttpPost("login")]
@@ -43,6 +44,16 @@ public class AuthController : ControllerBase
     {
         var result = await _signInService.LoginUserAsync(loginUser);
 
-        return Ok(result);
+        return result.ToDefaultApiResponse();
+    }
+    
+    [HttpPost("change-password")]
+    [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
+    {
+        var result = await _signInService.ChangePasswordAsync(request);
+
+        return result.ToDefaultApiResponse();
     }
 }
