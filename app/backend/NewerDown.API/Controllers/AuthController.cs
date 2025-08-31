@@ -23,7 +23,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Refresh(TokenDto token)
     {
         var result = await _signInService.RefreshTokenAsync(token);
-        
         return Ok(result);
     }
     
@@ -33,7 +32,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> SignUp([FromBody] RegisterUserDto registerUser)
     {
         var result = await _signInService.SignUpUserAsync(registerUser);
-        
         return result.ToDefaultApiResponse();
     }
     
@@ -43,7 +41,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserDto loginUser)
     {
         var result = await _signInService.LoginUserAsync(loginUser);
-
         return result.ToDefaultApiResponse();
     }
     
@@ -53,7 +50,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
     {
         var result = await _signInService.ChangePasswordAsync(request);
-
         return result.ToDefaultApiResponse();
     }
 }

@@ -6,9 +6,9 @@ using NewerDown.Domain.DTOs.Service;
 
 namespace NewerDown.Application.UnitTests.Validators;
 
-public class UpdateServiceValidatorTests
+public class UpdateMonitorValidatorTests
 {
-    private UpdateServiceValidator _validator;
+    private UpdateMonitorValidator _validator;
 
     [SetUp]
     public void Setup()

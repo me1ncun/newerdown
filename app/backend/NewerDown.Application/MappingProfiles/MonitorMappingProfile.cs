@@ -12,9 +12,11 @@ public class MonitorMappingProfile : Profile
         CreateMap<AddMonitorDto, Monitor>();
         
         CreateMap<Monitor, MonitorDto>()
+            .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Target))
             .ReverseMap();
 
-        CreateMap<UpdateMonitorDto, Monitor>();
+        CreateMap<UpdateMonitorDto, Monitor>()
+            .ForMember(dest => dest.Target, opt => opt.MapFrom(src => src.Url));
         
         CreateMap<UpdateMonitorDto, MonitorDto>();
     }
