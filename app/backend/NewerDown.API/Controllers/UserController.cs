@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NewerDown.Domain.DTOs.Account;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Extensions;
 
 namespace NewerDown.Controllers;
 
@@ -11,18 +11,15 @@ namespace NewerDown.Controllers;
 [Route("api/users/me")]
 public class UserController : ControllerBase
 {
-    private readonly ISignInService _signInService;
     private readonly IUserPhotoProvider _userPhotoProvider;
     private readonly IUserService _userService;
     private readonly IUserContextService _userContextService;
     
     public UserController(
-        ISignInService signInService,
         IUserPhotoProvider userPhotoProvider,
         IUserService userService,
         IUserContextService userContextService)
     {
-        _signInService = signInService;
         _userPhotoProvider = userPhotoProvider;
         _userService = userService;
         _userContextService = userContextService;
@@ -39,33 +36,23 @@ public class UserController : ControllerBase
     }
     
     [HttpDelete]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> DeleteUser()
     {
-        await _userService.DeleteUserAsync();
+        var result = await _userService.DeleteUserAsync();
         
-        return Ok();
+        return result.ToDefaultApiResponse();
     }
     
     [HttpPatch]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(UserDto))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
-        var user = await _userService.UpdateUserAsync(request);
+        var result = await _userService.UpdateUserAsync(request);
         
-        return Ok(user);
-    }
-    
-    [HttpPost("change-password")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
-    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
-    {
-        await _signInService.ChangePasswordAsync(request);
-
-        return Ok("Password changed successfully.");
+        return result.ToDefaultApiResponse();
     }
     
     [HttpPost("upload-photo")]
@@ -79,12 +66,12 @@ public class UserController : ControllerBase
     }
     
     [HttpDelete("delete-photo")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
+    [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> DeleteUserPhoto()
     {
-        await _userPhotoProvider.DeletePhotoAsync();
+        var result = await _userPhotoProvider.DeletePhotoAsync();
         
-        return Ok("Photo deleted successfully.");
+        return result.ToDefaultApiResponse();
     }
 }

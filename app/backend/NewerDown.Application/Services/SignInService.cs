@@ -3,6 +3,7 @@ using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using NewerDown.Application.Errors;
 using NewerDown.Application.Extensions;
 using NewerDown.Domain.DTOs.Account;
 using NewerDown.Domain.DTOs.Email;
@@ -11,6 +12,7 @@ using NewerDown.Domain.Entities;
 using NewerDown.Domain.Enums;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Domain.Result;
 using NewerDown.Infrastructure.Data;
 using NewerDown.Infrastructure.Extensions;
 using NewerDown.Infrastructure.Queuing;
@@ -48,12 +50,12 @@ public class SignInService : ISignInService
         _context = context;
     }
 
-    public async Task<TokenDto> LoginUserAsync(LoginUserDto request)
+    public async Task<Result<TokenDto>> LoginUserAsync(LoginUserDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
-            throw new InvalidOperationException("Invalid username or password.");
+            return Result<TokenDto>.Failure(UserErrors.InvalidCredentials);
         }
         
         List<Claim> authClaims = [
@@ -90,14 +92,14 @@ public class SignInService : ISignInService
         
         await _context.SaveChangesAsync();
 
-        return new TokenDto()
+        return Result<TokenDto>.Success(new TokenDto()
         {
             AccessToken = token,
             RefreshToken = refreshToken
-        };
+        });
     }
 
-    public async Task SignUpUserAsync(RegisterUserDto request)
+    public async Task<Result> SignUpUserAsync(RegisterUserDto request)
     {
         var user = _mapper.Map<User>(request);
         
@@ -105,7 +107,7 @@ public class SignInService : ISignInService
         if (existingUser != null)
         {
             _logger.LogWarning("User with email {email} already exists.", request.Email);
-            throw new InvalidAccessException("User with this email already exists.");
+            return Result.Failure(UserErrors.AlreadyExists);
         }
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -114,7 +116,7 @@ public class SignInService : ISignInService
             var exceptions = string.Join(", ", result.Errors.Select(e => e.Description));
             _logger.LogWarning("User {name} registration failed: {errors}", request.UserName, exceptions);
             
-            throw new InvalidAccessException("User registration failed: " + exceptions);
+            return Result.Failure(UserErrors.RegistrationFailed);
         }
 
         _logger.LogInformation("User {name} registered successfully.", request.UserName);
@@ -124,9 +126,11 @@ public class SignInService : ISignInService
         
         var email = new EmailDto(user.Email, user.UserName, DateTime.UtcNow);
         await _queueSender.SendAsync(email, sessionId: email.Id);
+        
+        return Result.Success();
     }
 
-    public async Task ChangePasswordAsync(ChangePasswordDto request)
+    public async Task<Result> ChangePasswordAsync(ChangePasswordDto request)
     {
         var userId = _userContextService.GetUserId();
         var user = (await _userManager.FindByIdAsync(userId.ToString())).ThrowIfNull(nameof(User));
@@ -134,9 +138,10 @@ public class SignInService : ISignInService
         var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!result.Succeeded)
         {
-            var errors = string.Join("; ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Password change failed: {errors}");
+            return Result.Failure(UserErrors.PasswordChangeError);
         }
+        
+        return Result.Success();
     }
     
     public async Task<TokenDto> RefreshTokenAsync(TokenDto tokenDto)
