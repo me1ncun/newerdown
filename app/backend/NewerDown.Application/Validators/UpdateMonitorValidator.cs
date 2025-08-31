@@ -3,10 +3,13 @@ using NewerDown.Domain.DTOs.Service;
 
 namespace NewerDown.Application.Validators;
 
-public class UpdateServiceValidator : AbstractValidator<UpdateMonitorDto>
+public class UpdateMonitorValidator : AbstractValidator<UpdateMonitorDto>
 {
-    public UpdateServiceValidator()
+    public UpdateMonitorValidator()
     {
+        RuleFor(x => x.Type)
+            .IsInEnum().WithMessage("Type must be a valid MonitorType.");
+        
         RuleFor(x => x.Url)
             .NotEmpty().WithMessage("Url is required.");
         

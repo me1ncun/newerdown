@@ -31,7 +31,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetCurrentUser()
     {
         var user = await _userContextService.GetCurrentUserAsync();
-        
         return Ok(user);
     }
     
@@ -41,7 +40,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> DeleteUser()
     {
         var result = await _userService.DeleteUserAsync();
-        
         return result.ToDefaultApiResponse();
     }
     
@@ -51,7 +49,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
         var result = await _userService.UpdateUserAsync(request);
-        
         return result.ToDefaultApiResponse();
     }
     
@@ -61,7 +58,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UploadUserPhoto(IFormFile file)
     {
         await _userPhotoProvider.UploadPhotoAsync(file);
-        
         return Ok("Photo uploaded successfully.");
     }
     
@@ -71,7 +67,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> DeleteUserPhoto()
     {
         var result = await _userPhotoProvider.DeletePhotoAsync();
-        
         return result.ToDefaultApiResponse();
     }
 }
