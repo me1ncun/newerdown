@@ -26,6 +26,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     
     public DbSet<FileAttachment> FileAttachments { get; set; }
     
+    public DbSet<TokenInfo> TokenInfos { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

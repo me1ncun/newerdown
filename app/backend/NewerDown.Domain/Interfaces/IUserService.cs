@@ -5,9 +5,11 @@ namespace NewerDown.Domain.Interfaces;
 
 public interface IUserService
 {
-    Guid GetUserId();
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
+    
     Task<User?> GetUserByIdAsync(Guid userId);
-    Task DeleteUserAsync();
-    Task<UserDto?> GetCurrentUserAsync();
+    
+    Task<Result.Result> DeleteUserAsync();
+
+    Task<Result.Result<UserDto>> UpdateUserAsync(UpdateUserDto request);
 }

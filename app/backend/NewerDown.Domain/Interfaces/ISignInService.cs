@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using NewerDown.Domain.DTOs.Account;
-using NewerDown.Domain.Entities;
+﻿using NewerDown.Domain.DTOs.Account;
+using NewerDown.Domain.DTOs.Token;
+using NewerDown.Domain.Result;
 
 namespace NewerDown.Domain.Interfaces;
 
 public interface ISignInService
 {
-    Task<string> LoginUserAsync(LoginUserDto request);
-    Task ChangePasswordAsync(ChangePasswordDto request);
-    Task RegisterUserAsync(RegisterUserDto request);
+    Task<Result<TokenDto>> LoginUserAsync(LoginUserDto request);
+    Task<Result.Result> ChangePasswordAsync(ChangePasswordDto request);
+    Task<Result.Result> SignUpUserAsync(RegisterUserDto request);
+    Task<TokenDto> RefreshTokenAsync(TokenDto tokenDto);
 }

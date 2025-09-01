@@ -7,6 +7,9 @@ public class AddServiceValidator : AbstractValidator<AddMonitorDto>
 {
     public AddServiceValidator()
     {
+        RuleFor(x => x.IntervalSeconds)
+            .GreaterThan(0).WithMessage("IntervalSeconds must be greater than 0.");
+        
         RuleFor(x => x.Target)
             .NotEmpty().WithMessage("Target is required.");
         

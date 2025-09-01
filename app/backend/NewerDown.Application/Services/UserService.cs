@@ -1,41 +1,30 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using NewerDown.Application.Errors;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Entities;
-using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Domain.Result;
 using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.Services;
 
 public class UserService : IUserService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserContextService _userContextService;
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
     public UserService(
-        IHttpContextAccessor httpContextAccessor,
+        IUserContextService userContextService,
         ApplicationDbContext context,
         IMapper mapper)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _userContextService = userContextService;
         _context = context;
         _mapper = mapper;
     }
-
-    public Guid GetUserId()
-    {
-        var userId = _httpContextAccessor.HttpContext?.User.FindFirst("userId")?.Value;
-        
-        return Guid.TryParse(userId, out var id)
-            ? id
-            : throw new UnauthorizedAccessException("User is not authenticated.");
-    }
-
+ 
     public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         var user = await _context.Users
@@ -53,23 +42,32 @@ public class UserService : IUserService
 
         return _mapper.Map<List<UserDto>>(await users);
     }
-
-    public async Task<UserDto?> GetCurrentUserAsync()
+    
+    public async Task<Result<UserDto>> UpdateUserAsync(UpdateUserDto request)
     {
-        var userId = GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = await GetUserByIdAsync(userId);
+        if (user == null)
+            return Result<UserDto>.Failure(UserErrors.UserNotFound);
         
-        return _mapper.Map<UserDto>(user);
+        _mapper.Map(request, user);
+        
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+        
+        return Result<UserDto>.Success(_mapper.Map<UserDto>(user));
     }
     
-    public async Task DeleteUserAsync()
+    public async Task<Result> DeleteUserAsync()
     {
-        var userId = GetUserId();
+        var userId = _userContextService.GetUserId();
         var user = _context.Users.FirstOrDefault(x => x.Id == userId);
         if (user == null)
-            throw new EntityNotFoundException("User not found.");
+            return Result.Failure(UserErrors.UserNotFound);
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
+        
+        return Result.Success();
     }
 }
