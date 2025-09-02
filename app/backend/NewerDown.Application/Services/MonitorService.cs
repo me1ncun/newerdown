@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using NewerDown.Application.Constants;
 using NewerDown.Application.CsvProfiles;
 using NewerDown.Application.Errors;
+using NewerDown.Application.Time;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Domain.Result;
@@ -25,6 +26,7 @@ public class MonitorService : IMonitorService
     private readonly IUserContextService _userContextService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<MonitorService> _logger;
+    private readonly IScopedTimeProvider _timeProvider;
 
     public MonitorService(
         ApplicationDbContext context,
@@ -32,7 +34,8 @@ public class MonitorService : IMonitorService
         ICacheService cacheService,
         IUserContextService userContextService,
         IHttpClientFactory httpClientFactory,
-        ILogger<MonitorService> logger)
+        ILogger<MonitorService> logger,
+        IScopedTimeProvider timeProvider)
     {
         _context = context;
         _mapper = mapper;
@@ -41,6 +44,7 @@ public class MonitorService : IMonitorService
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _cacheKey = $"{nameof(Monitor)}_{_userContextService.GetUserId()}";
+        _timeProvider = timeProvider;
     }
 
     public async Task<IEnumerable<MonitorDto>> GetAllMonitors()
@@ -66,6 +70,7 @@ public class MonitorService : IMonitorService
         var monitor = _mapper.Map<Monitor>(monitorDto);
         monitor.UserId = _userContextService.GetUserId();
         monitor.Id = Guid.NewGuid();
+        monitor.CreatedAt = _timeProvider.UtcNow();
         
         if (!await IsServiceSiteValid(monitor.Target))
             return Result<Guid>.Failure(MonitorErrors.TargetNotReachable);

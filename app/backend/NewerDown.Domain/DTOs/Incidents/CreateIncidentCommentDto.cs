@@ -1,9 +1,7 @@
 ﻿namespace NewerDown.Domain.DTOs.Incidents;
 
-public class IncidentCommentDto
+public class CreateIncidentCommentDto
 {
-    public Guid Id { get; set; }
-
     public Guid IncidentId { get; set; }
 
     public Guid UserId { get; set; }
