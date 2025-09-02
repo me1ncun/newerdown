@@ -1,6 +1,10 @@
-﻿using FluentValidation;
+﻿using System.Reflection;
+using FluentValidation;
+using GraphQL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NewerDown.Application.GraphQL.Mutations;
+using NewerDown.Application.GraphQL.Schemas;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
 using NewerDown.Application.Validators;
@@ -14,6 +18,7 @@ public static class ApplicationExtensions
     {
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.AddValidatorsFromAssembly(typeof(AddServiceValidator).Assembly);
+        services.AddGraphQLServices();
 
         services.AddSingleton<ICacheService, CacheService>();
         
@@ -30,6 +35,23 @@ public static class ApplicationExtensions
         services.AddScoped<IUserPhotoProvider, UserPhotoProvider>();
 
         services.AddScoped<IScopedTimeProvider, ScopedTimeProvider>();
+
+        return services;
+    }
+    
+    [Obsolete("Obsolete")]
+    private static IServiceCollection AddGraphQLServices(this IServiceCollection services)
+    {
+        services.AddScoped<AppSchema>();
+
+        services.AddGraphQL(builder => builder
+            .AddSystemTextJson()
+            .AddGraphTypes(Assembly.GetAssembly(typeof(AppMutation)))
+            .ConfigureExecutionOptions(options =>
+            {
+                options.EnableMetrics = true;
+            })
+        );
 
         return services;
     }

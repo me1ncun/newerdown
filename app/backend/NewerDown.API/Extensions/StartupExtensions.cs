@@ -41,7 +41,7 @@ public static class StartupExtensions
             options.AddDefaultPolicy(
                 policy =>
                 {
-                    policy.WithOrigins("http://example.com")
+                    policy.SetIsOriginAllowed(_ => true)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

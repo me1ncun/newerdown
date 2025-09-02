@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using GraphQL.Server;
+using GraphQL.Server.Ui.Playground;
+using Microsoft.AspNetCore.Identity;
 using NewerDown.Application;
+using NewerDown.Application.GraphQL.Schemas;
 using NewerDown.Domain.Entities;
 using NewerDown.Extensions;
 using NewerDown.Infrastructure;
@@ -74,6 +77,9 @@ public class Startup
 
         app.UseAuthentication();
         app.UseAuthorization();
+        
+        app.UseGraphQL<AppSchema>("/graphql"); 
+        app.UseGraphQLGraphiQL("/ui/graphql");
 
         app.UseIdentityServer();
         

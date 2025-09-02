@@ -16,11 +16,15 @@ public class Monitor
     
     public bool IsActive { get; set; }
     
+    
     public DateTime CreatedAt { get; set; }
     
     public Guid UserId { get; set; }
+    
     public User User { get; set; }
     
+    
     public ICollection<MonitorCheck> Checks { get; set; } = new List<MonitorCheck>();
+    
     public ICollection<Alert> Alerts { get; set; } = new List<Alert>();
 }
