@@ -2,7 +2,7 @@
 @use '../utils/variables.scss' as *;
 
 .detail {
-  &__photos { 
+  &__photos {
     margin-bottom: 16px;
 
     @include page-grid;
