@@ -1,0 +1,13 @@
+@use '../utils/mixins.scss' as *;
+@use '../utils/variables.scss' as *;
+
+.contacts {
+  &__wrapper {
+    display: grid;
+    row-gap: 40px;
+
+    @include on-tablet {
+      row-gap: 48px;
+    }
+  }
+}
