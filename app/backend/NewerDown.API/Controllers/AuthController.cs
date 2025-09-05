@@ -20,10 +20,26 @@ public class AuthController : ControllerBase
     [HttpPost("token/refresh")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]                  
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> Refresh(TokenDto token)
+    public async Task<IActionResult> Refresh()
     {
-        var result = await _signInService.RefreshTokenAsync(token);
-        return Ok(result);
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(refreshToken))
+            return Unauthorized();
+
+        var accessToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var tokenDto = new TokenDto { AccessToken = accessToken, RefreshToken = refreshToken };
+
+        var result = await _signInService.RefreshTokenAsync(tokenDto);
+
+        Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+
+        return Ok(new { accessToken = result.AccessToken });
     }
     
     [HttpPost("signup")]
@@ -41,7 +57,16 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserDto loginUser)
     {
         var result = await _signInService.LoginUserAsync(loginUser);
-        return result.ToDefaultApiResponse();
+        
+        Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true, 
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+        
+        return Ok(result.Value.AccessToken);
     }
     
     [HttpPost("change-password")]
