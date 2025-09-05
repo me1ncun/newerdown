@@ -1,0 +1,42 @@
+.wrapper {
+  position: absolute;
+  left: 0.8em;
+  top: 0.8em;
+  z-index: 3;
+  display: flex;
+  gap: 1.6em;
+  width: calc(100% - 1.6em);
+  padding: 1.2em 1.6em;
+  border: 0.1em solid #9a8060;
+  background-color: #dad1c1;
+  border-radius: 1em;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-20px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.wrapper.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.text {
+  font-size: 1.4em;
+  font-weight: 400;
+  color: var(--c-text);
+  line-height: 120%;
+}
+
+.icon {
+  width: 4.2em;
+  height: 4.2em;
+}
+.iconClose {
+  align-self: flex-start;
+  color: var(--c-text);
+}
+
+/*# sourceMappingURL=PdfPopup.module.css.map */

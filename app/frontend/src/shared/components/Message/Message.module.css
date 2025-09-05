@@ -1,0 +1,84 @@
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.8em;
+  padding: 0.8em;
+  transition: transform 0.5s;
+  margin-inline: 0 1.2em;
+}
+@media (min-width: 1280px) {
+  .message {
+    position: absolute;
+    right: 0;
+    animation:
+      step1 0.1s 1400ms linear forwards,
+      step2 0.1s 4400ms linear forwards;
+  }
+}
+.messageRightSide {
+  flex-direction: row-reverse;
+  margin-inline: 1.2em 0;
+}
+.messageAvatar {
+  width: 3em;
+  height: 3em;
+}
+.messageContainer {
+  position: relative;
+}
+.messageContent {
+  width: fit-content;
+  background-color: var(--c-grey-shadow);
+  border-radius: 1.3em;
+  padding: 0.9em 1.4em;
+  margin-bottom: 0.5em;
+}
+.messageContentText {
+  font-family: var(font--main);
+  color: var(--c-text);
+  font-size: 1.44em;
+  font-weight: 400;
+  line-height: 135%;
+}
+.messageContentText span {
+  display: inline-block;
+  margin-top: 0.5em;
+  font-weight: 700;
+  color: inherit;
+}
+.messageContentRightSide {
+  background-color: var(--c-primary);
+}
+.messageContentRightSide p {
+  color: var(--c-snow);
+}
+.messageContentPart {
+  height: 1em;
+  position: absolute;
+  bottom: 0;
+}
+.messageContentPartChat {
+  left: 0;
+}
+.messageContentPartUser {
+  right: 0;
+}
+
+@keyframes step1 {
+  from {
+    transform: translateY(0em);
+  }
+  to {
+    transform: translateY(-3em);
+  }
+}
+@keyframes step2 {
+  from {
+    transform: translateY(-3em);
+  }
+  to {
+    transform: translateY(-15.5em);
+  }
+}
+
+/*# sourceMappingURL=Message.module.css.map */

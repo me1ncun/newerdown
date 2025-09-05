@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  margin-right: 0.4em;
+  width: 1.2em;
+  height: 1.2em;
+}
+.icon:last-child {
+  margin-right: 0;
+}
+.iconBig {
+  width: 2.5em;
+  height: 2.5em;
+}
+
+/*# sourceMappingURL=StarRating.module.css.map */

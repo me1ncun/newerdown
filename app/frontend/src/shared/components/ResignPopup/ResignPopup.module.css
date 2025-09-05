@@ -1,0 +1,55 @@
+.popupWrapper {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(17, 17, 17, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.popupInner {
+  position: relative;
+  padding: 2.4em 1.2em 0;
+  background-color: var(--c-bg);
+  border-radius: 1em;
+}
+@media (min-width: 1280px) {
+  .popupInnerAdaptive {
+    width: 40em;
+    margin: auto;
+  }
+}
+.popupContent {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity, 0.3s;
+  min-width: 4em;
+  min-height: 4em;
+}
+.popupContentLoading {
+  opacity: 0;
+}
+.popupClose {
+  position: absolute;
+  z-index: 1;
+  right: 2em;
+  width: 2em;
+  height: 2em;
+}
+.popupLoader {
+  position: absolute;
+  top: calc(50% - 2.4em);
+  left: calc(50% - 2.4em);
+}
+
+.closeIcon {
+  color: #b7b4c1;
+}
+
+/*# sourceMappingURL=ResignPopup.module.css.map */

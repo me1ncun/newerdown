@@ -1,0 +1,27 @@
+@import '../../styles/colors.scss';
+
+.infoDescription {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding: 0.9em 0.8em;
+  border: 0.1em solid var(--c-button-frame);
+  border-radius: 1em;
+  background-color: var(--c-bg);
+}
+
+.infoIcon {
+  width: 1.7em;
+  height: 1.7em;
+}
+
+.infoText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+
+  &Goal {
+    min-height: 4em;
+  }
+}

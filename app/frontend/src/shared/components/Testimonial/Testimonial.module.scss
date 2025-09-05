@@ -1,0 +1,67 @@
+@import '../../styles/colors';
+@import '../../styles/mixins';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2.8em;
+  border-radius: 1em;
+  background: $c-snow;
+  position: relative;
+  padding: 3.1em 1.6em 1.2em;
+
+  &Adaptive {
+    > .row:first-of-type {
+      @include onDesktopLarge {
+        justify-content: flex-start;
+        margin-left: 8em;
+      }
+    }
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+
+.image {
+  position: absolute;
+  z-index: 1;
+  top: 1.7em;
+  left: 1.6em;
+  width: 6.5em;
+  height: 6.5em;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  margin-right: 2em;
+}
+
+.note {
+  color: $c-text;
+  margin-bottom: 3px;
+  text-align: left;
+
+  &Text {
+    color: inherit;
+  }
+}
+
+.rating {
+  font-weight: 300;
+  font-size: 1.2em;
+  line-height: 120%;
+  margin-left: 0.8em;
+  color: $c-grey;
+}

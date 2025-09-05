@@ -1,0 +1,16 @@
+@import '../../styles/mixins.scss';
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  gap: 2.4em;
+  flex-direction: column;
+  align-items: center;
+
+  @include onDesktopLarge {
+    padding-block: 8em;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+}

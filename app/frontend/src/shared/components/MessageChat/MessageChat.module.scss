@@ -1,0 +1,127 @@
+@import '../../styles/mixins.scss';
+
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.8em;
+  padding: 0.8em;
+  transition: transform 0.5s;
+  margin-inline: 0 1.2em;
+
+  @include onDesktopLarge {
+    position: absolute;
+    left: 0;
+    right: 1.2em;
+
+    &First {
+      animation:
+        step1 0.1s 5400ms linear forwards,
+        step2 0.1s 6800ms linear forwards,
+        step3 0.1s 9800ms linear forwards;
+    }
+  }
+
+  &Avatar {
+    width: 3em;
+    height: 3em;
+  }
+
+  &Container {
+    position: relative;
+    animation: 0.5s fade-in forwards;
+  }
+
+  &Content {
+    width: fit-content;
+    background-color: var(--c-grey-shadow);
+    border-radius: 1.3em;
+    padding: 0.9em 1.4em;
+    margin-bottom: 0.5em;
+
+    &Text {
+      font-family: var(font--main);
+      color: var(--c-text);
+      font-size: 1.44em;
+      font-weight: 400;
+      line-height: 135%;
+
+      & span {
+        display: inline-block;
+        margin-top: 0.5em;
+        font-weight: 700;
+        color: inherit;
+      }
+    }
+
+    &Part {
+      height: 1em;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+  }
+
+  &Like {
+    opacity: 0;
+    height: 2.5em;
+    width: 2.5em;
+    position: absolute;
+    right: 1em;
+    bottom: 0.8em;
+
+    animation: 0.5s put-like 1.5s forwards;
+
+    @include onDesktopLarge {
+      right: 0;
+    }
+  }
+}
+
+@keyframes put-like {
+  from {
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0em);
+  }
+}
+
+@keyframes step1 {
+  from {
+    transform: translateY(0em);
+  }
+  to {
+    transform: translateY(-5em);
+  }
+}
+@keyframes step2 {
+  from {
+    transform: translateY(-5em);
+  }
+  to {
+    transform: translateY(-8em);
+  }
+}
+@keyframes step3 {
+  from {
+    transform: translateY(-8em);
+  }
+  to {
+    transform: translateY(-20.5em);
+  }
+}

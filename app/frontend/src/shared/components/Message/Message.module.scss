@@ -1,0 +1,94 @@
+@import '../../styles/mixins.scss';
+
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.8em;
+  padding: 0.8em;
+  transition: transform 0.5s;
+  margin-inline: 0 1.2em;
+
+  @include onDesktopLarge {
+    position: absolute;
+    right: 0;
+    animation:
+      step1 0.1s 1400ms linear forwards,
+      step2 0.1s 4400ms linear forwards;
+  }
+
+  &RightSide {
+    flex-direction: row-reverse;
+    margin-inline: 1.2em 0;
+  }
+
+  &Avatar {
+    width: 3em;
+    height: 3em;
+  }
+
+  &Container {
+    position: relative;
+  }
+
+  &Content {
+    width: fit-content;
+    background-color: var(--c-grey-shadow);
+    border-radius: 1.3em;
+    padding: 0.9em 1.4em;
+    margin-bottom: 0.5em;
+
+    &Text {
+      font-family: var(font--main);
+      color: var(--c-text);
+      font-size: 1.44em;
+      font-weight: 400;
+      line-height: 135%;
+
+      & span {
+        display: inline-block;
+        margin-top: 0.5em;
+        font-weight: 700;
+        color: inherit;
+      }
+    }
+
+    &RightSide {
+      background-color: var(--c-primary);
+
+      & p {
+        color: var(--c-snow);
+      }
+    }
+
+    &Part {
+      height: 1em;
+      position: absolute;
+      bottom: 0;
+
+      &Chat {
+        left: 0;
+      }
+
+      &User {
+        right: 0;
+      }
+    }
+  }
+}
+
+@keyframes step1 {
+  from {
+    transform: translateY(0em);
+  }
+  to {
+    transform: translateY(-3em);
+  }
+}
+@keyframes step2 {
+  from {
+    transform: translateY(-3em);
+  }
+  to {
+    transform: translateY(-15.5em);
+  }
+}

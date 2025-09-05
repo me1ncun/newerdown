@@ -1,0 +1,23 @@
+.notification {
+  width: 100%;
+  padding: 1.2em 1.6em;
+  background: var(--c-note);
+  border: 0.1em solid var(--c-note-frame);
+  border-radius: 1em;
+  transition: opacity 1s;
+}
+.notificationText {
+  color: inherit;
+}
+.notificationHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8em;
+}
+.notificationIcon {
+  width: 1.6em;
+  height: 1.6em;
+}
+
+/*# sourceMappingURL=Notification.module.css.map */

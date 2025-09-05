@@ -1,0 +1,23 @@
+.loader {
+  width: 4.8em;
+  height: 4.8em;
+  border-radius: 50%;
+  animation: skLinRotate 1.4s ease-in-out infinite alternate;
+}
+.loader::after {
+  content: '';
+  position: absolute;
+  inset: 0.5em;
+  border-radius: 50%;
+  border: 0.5em solid transparent;
+  border-top-color: var(--c-primary);
+}
+
+@keyframes skLinRotate {
+  95%,
+  100% {
+    transform: rotate(840deg);
+  }
+}
+
+/*# sourceMappingURL=Loader.module.css.map */

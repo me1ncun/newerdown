@@ -1,0 +1,24 @@
+.notification {
+  width: 100%;
+  padding: 1.2em 1.6em;
+  background: var(--c-note);
+  border: 0.1em solid var(--c-note-frame);
+  border-radius: 1em;
+  transition: opacity 1s;
+
+  &Text {
+    color: inherit;
+  }
+
+  &Head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8em;
+  }
+
+  &Icon {
+    width: 1.6em;
+    height: 1.6em;
+  }
+}

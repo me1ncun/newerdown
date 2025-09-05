@@ -1,0 +1,18 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  background-color: var(--c-bg-secondary);
+  overflow-x: hidden;
+}
+
+.inner {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background-color: var(--c-primary);
+  transition: width 0.2s;
+}
+
+/*# sourceMappingURL=LineCommon.module.css.map */

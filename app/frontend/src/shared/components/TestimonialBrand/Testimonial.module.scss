@@ -1,0 +1,78 @@
+@import '../../../../set-aff_adopt/shared/styles/colors.scss';
+@import '../../../../set-aff_adopt/shared/styles/mixins.scss';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 20em;
+  padding: 1.7em 1.6em 1.6em;
+  margin: 0 1.6em;
+  border-radius: 1em;
+  border: 0.1em solid var(--c-bg-secondary);
+  background: var(--c-snow);
+  font-family: 'DMSans', sans-serif;
+
+  @include onDesktopLarge {
+    margin: 0;
+  }
+}
+
+.header {
+  margin-bottom: 1.4em;
+  display: flex;
+  gap: 0.8em;
+  align-items: center;
+}
+
+.name {
+  color: var(--c-text);
+  margin-right: 0.4em;
+
+  @include onDesktopLarge {
+    margin-right: 0;
+  }
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+
+  &Image {
+    height: 1.4em;
+    width: 7.5em;
+  }
+}
+
+.text {
+  color: var(--c-text);
+}
+
+.verified {
+  &Block {
+    display: flex;
+    align-items: center;
+  }
+
+  &Icon {
+    width: 1.25em;
+    height: 1.25em;
+    margin-right: 0.2em;
+  }
+
+  &Text {
+    font-size: 1.2em;
+    font-weight: 400;
+    line-height: 120%;
+    color: var(--c-success);
+  }
+}
+
+.date {
+  text-align: right;
+  color: var(--c-grey);
+
+  &Block {
+    margin-top: auto;
+    width: 100%;
+  }
+}

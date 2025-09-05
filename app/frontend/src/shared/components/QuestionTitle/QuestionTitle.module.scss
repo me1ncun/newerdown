@@ -1,0 +1,19 @@
+@import '../../styles/colors.scss';
+
+.title {
+  text-align: center;
+  color: var(--c-text);
+
+  &Animated {
+    animation: 0.5s fade-in forwards;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}

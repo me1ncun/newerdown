@@ -1,0 +1,28 @@
+.button {
+  width: 100%;
+  height: auto;
+  padding: 1.45em 1em;
+  border-radius: 1.2em;
+  background-color: var(--c-light-color);
+  border: 0.1em solid var(--c-button-frame);
+  transition: border-color 0.3s;
+}
+.button:active {
+  border-color: var(--c-button-pressed-frame);
+}
+.buttonTransparent {
+  padding: 0;
+  background-color: transparent;
+  border-color: transparent;
+}
+.buttonWithIcon {
+  padding: 0.9em 1.6em;
+}
+.buttonDisabled {
+  background-color: #e8e6ef;
+  border-color: #d2cfdf;
+  color: #b7b4c1;
+  cursor: not-allowed;
+}
+
+/*# sourceMappingURL=Button.module.css.map */

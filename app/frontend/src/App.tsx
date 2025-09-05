@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { NavLink, Outlet } from 'react-router-dom';
+import classNames from 'classnames';
+import { useAppDispatch, useAppSelector } from './shared/hooks/reduxHooks';
+import { logoutUser } from './features/authSlice';
+import { useEffect } from 'react';
+import './App.scss';
 
-function App() {
-  const [count, setCount] = useState(0)
+const getLinkActiveClass = ({ isActive }: { isActive: boolean }) =>
+  classNames('topbar_main__link', {
+    'topbar_main__link--active': isActive,
+  });
+
+export const App = () => {
+  const dispatch = useAppDispatch();
+  const { token } = useAppSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+
+    if (storedToken && !token) {
+      dispatch({ type: 'auth/setToken', payload: storedToken });
+    }
+  }, [token, dispatch]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div data-cy="app">
+      <div className="topbar_main">
+        <div className="container">
+          <div className="topbar_main__content">
+            <div className="topbar_main__auth">
+              {token ? (
+                <>
+                  <NavLink className={getLinkActiveClass} to="/account">
+                    Account
+                  </NavLink>
+                  <button className="topbar_main__logout" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <NavLink className={getLinkActiveClass} to="/login">
+                  Login
+                </NavLink>
+              )}
+            </div>
 
-export default App
+            <nav className="topbar_main__nav">
+              <NavLink className={getLinkActiveClass} to="/">
+                Home
+              </NavLink>
+              <NavLink className={getLinkActiveClass} to="/monitoring">
+                Monitoring
+              </NavLink>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <Outlet />
+    </div>
+  );
+};

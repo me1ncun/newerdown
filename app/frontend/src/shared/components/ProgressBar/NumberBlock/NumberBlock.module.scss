@@ -1,0 +1,8 @@
+.block {
+  color: var(--c-unchoosen-element);
+  min-width: 2.5em;
+
+  &Active {
+    color: var(--c-primary);
+  }
+}

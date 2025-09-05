@@ -1,0 +1,113 @@
+.popupWrapper {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(17, 17, 17, 0.5);
+  display: flex;
+  align-items: center;
+}
+.popupInner {
+  padding: 2.4em 1.2em 0;
+  background-color: var(--c-bg);
+  border-radius: 1em;
+  width: 100%;
+  margin: auto 2.4em;
+}
+@media (min-width: 1280px) {
+  .popupInnerAdaptive {
+    width: 40em;
+    margin: auto;
+  }
+}
+.popupClose {
+  order: -1;
+  width: 1.4em;
+  height: 1.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.popupHead {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 2.4em;
+}
+.popupContent {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  transition: opacity, 0.3s;
+}
+.popupContentLoading {
+  opacity: 0;
+}
+.popupLoader {
+  position: absolute;
+  top: calc(50% - 2.4em);
+  left: calc(50% - 2.4em);
+}
+
+.closeIcon {
+  color: #b7b4c1;
+}
+
+.selectPopupTitle {
+  flex: 1;
+  text-align: center;
+  color: inherit;
+}
+
+.formWrapper {
+  position: relative;
+}
+.formWrapper iframe {
+  width: 100%;
+}
+
+.hide {
+  display: none;
+}
+
+.applePayButtonContainer {
+  margin: 2em 0 1.2em;
+  height: 40px;
+}
+
+.googlePlayButtonContainer {
+  margin-bottom: 1.2em;
+}
+
+.paypalButtonContainer {
+  margin-bottom: 2em;
+}
+
+.paySafeBlockWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.2em;
+}
+.paySafeBlockInner {
+  padding: 0.6em 0.8em;
+  border-radius: 1em;
+  border: 0.1em solid #27c653;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.paySafeText {
+  color: #27c653;
+}
+.paySafeIcon {
+  margin-right: 0.4em;
+  width: 2em;
+  height: 2em;
+  display: block;
+}
+
+/*# sourceMappingURL=PaymentPopup.module.css.map */

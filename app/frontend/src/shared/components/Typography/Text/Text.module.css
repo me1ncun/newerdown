@@ -1,0 +1,97 @@
+p {
+  color: #111;
+}
+p span {
+  color: #31728d;
+}
+
+.center {
+  text-align: center;
+}
+
+.button1Extrabold {
+  font-weight: 800;
+  font-size: 1.8em;
+  line-height: 120%;
+}
+
+.button1Bold {
+  font-weight: 700;
+  font-size: 1.8em;
+  line-height: 120%;
+}
+
+.button2Bold {
+  font-weight: 700;
+  font-size: 1.6em;
+  line-height: 120%;
+}
+
+.bodyBold {
+  font-weight: 700;
+  font-size: 1.6em;
+  line-height: 120%;
+}
+
+.bodyBoldUnderline {
+  font-weight: 700;
+  font-size: 1.6em;
+  line-height: 120%;
+  text-decoration: underline;
+}
+
+.bodyLight {
+  font-weight: 300;
+  font-size: 1.6em;
+  line-height: 120%;
+}
+
+.bodyRegular {
+  font-weight: 400;
+  font-size: 1.6em;
+  line-height: 120%;
+}
+
+.secondaryBold {
+  font-weight: 700;
+  font-size: 1.4em;
+  line-height: 120%;
+}
+
+.secondaryLight {
+  font-weight: 300;
+  font-size: 1.4em;
+  line-height: 120%;
+}
+
+.smallBold {
+  font-weight: 700;
+  font-size: 1.2em;
+  line-height: 120%;
+}
+
+.smallLight {
+  font-weight: 300;
+  font-size: 1.2em;
+  line-height: 120%;
+}
+
+.verySmallBold {
+  font-weight: 700;
+  font-size: 1em;
+  line-height: 120%;
+}
+
+.verySmallRegular {
+  font-weight: normal;
+  font-size: 1em;
+  line-height: 120%;
+}
+
+.verySmallLight {
+  font-weight: 300;
+  font-size: 1em;
+  line-height: 120%;
+}
+
+/*# sourceMappingURL=Text.module.css.map */

@@ -1,0 +1,70 @@
+.wrapper {
+  width: 100%;
+  overflow: visible;
+}
+
+.fadeMask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 1) 50%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+}
+
+.swiper {
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 1em;
+}
+
+.item {
+  width: 100%;
+  height: auto;
+}
+
+.swiperButton {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.1em;
+  background-color: var(--c-snow);
+  border-radius: 50%;
+  top: 55%;
+
+  &Next {
+    right: -6.6em;
+
+    &Arrow {
+      height: 2em;
+      width: 2em;
+    }
+  }
+
+  &Prev {
+    left: -6.6em;
+
+    &Arrow {
+      height: 2em;
+      width: 2em;
+      transform: rotate(180deg);
+    }
+  }
+
+  &::after {
+    content: '';
+  }
+}

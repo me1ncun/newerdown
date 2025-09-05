@@ -1,0 +1,73 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 20em;
+  padding: 1.7em 1.6em 1.6em;
+  margin: 0 1.6em;
+  border-radius: 1em;
+  border: 0.1em solid var(--c-bg-secondary);
+  background: var(--c-snow);
+  font-family: 'DMSans', sans-serif;
+}
+@media (min-width: 1280px) {
+  .wrapper {
+    margin: 0;
+  }
+}
+
+.header {
+  margin-bottom: 1.4em;
+  display: flex;
+  gap: 0.8em;
+  align-items: center;
+}
+
+.name {
+  color: var(--c-text);
+  margin-right: 0.4em;
+}
+@media (min-width: 1280px) {
+  .name {
+    margin-right: 0;
+  }
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+}
+.ratingImage {
+  height: 1.4em;
+  width: 7.5em;
+}
+
+.text {
+  color: var(--c-text);
+}
+
+.verifiedBlock {
+  display: flex;
+  align-items: center;
+}
+.verifiedIcon {
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: 0.2em;
+}
+.verifiedText {
+  font-size: 1.2em;
+  font-weight: 400;
+  line-height: 120%;
+  color: var(--c-success);
+}
+
+.date {
+  text-align: right;
+  color: var(--c-grey);
+}
+.dateBlock {
+  margin-top: auto;
+  width: 100%;
+}
+
+/*# sourceMappingURL=Testimonial.module.css.map */

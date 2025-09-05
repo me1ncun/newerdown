@@ -1,0 +1,25 @@
+@import '../../styles/colors';
+
+.rights {
+  font-weight: 300;
+  font-size: 1em;
+  line-height: 120%;
+  text-align: center;
+  white-space: normal;
+
+  &Strong {
+    font-weight: 700;
+    color: inherit;
+  }
+}
+
+.link {
+  display: inline;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+  color: inherit;
+}
