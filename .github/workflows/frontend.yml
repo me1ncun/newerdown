@@ -40,26 +40,32 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Install dependencies
+      working-directory: app/frontend
       run: npm ci
 
     - name: Lint code
+      working-directory: app/frontend
       run: npm run lint
 
     - name: Check formatting
+      working-directory: app/frontend
       run: npm run format -- --check
 
     - name: Build the app
+      working-directory: app/frontend
       run: npm run build
+
     - name: Run component tests
+      working-directory: app/frontend
       run: |
         npm run test
         
     - name: Setup Pages
       uses: actions/configure-pages@v5
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
-        path: 'dist/'
+        path: 'app/frontend/dist/'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
