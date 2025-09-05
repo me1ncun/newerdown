@@ -1,9 +1,0 @@
-.block {
-  color: var(--c-unchoosen-element);
-  min-width: 2.5em;
-}
-.blockActive {
-  color: var(--c-primary);
-}
-
-/*# sourceMappingURL=NumberBlock.module.css.map */

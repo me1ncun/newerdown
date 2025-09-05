@@ -25,6 +25,7 @@ export default tseslint.config([
       ...prettierPlugin.configs.recommended.rules,
       'no-console': 'warn',
       eqeqeq: 'warn',
+      "react-refresh/only-export-components": "off",
     },
     languageOptions: {
       ecmaVersion: 2020,
