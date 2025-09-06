@@ -4,7 +4,7 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NewerDown.Domain.DTOs.Service;
-using NewerDown.Domain.Interfaces;
+using NewerDown.Functions.Services;
 
 namespace NewerDown.Functions.Functions;
 

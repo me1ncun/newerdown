@@ -12,6 +12,8 @@ using NewerDown.Functions.Models;
 using NewerDown.Functions.Services;
 using NewerDown.Infrastructure.Data;
 using NewerDown.Infrastructure.Queuing;
+using IMonitorService = NewerDown.Functions.Services.IMonitorService;
+using MonitorService = NewerDown.Functions.Services.MonitorService;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
