@@ -10,6 +10,10 @@ public class Alert
     public AlertType Type { get; set; }
     
     public string Target { get; set; } = default!; // Email address or URL
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public string Message { get; set; }
 
     public Guid MonitorId { get; set; }
     

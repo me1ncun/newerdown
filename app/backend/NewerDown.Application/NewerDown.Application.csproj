@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <UserSecretsId>26624f88-bd03-4e56-b8fa-f3eb73779fd8</UserSecretsId>
@@ -15,9 +15,10 @@
       <PackageReference Include="GraphQL" Version="8.5.0" />
       <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="8.3.0" />
       <PackageReference Include="GraphQL.SystemTextJson" Version="8.5.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
       <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.5" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>

@@ -15,4 +15,5 @@ public interface IMonitorService
     Task<Result.Result> ResumeMonitorAsync(Guid id);
     Task<byte[]> ExportMonitorCsvAsync(Guid id);
     Task ImportMonitorsFromCsvAsync(IFormFile file);
+    Task<bool> CheckWebsiteAsync(MonitorDto dto);
 }

@@ -1,44 +1,36 @@
-/*using System.Text;
+using System.Text;
+using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Interfaces;
-using NewerDown.Functions.Models;
-using NewerDown.Functions.Services;
-using NewerDown.Infrastructure.Data;
-using Newtonsoft.Json;
 
 namespace NewerDown.Functions.Functions;
 
 public class WebsiteCheckerFunction
 {
-    private readonly INotificationService _notificationService;
-    private readonly IWebsiteCheckerService _websiteCheckerService;
+    private readonly IMonitorService _monitorService;
     private readonly ILogger<WebsiteCheckerFunction> _logger;
 
     public WebsiteCheckerFunction(
-        INotificationService notificationService,
-        IWebsiteCheckerService websiteCheckerService,
+        IMonitorService monitorService,
         ILogger<WebsiteCheckerFunction> logger)
     {
-        _notificationService = notificationService;
-        _websiteCheckerService = websiteCheckerService;
+        _monitorService = monitorService;
         _logger = logger;
     }
 
     [Function(nameof(WebsiteCheckerFunction))]
-    public async Task Run([ServiceBusTrigger("monitoring", Connection = "ServiceBusConnection")]
-        ServiceBusReceivedMessage message,
+    public async Task Run(
+        [ServiceBusTrigger("monitoring", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message, 
         ServiceBusMessageActions messageActions)
     {
-        var data = JsonConvert.DeserializeObject<ServiceDto>(Encoding.UTF8.GetString(message.Body));
-        Guid serviceId = data.ServiceId;
+        var monitorDto = JsonSerializer.Deserialize<MonitorDto>(Encoding.UTF8.GetString(message.Body)) 
+                         ?? throw new InvalidOperationException("Invalid monitor message");;
 
-        await _websiteCheckerService.CheckWebsiteAsync(serviceId);
+        var result = await _monitorService.CheckWebsiteAsync(monitorDto);
 
-        // Complete the message
-        await messageActions.CompleteMessageAsync(message);
-        
-        _logger.LogInformation("Website check completed for service ID: {ServiceId}", serviceId);
+        _logger.LogInformation("Website check completed for monitor {MonitorId}, success={Success}", monitorDto.Id, result);
     }
-}*/
+}

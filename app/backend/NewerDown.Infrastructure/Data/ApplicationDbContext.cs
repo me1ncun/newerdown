@@ -28,6 +28,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     
     public DbSet<TokenInfo> TokenInfos { get; set; }
     
+    public DbSet<MonitorStatistic> MonitorStatistics { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

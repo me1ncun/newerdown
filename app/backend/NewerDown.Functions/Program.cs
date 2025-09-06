@@ -1,4 +1,5 @@
 ﻿using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using NewerDown.Domain.Interfaces;
 using NewerDown.Functions.Models;
 using NewerDown.Functions.Services;
 using NewerDown.Infrastructure.Data;
+using NewerDown.Infrastructure.Queuing;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -37,10 +39,15 @@ builder.Services.AddOptions<EmailSettings>()
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IQueueSenderFactory, QueueSenderFactory>();
+builder.Services.AddTransient<IMonitorService, MonitorService>();
+builder.Services.AddTransient<IStatisticsService, StatisticsService>();
+
+builder.Services.AddSingleton<ServiceBusClient>(sp => new ServiceBusClient(builder.Configuration["ServiceBusConnection"]));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseAzureSql(builder.Configuration["DatabaseConnection"]);
+    options.UseSqlServer(builder.Configuration["DatabaseConnection"]);
 });
 
 builder.Build().Run();
