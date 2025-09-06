@@ -14,6 +14,10 @@ public class MonitorCheck
     
     public MonitorStatus Status { get; set; }
     
+    public string? StatusCode { get; set; }
+    
+    public bool IsSuccess { get; set; }
+    
     public double? ResponseTimeMs { get; set; }
     
     public string? ErrorMessage { get; set; }

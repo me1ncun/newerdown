@@ -1,13 +1,9 @@
-/*using System;
-using Azure.Messaging.ServiceBus;
+using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NewerDown.Functions.Models;
+using NewerDown.Domain.DTOs.Service;
 using NewerDown.Infrastructure.Data;
-using Newtonsoft.Json;
 
 namespace NewerDown.Functions.Functions;
 
@@ -25,18 +21,30 @@ public class MonitoringSchedulerFunction
 
     [Function(nameof(MonitoringSchedulerFunction))]
     [ServiceBusOutput("monitoring", Connection = "ServiceBusConnection")]
-    public async Task<IEnumerable<string>> Run([TimerTrigger("0 #1#1 * * * *")] TimerInfo timer)
+    public async Task<IEnumerable<string>> Run([TimerTrigger("0 */1 * * * *")] TimerInfo timer)
     {
-        var services = await _context.Services
-            .Where(s => s.IsActive)
+        var now = DateTime.UtcNow;
+        
+        var monitors = await _context.Monitors
+            .Where(m => m.IsActive)
+            .Include(m => m.Checks.OrderByDescending(c => c.CheckedAt).Take(1))
             .ToListAsync();
 
-        return services.Select(service =>
+        var messages = new List<string>();
+        foreach (var monitor in monitors)
+        {
+            var lastCheck = monitor.Checks.FirstOrDefault();
+            var shouldCheck = lastCheck == null || (now - lastCheck.CheckedAt).TotalSeconds >= monitor.IntervalSeconds;
+            if (shouldCheck)
             {
-                var json = JsonConvert.SerializeObject(new ServiceDto() { ServiceId = service.Id });
-                _logger.LogInformation($"Sending message: {json}");
-                return json;
+                var dto = new MonitorDto { Id = monitor.Id, Url = monitor.Target};
+                var json = JsonSerializer.Serialize(dto);
+
+                _logger.LogInformation("Scheduling check for monitor {MonitorId} at {Now}", monitor.Id, now);
+                messages.Add(json);
             }
-        ).ToArray();
+        }
+
+        return messages;
     }
-}*/
+}

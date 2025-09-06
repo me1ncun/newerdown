@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewerDown.Infrastructure.Data;
 
 #nullable disable
 
-namespace NewerDown.Infrastructure.Migrations
+namespace NewerDown.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250906131129_AddNullable")]
+    partial class AddNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -381,41 +384,6 @@ namespace NewerDown.Infrastructure.Migrations
                     b.HasIndex("MonitorId");
 
                     b.ToTable("MonitorChecks");
-                });
-
-            modelBuilder.Entity("NewerDown.Domain.Entities.MonitorStatistic", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("AvgResponseTimeMs")
-                        .HasColumnType("float");
-
-                    b.Property<int>("FailedChecks")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IncidentsCount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("MonitorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("PeriodEnd")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("PeriodStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TotalChecks")
-                        .HasColumnType("int");
-
-                    b.Property<double>("UptimePercent")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MonitorStatistics");
                 });
 
             modelBuilder.Entity("NewerDown.Domain.Entities.TokenInfo", b =>

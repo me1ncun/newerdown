@@ -56,7 +56,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>, IA
 
             services.AddDbContext<ApplicationDbContext>((IServiceProvider sp, DbContextOptionsBuilder opts) =>
             {
-                opts.UseAzureSql(_dbContainer.GetConnectionString(), (options) =>
+                opts.UseSqlServer(_dbContainer.GetConnectionString(), (options) =>
                     {
                         options.EnableRetryOnFailure();
                     });
