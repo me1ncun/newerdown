@@ -54,7 +54,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             .HasOne(ic => ic.Incident)
             .WithMany(i => i.Comments) 
             .HasForeignKey(ic => ic.IncidentId)
-            .OnDelete(DeleteBehavior.Restrict); 
+            .OnDelete(DeleteBehavior.Cascade); 
         
        
         modelBuilder.Entity<Incident>()

@@ -5,26 +5,25 @@ using Microsoft.Extensions.Logging;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Infrastructure.Data;
 
-namespace NewerDown.Functions.Functions;
+namespace NewerDown.ServicingFunctions.Functions;
 
 public class MonitoringSchedulerFunction
 {
+    private readonly ILogger _logger;
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<MonitoringSchedulerFunction> _logger;
 
-    public MonitoringSchedulerFunction(ApplicationDbContext context,
-        ILogger<MonitoringSchedulerFunction> logger)
+    public MonitoringSchedulerFunction(ILoggerFactory loggerFactory, ApplicationDbContext context)
     {
+        _logger = loggerFactory.CreateLogger<MonitoringSchedulerFunction>();
         _context = context;
-        _logger = logger;
     }
 
-    [Function(nameof(MonitoringSchedulerFunction))]
+    [Function("MonitoringSchedulerFunction")]
     [ServiceBusOutput("monitoring", Connection = "ServiceBusConnection")]
-    public async Task<IEnumerable<string>> Run([TimerTrigger("0 */1 * * * *")] TimerInfo timer)
+    public async Task<IEnumerable<string>> Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer)
     {
         var now = DateTime.UtcNow;
-        
+
         var monitors = await _context.Monitors
             .Where(m => m.IsActive)
             .Include(m => m.Checks.OrderByDescending(c => c.CheckedAt).Take(1))
@@ -37,7 +36,7 @@ public class MonitoringSchedulerFunction
             var shouldCheck = lastCheck == null || (now - lastCheck.CheckedAt).TotalSeconds >= monitor.IntervalSeconds;
             if (shouldCheck)
             {
-                var dto = new MonitorDto { Id = monitor.Id, Url = monitor.Target};
+                var dto = new MonitorDto { Id = monitor.Id, Url = monitor.Target };
                 var json = JsonSerializer.Serialize(dto);
 
                 _logger.LogInformation("Scheduling check for monitor {MonitorId} at {Now}", monitor.Id, now);
