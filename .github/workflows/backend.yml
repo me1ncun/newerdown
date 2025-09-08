@@ -75,6 +75,9 @@ jobs:
           name: function-app
           path: ./publish-functions
 
+      - name: Zip output
+        run: cd publish-functions && zip -r ../functionapp.zip .
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -90,8 +93,5 @@ jobs:
           slot-name: 'Production'
           package: ./publish
 
-      - name: Deploy Azure Function
-        uses: Azure/functions-action@v1
-        with:
-          app-name: 'func-newerdown-servicingfunctions'
-          package: ./publish-functions
+      - name: Deploy to Azure Function App
+        run: az functionapp deployment source config-zip -g ${{ secrets.AZURE_RG }} -n ${{ secrets.AZURE_FUNCTION_APP_NAME }} --src functionapp.zip
