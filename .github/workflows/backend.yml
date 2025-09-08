@@ -33,10 +33,7 @@ jobs:
         run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish --no-build
 
       - name: Publish Azure Function
-        run: |
-          dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctions.csproj -c Release -o ./publish-functions --self-contained false --no-build
-          mv ./publish-functions/bin/Release/net8.0/* ./publish-functions/
-          rm -rf ./publish-functions/bin
+        run: dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctions.csproj -c Release -o ./publish-functions --self-contained false /p:CopyAllFilesToSingleFolder=true
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
