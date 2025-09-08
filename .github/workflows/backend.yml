@@ -6,7 +6,6 @@ on:
       - master
     paths:
       - 'app/backend/**'
-  workflow_dispatch:
 
 jobs:
   build:
@@ -33,7 +32,7 @@ jobs:
         run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish
 
       - name: Publish Azure Function
-        run: dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctions.csproj -c Release -o ./publish-functions
+        run: dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctionscsproj -c Release -o ./publish-functions
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -75,9 +74,6 @@ jobs:
           name: function-app
           path: ./publish-functions
 
-      - name: Zip output
-        run: cd publish-functions && zip -r ../functionapp.zip .
-
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -93,5 +89,8 @@ jobs:
           slot-name: 'Production'
           package: ./publish
 
-      - name: Deploy to Azure Function App
-        run: az functionapp deployment source config-zip -g ${{ secrets.AZURE_RG }} -n ${{ secrets.AZURE_FUNCTION_APP_NAME }} --src functionapp.zip
+      - name: Deploy Azure Function
+        uses: Azure/functions-action@v1
+        with:
+          app-name: 'func-servicing'
+          package: ./publish-functions
