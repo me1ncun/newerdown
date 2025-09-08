@@ -33,7 +33,7 @@ jobs:
         run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish
 
       - name: Publish Azure Function
-        run: dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctionscsproj -c Release -o ./publish-functions
+        run: dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctions.csproj -c Release -o ./publish-functions
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
