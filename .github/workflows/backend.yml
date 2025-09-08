@@ -32,20 +32,11 @@ jobs:
       - name: dotnet publish
         run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish --no-build
 
-      - name: Publish Azure Function
-        run: dotnet publish app/backend/NewerDown.ServicingFunctions/NewerDown.ServicingFunctions.csproj -c Release -o ./publish-functions --self-contained false /p:CopyAllFilesToSingleFolder=true
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
           path: ./publish
-
-      - name: Upload Azure Function artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: function-app
-          path: ./publish-functions
 
       - name: Execute unit tests
         continue-on-error: true
@@ -69,12 +60,6 @@ jobs:
           name: .net-app
           path: ./publish
 
-      - name: Download Azure Function artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: function-app
-          path: ./publish-functions
-
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -89,9 +74,3 @@ jobs:
           app-name: 'app-newerdown'
           slot-name: 'Production'
           package: ./publish
-
-      - name: Deploy Azure Function
-        uses: Azure/functions-action@v1
-        with:
-          app-name: 'func-servicing'
-          package: ./publish-functions
