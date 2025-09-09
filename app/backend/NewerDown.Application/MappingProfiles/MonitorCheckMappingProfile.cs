@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NewerDown.Domain.DTOs.MonitorCheck;
 using NewerDown.Domain.DTOs.MonitoringResults;
 using NewerDown.Domain.Entities;
 
@@ -9,5 +10,7 @@ public class MonitorCheckMappingProfile : Profile
     public MonitorCheckMappingProfile()
     {
         CreateMap<MonitorCheck, MonitoringResultDto>();
+
+        CreateMap<MonitorCheck, MonitorCheckDto>();
     }
 }

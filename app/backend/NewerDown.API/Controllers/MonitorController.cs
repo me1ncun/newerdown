@@ -1,8 +1,12 @@
 ﻿using System.Net.Mime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NewerDown.Domain.DTOs.MonitorCheck;
+using NewerDown.Domain.DTOs.MonitoringResults;
 using NewerDown.Domain.DTOs.Service;
+using NewerDown.Domain.Enums;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Domain.Paging;
 using NewerDown.Extensions;
 using NewerDown.Shared.Validations;
 
@@ -118,56 +122,56 @@ public class MonitorController : ControllerBase
     }
     
     [HttpGet("{id}/history")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(PagedList<MonitorCheckDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public IActionResult GetHistoryByMonitor(Guid id)
+    public async Task<IActionResult> GetHistoryByMonitor(Guid id, int pageNumber, int pageSize)
     {
-        // Logic to create a monitor
-        return Ok("Monitor created successfully");
+        var history = await _monitorService.GetHistoryByMonitorAsync(id, pageNumber, pageSize);
+        return Ok(history);
     }
     
     [HttpGet("{id}/status")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorStatus))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public IActionResult GetMonitorStatus(Guid id)
+    public async Task<IActionResult> GetMonitorStatus(Guid id)
     {
-        // Logic to create a monitor
-        return Ok("Monitor created successfully");
+        var status = await _monitorService.GetMonitorStatusAsync(id);
+        return Ok(status);
     }
     
     [HttpGet("{id}/summary")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorSummaryDto))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public IActionResult GetMonitorSummary(Guid id)
+    public async Task<IActionResult> GetMonitorSummary(Guid id, int hours)
     {
-        // Logic to create a monitor
-        return Ok("Monitor created successfully");
+        var summary = await _monitorService.GetMonitorSummaryAsync(id, hours);
+        return Ok(summary);
     }
     
     [HttpGet("{id}/downtimes")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<DownTimeDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public IActionResult GetMonitorDowntimes(Guid id)
+    public async Task<IActionResult> GetMonitorDowntimes(Guid id)
     {
-        // Logic to create a monitor
-        return Ok("Monitor created successfully");
+        var downTimes = await _monitorService.GetDownTimesAsync(id);
+        return Ok(downTimes);
     }
     
     [HttpGet("{id}/uptime-percentage")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(UptimePercentageDto))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public IActionResult GetMonitorUptimePercentage(Guid id)
+    public async Task<IActionResult> GetMonitorUptimePercentage(Guid id, DateTime from, DateTime to)
     {
-        // Logic to create a monitor
-        return Ok("Monitor created successfully");
+        var result = await _monitorService.GetUptimePercentageAsync(id, from, to);
+        return Ok(result);
     }
     
     [HttpGet("{id}/latency-path")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<MonitorCheckShortDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public IActionResult GetMonitorLatencyPath(Guid id)
+    public async Task<IActionResult> GetMonitorLatencyGraph(Guid id, DateTime from, DateTime to)
     {
-        // Logic to create a monitor
-        return Ok("Monitor created successfully");
+        var results = await _monitorService.GetLatencyGraph(id, from, to);
+        return Ok(results);
     }
 }

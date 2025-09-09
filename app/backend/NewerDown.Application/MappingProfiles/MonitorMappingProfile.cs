@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net.NetworkInformation;
+using AutoMapper;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Entities;
 using Monitor = NewerDown.Domain.Entities.Monitor;
@@ -12,6 +13,7 @@ public class MonitorMappingProfile : Profile
         CreateMap<AddMonitorDto, Monitor>();
         
         CreateMap<Monitor, MonitorDto>()
+            .ForMember(dest => dest.CheckIntervalSeconds, opt => opt.MapFrom(src => src.IntervalSeconds))
             .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Target))
             .ReverseMap();
 

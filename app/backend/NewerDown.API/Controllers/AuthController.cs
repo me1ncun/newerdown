@@ -57,6 +57,8 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginUserDto loginUser)
     {
         var result = await _signInService.LoginUserAsync(loginUser);
+        if(result.IsFailure)
+            return BadRequest(result.Error);
         
         Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions
         {

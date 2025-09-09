@@ -5,7 +5,7 @@ namespace NewerDown.Domain.Interfaces;
 
 public interface IUserPhotoProvider
 {
-    Task UploadPhotoAsync(IFormFile file);
+    Task<string> UploadPhotoAsync(IFormFile file);
     Task<Result<string>> GetPhotoUrlAsync();
     Task<Result.Result> DeletePhotoAsync();
 }

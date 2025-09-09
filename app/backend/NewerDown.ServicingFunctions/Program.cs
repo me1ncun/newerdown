@@ -17,7 +17,7 @@ builder.Services
     .ConfigureFunctionsApplicationInsights();
 
 builder.Services.AddSingleton<IQueueSenderFactory, QueueSenderFactory>();
-builder.Services.AddTransient<IMonitorService, MonitorService>();
+builder.Services.AddTransient<IWebSiteCheckService, WebSiteCheckService>();
 builder.Services.AddTransient<IStatisticsService, StatisticsService>();
 
 builder.Services.AddSingleton<ServiceBusClient>(sp => new ServiceBusClient(builder.Configuration["ServiceBusConnection"]));
