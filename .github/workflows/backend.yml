@@ -39,11 +39,9 @@ jobs:
           path: ./publish
 
       - name: Execute unit tests
-        continue-on-error: true
         run: dotnet test app/backend/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
 
       - name: Execute integration tests
-        continue-on-error: true
         run: dotnet test app/backend/NewerDown.IntegrationTests/NewerDown.IntegrationTests.csproj
 
   deploy:

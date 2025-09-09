@@ -56,7 +56,7 @@ public class MonitorService : IMonitorService
     public async Task<IEnumerable<MonitorDto>> GetAllMonitors()
     {
         var cached = await _cacheService.GetAsync<IEnumerable<MonitorDto>>(_cacheKey);
-        if (cached is not null)
+        if (cached != null && cached.Any())
             return cached;
 
         var monitors = await _context.Monitors
