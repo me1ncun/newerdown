@@ -10,22 +10,22 @@ using NewerDown.Infrastructure.Queuing;
 
 namespace NewerDown.ServicingFunctions.Services
 {
-    public interface IMonitorService
+    public interface IWebSiteCheckService
     {
         Task<bool> CheckWebsiteAsync(MonitorDto dto);
     }
 
-    public class MonitorService : IMonitorService
+    public class WebSiteCheckService : IWebSiteCheckService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<MonitorService> _logger;
+        private readonly ILogger<WebSiteCheckService> _logger;
         private readonly IQueueSender _queueSender;
 
-        public MonitorService(
+        public WebSiteCheckService(
             ApplicationDbContext context,
             IHttpClientFactory httpClientFactory,
-            ILogger<MonitorService> logger,
+            ILogger<WebSiteCheckService> logger,
             IQueueSenderFactory queueSenderFactory)
 
         {

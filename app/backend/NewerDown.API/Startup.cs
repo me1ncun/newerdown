@@ -1,6 +1,4 @@
-﻿using GraphQL.Server;
-using GraphQL.Server.Ui.Playground;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using NewerDown.Application;
 using NewerDown.Application.GraphQL.Schemas;
 using NewerDown.Domain.Entities;

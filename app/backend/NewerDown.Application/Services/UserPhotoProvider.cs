@@ -31,7 +31,7 @@ public class UserPhotoProvider : IUserPhotoProvider
         _context = context;
     }
 
-    public async Task UploadPhotoAsync(IFormFile file)
+    public async Task<string> UploadPhotoAsync(IFormFile file)
     {
         var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
@@ -40,32 +40,33 @@ public class UserPhotoProvider : IUserPhotoProvider
         
         user.FileAttachmentId = uploadedPhoto.FileAttachment.Id;
         
-        _logger.LogInformation("User {UserId} uploaded a new photo: {PhotoUrl}", userId, uploadedPhoto.FileAttachment.Uri);
+        _logger.LogInformation("User {UserId} uploaded a new photo: {PhotoUrl}", userId, uploadedPhoto.FileAttachment.FilePath);
         
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
+
+        return uploadedPhoto.FileAttachment.FilePath;
     }
     
     public async Task<Result<string>> GetPhotoUrlAsync()
     {
         var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
-        if (user.FileAttachmentId == Guid.Empty)
+        if (user.FileAttachmentId is null || user.FileAttachmentId == Guid.Empty)
         {
             return Result<string>.Failure(PhotoErrors.UserPhotoNotFound);
         }
 
         var fileAttachment = await _blobStorageService.GetFileAttachmentByIdAsync(user.FileAttachmentId);
         
-        return Result<string>.Success(fileAttachment.Uri);
+        return Result<string>.Success(fileAttachment.FilePath);
     }
     
     public async Task<Result> DeletePhotoAsync()
     {
         var userId = _userContextService.GetUserId();
         var user = (await _userService.GetUserByIdAsync(userId)).ThrowIfNull();
-        
-        if (user.FileAttachmentId == Guid.Empty)
+        if (user.FileAttachmentId is null || user.FileAttachmentId == Guid.Empty)
         {
             return Result.Failure(PhotoErrors.UserPhotoNotFound);
         }

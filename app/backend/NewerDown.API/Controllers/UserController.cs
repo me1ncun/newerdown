@@ -30,8 +30,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var user = await _userContextService.GetCurrentUserAsync();
-        return Ok(user);
+        var result = await _userContextService.GetCurrentUserAsync();
+        return result.ToDefaultApiResponse();
     }
     
     [HttpDelete]
@@ -57,8 +57,8 @@ public class UserController : ControllerBase
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> UploadUserPhoto(IFormFile file)
     {
-        await _userPhotoProvider.UploadPhotoAsync(file);
-        return Ok("Photo uploaded successfully.");
+        var result = await _userPhotoProvider.UploadPhotoAsync(file);
+        return Ok(result);
     }
     
     [HttpDelete("delete-photo")]

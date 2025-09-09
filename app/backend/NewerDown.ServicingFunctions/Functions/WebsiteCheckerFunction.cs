@@ -11,12 +11,12 @@ namespace NewerDown.ServicingFunctions.Functions;
 public class WebsiteCheckerFunction
 {
     private readonly ILogger<WebsiteCheckerFunction> _logger;
-    private readonly IMonitorService _monitorService;
+    private readonly IWebSiteCheckService _webSiteCheckService;
 
-    public WebsiteCheckerFunction(ILogger<WebsiteCheckerFunction> logger, IMonitorService monitorService)
+    public WebsiteCheckerFunction(ILogger<WebsiteCheckerFunction> logger, IWebSiteCheckService webSiteCheckService)
     {
         _logger = logger;
-        _monitorService = monitorService;
+        _webSiteCheckService = webSiteCheckService;
     }
 
     [Function(nameof(WebsiteCheckerFunction))]
@@ -27,7 +27,7 @@ public class WebsiteCheckerFunction
         var monitorDto = JsonSerializer.Deserialize<MonitorDto>(Encoding.UTF8.GetString(message.Body)) ??
                          throw new InvalidOperationException("Invalid monitor message");
         
-        var result = await _monitorService.CheckWebsiteAsync(monitorDto);
+        var result = await _webSiteCheckService.CheckWebsiteAsync(monitorDto);
         _logger.LogInformation("Website check completed for monitor {MonitorId}, success={Success}", monitorDto.Id, result);
     }
 }
