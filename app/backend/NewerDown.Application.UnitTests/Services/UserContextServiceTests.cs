@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.Services;
+using NewerDown.Domain.DTOs.User;
+using NewerDown.Domain.Entities;
 using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.UnitTests.Services;
@@ -15,9 +17,9 @@ public class UserContextServiceTests
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
     
     private ApplicationDbContext _context;
-    private UserContextService userContextService;
+    private UserContextService _userContextService;
     
-    private readonly Guid currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
+    private readonly Guid _currentUserId = Guid.NewGuid();
     
     [SetUp]
     public void Setup()
@@ -32,7 +34,7 @@ public class UserContextServiceTests
         _context = new ApplicationDbContext(options);
         _context.Database.EnsureCreated();
         
-        userContextService = new UserContextService(_context, _httpContextAccessorMock.Object, _mapperMock.Object);
+        _userContextService = new UserContextService(_context, _httpContextAccessorMock.Object, _mapperMock.Object);
     }
     
     [TearDown]
@@ -47,7 +49,7 @@ public class UserContextServiceTests
         // Arrange
         var claims = new List<Claim>
         {
-            new Claim("userId", currentUserId.ToString())
+            new(ClaimTypes.NameIdentifier, _currentUserId.ToString())
         };
         
         var identity = new ClaimsIdentity(claims, "TestAuth");
@@ -56,9 +58,46 @@ public class UserContextServiceTests
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(new DefaultHttpContext { User = principal });
         
         // Act
-        var result = userContextService.GetUserId();
+        var result = _userContextService.GetUserId();
         
         // Assert
-        Assert.That(result, Is.EqualTo(currentUserId));
+        Assert.That(result, Is.EqualTo(_currentUserId));
+    }
+
+    [Test]
+    public async Task GetUserAsync_AuthenticatedUser_ReturnsUser()
+    {
+        // Arrange
+        var user = new User()
+        {
+            Id = _currentUserId,
+            Email = "test@email.com"
+        };
+        
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, _currentUserId.ToString())
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        var principal = new ClaimsPrincipal(identity);
+
+        _httpContextAccessorMock
+            .Setup(x => x.HttpContext)
+            .Returns(new DefaultHttpContext { User = principal });
+        
+        var expectedDto = new UserDto { Id = user.Id, Email = user.Email };
+        _mapperMock.Setup(m => m.Map<UserDto>(It.IsAny<User>()))
+            .Returns(expectedDto);
+
+        // Act 
+        var result = await _userContextService.GetCurrentUserAsync();
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.Value.Id, Is.EqualTo(user.Id));
+        Assert.That(result.Value.Email, Is.EqualTo(user.Email));
     }
 }
