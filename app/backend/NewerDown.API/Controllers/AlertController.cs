@@ -41,7 +41,7 @@ public class AlertController : ControllerBase
         return Ok(alerts);
     }
     
-    [HttpGet]
+    [HttpGet("by-id")]
     public async Task<IActionResult> GetById(GetByIdDto request)
     {
         var validationResult = await _fluentValidator.ValidateAsync(request);

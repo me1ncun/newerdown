@@ -52,7 +52,7 @@ public class MonitorController : ControllerBase
         return Ok(result);
     }
     
-    [HttpGet]
+    [HttpGet(("by-id"))]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetMonitorById(GetByIdDto request)
