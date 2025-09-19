@@ -38,7 +38,7 @@ public class AlertService : IAlertService
             return cached;
         
         var alerts = await _context.Alerts
-            .Where(x => x.MonitorId == _userContextService.GetUserId())
+            .Where(x => x.UserId == _userContextService.GetUserId())
             .ToListAsync();
         
         var result = _mapper.Map<List<AlertDto>>(alerts);
@@ -47,9 +47,17 @@ public class AlertService : IAlertService
         return result;
     }
 
-    public Task<AlertDto> UpdateAlertAsync(Guid id, UpdateAlertDto updateAlertDto)
+    public async Task UpdateAlertAsync(Guid id, UpdateAlertDto updateAlertDto)
     {
-        throw new NotImplementedException();
+        var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.Id == id);
+        if(alert is null)
+            throw new EntityNotFoundException(nameof(Alert));
+
+        _mapper.Map(updateAlertDto, alert);
+        _context.Alerts.Update(alert);
+        await _context.SaveChangesAsync();
+        
+        await _cacheService.RemoveAsync(CacheKey);
     }
 
     public async Task CreateAlertAsync(AddAlertDto alertDto)
@@ -62,20 +70,24 @@ public class AlertService : IAlertService
 
         var alert = _mapper.Map<Alert>(alertDto);
         alert.Id = Guid.NewGuid();
-        alert.MonitorId = currentUserId;
+        alert.UserId = currentUserId;
         
         _context.Alerts.Add(alert);
         await _context.SaveChangesAsync();
+        
+        await _cacheService.RemoveAsync(CacheKey);
     }
 
     public async Task DeleteAlertAsync(Guid id)
     {
         var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.Id == id);
         if (alert is null)
-            throw new EntityNotFoundException(nameof(Alert));
+            throw new EntityNotFoundException($"Alert not found by Id: {id}");
         
         _context.Alerts.Remove(alert);
         await _context.SaveChangesAsync();
+        
+        await _cacheService.RemoveAsync(CacheKey);
     }
     
     public async Task<AlertDto> GetAlertByIdAsync(Guid id)

@@ -9,5 +9,7 @@ public class AlertMappingProfile : Profile
     public AlertMappingProfile()
     {
         CreateMap<AddAlertDto, Alert>();
+
+        CreateMap<Alert, AlertDto>();
     }
 }

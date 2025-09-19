@@ -27,17 +27,9 @@ public class AdminController : ControllerBase
     
     [Authorize(Roles = nameof(RoleType.Administrator))]
     [HttpGet("monitors")]
-    public IActionResult GetMonitors()
+    public async Task<IActionResult> GetMonitors()
     {
-        // Logic to get all monitors
-        return Ok("List of monitors retrieved successfully");
-    }
-    
-    [Authorize(Roles = nameof(RoleType.Administrator))]
-    [HttpGet("logs")]
-    public IActionResult GetSystemLogs()
-    {
-        // Logic to get all logs
-        return Ok("List of logs retrieved successfully");
+        var monitors = await _adminService.GetAllMonitorsAsync();
+        return Ok(monitors);
     }
 }

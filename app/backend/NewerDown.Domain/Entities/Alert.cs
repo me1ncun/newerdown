@@ -13,7 +13,7 @@ public class Alert
     
     public DateTime CreatedAt { get; set; }
     
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     public Guid MonitorId { get; set; }
     
