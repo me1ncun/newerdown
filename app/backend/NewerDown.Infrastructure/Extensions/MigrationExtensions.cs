@@ -6,7 +6,7 @@ using NewerDown.Infrastructure.Helpers;
 
 namespace NewerDown.Infrastructure.Extensions;
 
-public static class MigrationExtension
+public static class MigrationExtensions
 {
     public static void ApplyMigrations(this IApplicationBuilder app)
     {

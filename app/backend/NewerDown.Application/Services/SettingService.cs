@@ -46,5 +46,4 @@ public class SettingService : ISettingService
     {
          return await _context.MonitorChecks.Select(mc => mc.StatusCode).Distinct().ToListAsync();
     }
-
 }

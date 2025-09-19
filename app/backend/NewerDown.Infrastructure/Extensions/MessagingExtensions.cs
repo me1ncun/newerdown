@@ -12,9 +12,10 @@ public static class MessagingExtensions
         return message;
     }
     
-    public static T GetBody<T>(this ServiceBusReceivedMessage message)
+    public static T? GetBody<T>(this ServiceBusReceivedMessage message)
     {
         var jsonString = message.Body.ToString(); 
+        
         return JsonSerializer.Deserialize<T>(jsonString); 
     }
 }

@@ -80,10 +80,7 @@ public static class ServicesExtensions
 
     public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<ServiceBusClient>(sp =>
-        {
-            return new ServiceBusClient(configuration["ServiceBusConnection"]);
-        });
+        services.AddSingleton<ServiceBusClient>(sp => new ServiceBusClient(configuration["ServiceBusConnection"]));
 
         services.AddSingleton<IQueueSenderFactory, QueueSenderFactory>();
 
