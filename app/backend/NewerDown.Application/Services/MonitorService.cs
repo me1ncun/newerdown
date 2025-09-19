@@ -2,14 +2,17 @@
 using AutoMapper;
 using CsvHelper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NewerDown.Application.Constants;
 using NewerDown.Application.CsvProfiles;
 using NewerDown.Application.Errors;
+using NewerDown.Application.Extensions;
 using NewerDown.Application.Time;
 using NewerDown.Domain.DTOs.MonitorCheck;
 using NewerDown.Domain.DTOs.MonitoringResults;
+using NewerDown.Domain.DTOs.Request;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Enums;
@@ -33,6 +36,8 @@ public class MonitorService : IMonitorService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<MonitorService> _logger;
     private readonly IScopedTimeProvider _timeProvider;
+    private readonly UserManager<User> _userManager;
+    private readonly IUserService _userService;
 
     public MonitorService(
         ApplicationDbContext context,
@@ -41,7 +46,9 @@ public class MonitorService : IMonitorService
         IUserContextService userContextService,
         IHttpClientFactory httpClientFactory,
         ILogger<MonitorService> logger,
-        IScopedTimeProvider timeProvider)
+        IScopedTimeProvider timeProvider,
+        UserManager<User> userManager,
+        IUserService userService)
     {
         _context = context;
         _mapper = mapper;
@@ -51,15 +58,28 @@ public class MonitorService : IMonitorService
         _logger = logger;
         _cacheKey = $"{nameof(Monitor)}_{_userContextService.GetUserId()}";
         _timeProvider = timeProvider;
+        _userManager = userManager;
+        _userService = userService;
     }
 
-    public async Task<IEnumerable<MonitorDto>> GetAllMonitors()
+    public async Task<List<MonitorDto>> GetAllMonitorsAsync()
     {
-        var cached = await _cacheService.GetAsync<IEnumerable<MonitorDto>>(_cacheKey);
+        var cached = await _cacheService.GetAsync<List<MonitorDto>>(_cacheKey);
         if (cached != null && cached.Any())
             return cached;
 
-        var monitors = await _context.Monitors
+        List<Monitor> monitors;
+        
+        var currentUserId = _userContextService.GetUserId();
+        var currentUser = await _userService.GetUserByIdAsync(currentUserId).ThrowIfNullAsync(nameof(User));
+        var userRoles = await _userManager.GetRolesAsync(currentUser);
+        if (userRoles.Contains(RoleType.Administrator.ToString()))
+        {
+            monitors = await _context.Monitors.ToListAsync();
+            return _mapper.Map<List<MonitorDto>>(monitors);
+        }
+        
+        monitors = await _context.Monitors
             .Where(m => m.UserId == _userContextService.GetUserId())
             .ToListAsync();
 
@@ -69,15 +89,15 @@ public class MonitorService : IMonitorService
         return result;
     }
 
-    public async Task<Result<Guid>> CreateMonitorAsync(AddMonitorDto monitorDto)
+    public async Task<Result<Guid>> CreateMonitorAsync(AddMonitorDto request)
     {
         var existingMonitor = await _context.Monitors.FirstOrDefaultAsync(m => m.UserId == _userContextService.GetUserId()
-                                                                          && m.Name == monitorDto.Name);
+                                                                          && m.Name == request.Name);
 
         if (existingMonitor != null)
-            throw new EntityAlreadyExistsException($"Monitor with name {monitorDto.Name} already exists");
+            throw new EntityAlreadyExistsException($"Monitor with name {request.Name} already exists");
 
-        var monitor = _mapper.Map<Monitor>(monitorDto);
+        var monitor = _mapper.Map<Monitor>(request);
         monitor.UserId = _userContextService.GetUserId();
         monitor.Id = Guid.NewGuid();
         monitor.CreatedAt = _timeProvider.UtcNow();
@@ -92,7 +112,7 @@ public class MonitorService : IMonitorService
         return Result<Guid>.Success(monitor.Id);
     }
 
-    public async Task<Result> UpdateMonitorAsync(Guid monitorId, UpdateMonitorDto monitorDto)
+    public async Task<Result> UpdateMonitorAsync(Guid monitorId, UpdateMonitorDto request)
     {
         var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == monitorId
                                                                        && m.UserId == _userContextService.GetUserId());
@@ -100,9 +120,9 @@ public class MonitorService : IMonitorService
             return Result.Failure(MonitorErrors.MonitorNotFound);
         
         monitor.UserId = _userContextService.GetUserId();
-        _mapper.Map(monitorDto, monitor);
+        _mapper.Map(request, monitor);
 
-        if (!await IsTargetReachable(monitorDto.Url))
+        if (!await IsTargetReachable(request.Url))
             return Result.Failure(MonitorErrors.TargetNotReachable);
         
         _context.Monitors.Update(monitor);
@@ -112,9 +132,10 @@ public class MonitorService : IMonitorService
         return Result.Success();
     }
 
-    public async Task<Result> DeleteMonitorAsync(Guid id)
+    public async Task<Result> DeleteMonitorAsync(DeleteMonitorDto request)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id 
+                                                                       && m.UserId == _userContextService.GetUserId());
         
         if (monitor is null)
             return Result.Failure(MonitorErrors.MonitorNotFound);
@@ -126,18 +147,19 @@ public class MonitorService : IMonitorService
         return Result.Success();
     }
 
-    public async Task<Result<MonitorDto>> GetMonitorByIdAsync(Guid id)
+    public async Task<Result<MonitorDto>> GetMonitorByIdAsync(GetByIdDto request)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id);
-        if (monitor is null || monitor.UserId != _userContextService.GetUserId())
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id
+                                    && m.UserId == _userContextService.GetUserId());
+        if (monitor is null)
             return Result<MonitorDto>.Failure(MonitorErrors.MonitorNotFound);
 
         return Result<MonitorDto>.Success(_mapper.Map<MonitorDto>(monitor));
     }
     
-    public async Task<Result> PauseMonitorAsync(Guid id)
+    public async Task<Result> PauseMonitorAsync(GetByIdDto request)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id && m.UserId == _userContextService.GetUserId());
         if (monitor is null)
             return Result<MonitorDto>.Failure(MonitorErrors.MonitorNotFound);
 
@@ -150,9 +172,9 @@ public class MonitorService : IMonitorService
         return Result.Success();
     }
     
-    public async Task<Result> ResumeMonitorAsync(Guid id)
+    public async Task<Result> ResumeMonitorAsync(GetByIdDto request)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id && m.UserId == _userContextService.GetUserId());
         if (monitor is null)
             return Result<MonitorDto>.Failure(MonitorErrors.MonitorNotFound);
 
@@ -164,11 +186,11 @@ public class MonitorService : IMonitorService
         return Result.Success();
     }
 
-    public async Task<byte[]> ExportMonitorCsvAsync(Guid id)
+    public async Task<byte[]> ExportMonitorCsvAsync(GetByIdDto request)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id && m.UserId == _userContextService.GetUserId());
         if (monitor is null)
-            throw new EntityNotFoundException($"Monitor with id: {id} not found");
+            throw new EntityNotFoundException($"Monitor with id: {request.Id} not found");
 
         await using var memoryStream = new MemoryStream();
         await using var streamWriter = new StreamWriter(memoryStream);
@@ -214,18 +236,18 @@ public class MonitorService : IMonitorService
         await _cacheService.RemoveAsync(_cacheKey);
     }
     
-    public async Task<MonitorStatus> GetMonitorStatusAsync(Guid id)
+    public async Task<MonitorStatus> GetMonitorStatusAsync(GetByIdDto request)
     {
         var monitor = await _context.Monitors
             .Include(m => m.Checks.OrderByDescending(mc => mc.CheckedAt).Take(1))
-            .FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
+            .FirstOrDefaultAsync(m => m.Id == request.Id && m.UserId == _userContextService.GetUserId());
 
         if (monitor is null)
-            throw new EntityNotFoundException($"No checks found for monitor with id: {id}");
+            throw new EntityNotFoundException($"No checks found for monitor with id: {request.Id}");
 
         var lastCheck = monitor.Checks.FirstOrDefault();
         if (lastCheck is null)
-            throw new EntityNotFoundException($"Monitor with id: {id} has no check history yet");
+            throw new EntityNotFoundException($"Monitor with id: {request.Id} has no check history yet");
 
         return lastCheck.IsSuccess ? MonitorStatus.Up : MonitorStatus.Down;
     }
@@ -275,10 +297,10 @@ public class MonitorService : IMonitorService
         return points;
     }
 
-    public async Task<List<DownTimeDto>> GetDownTimesAsync(Guid id)
+    public async Task<List<DownTimeDto>> GetDownTimesAsync(GetByIdDto request)
     {
         var checks = await _context.MonitorChecks
-            .Where(c => c.MonitorId == id)
+            .Where(c => c.MonitorId == request.Id)
             .OrderBy(c => c.CheckedAt)
             .ToListAsync();
 

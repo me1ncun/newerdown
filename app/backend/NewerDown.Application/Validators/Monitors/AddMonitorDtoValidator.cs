@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using NewerDown.Domain.DTOs.Service;
 
-namespace NewerDown.Application.Validators;
+namespace NewerDown.Application.Validators.Monitors;
 
-public class AddServiceValidator : AbstractValidator<AddMonitorDto>
+public class AddMonitorDtoValidator : AbstractValidator<AddMonitorDto>
 {
-    public AddServiceValidator()
+    public AddMonitorDtoValidator()
     {
         RuleFor(x => x.IntervalSeconds)
             .GreaterThan(0).WithMessage("IntervalSeconds must be greater than 0.");

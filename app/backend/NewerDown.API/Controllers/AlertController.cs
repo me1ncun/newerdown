@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NewerDown.Domain.DTOs.Alerts;
+using NewerDown.Domain.DTOs.Request;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Shared.Validations;
 
@@ -19,15 +20,15 @@ public class AlertController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreateAlert([FromBody] AddAlertDto alertDto)
+    public async Task<IActionResult> CreateAlert([FromBody] AddAlertDto request)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(alertDto);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors);
         }
         
-        await _alertService.CreateAlertAsync(alertDto);
+        await _alertService.CreateAlertAsync(request);
         
         return Ok();
     }
@@ -40,26 +41,47 @@ public class AlertController : ControllerBase
         return Ok(alerts);
     }
     
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpGet]
+    public async Task<IActionResult> GetById(GetByIdDto request)
     {
-        var alert = await _alertService.GetAlertByIdAsync(id);
-       
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var alert = await _alertService.GetAlertByIdAsync(request);
+        
         return Ok(alert);
     }
     
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateAlert(Guid id, [FromBody] UpdateAlertDto updateAlertDto)
+    public async Task<IActionResult> UpdateAlert(Guid id, [FromBody] UpdateAlertDto request)
     {
-        await _alertService.UpdateAlertAsync(id, updateAlertDto);
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
+        
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        await _alertService.UpdateAlertAsync(id, request);
         
         return Ok();
     }
     
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteAlert([FromRoute] Guid id)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAlert([FromBody] DeleteAlertDto request)
     {
-        await _alertService.DeleteAlertAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        await _alertService.DeleteAlertAsync(request);
         
         return Ok();
     }

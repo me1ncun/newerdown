@@ -7,7 +7,7 @@ using NewerDown.Application.GraphQL.Mutations;
 using NewerDown.Application.GraphQL.Schemas;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
-using NewerDown.Application.Validators;
+using NewerDown.Application.Validators.Monitors;
 using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Application;
@@ -17,7 +17,7 @@ public static class ApplicationExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-        services.AddValidatorsFromAssembly(typeof(AddServiceValidator).Assembly);
+        services.AddValidatorsFromAssembly(typeof(AddMonitorDtoValidator).Assembly);
         services.AddGraphQLServices();
 
         services.AddSingleton<ICacheService, CacheService>();
@@ -30,7 +30,6 @@ public static class ApplicationExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IBlobStorageService, BlobStorageService>();
         services.AddScoped<IIncidentService, IncidentService>();
-        services.AddScoped<IAdminService, AdminService>();
         
         services.AddScoped<IUserPhotoProvider, UserPhotoProvider>();
 

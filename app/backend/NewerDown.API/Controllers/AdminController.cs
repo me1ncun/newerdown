@@ -7,29 +7,31 @@ namespace NewerDown.Controllers;
 
 [ApiController]
 [Route("api/admin")]
+[Authorize(Roles = nameof(RoleType.Administrator))]
 public class AdminController : ControllerBase
 {
-    private readonly IAdminService _adminService;
+    private readonly IMonitorService _monitorService;
+    private readonly IUserService _userService;
     
-    public AdminController(IAdminService adminService)
+    public AdminController(
+        IMonitorService monitorService,
+        IUserService userService)
     {
-        _adminService = adminService;
+        _monitorService = monitorService;
+        _userService = userService;
     }
-    
-    [Authorize(Roles = nameof(RoleType.Administrator))]
+
     [HttpGet("users")]
     public async Task<IActionResult> GetUsers()
     {
-        var users = await _adminService.GetAllUsersAsync();
-        
-        return Ok(users);
+        var response = await _userService.GetAllUsersAsync();
+        return Ok(response);
     }
-    
-    [Authorize(Roles = nameof(RoleType.Administrator))]
+
     [HttpGet("monitors")]
     public async Task<IActionResult> GetMonitors()
     {
-        var monitors = await _adminService.GetAllMonitorsAsync();
-        return Ok(monitors);
+        var response = await _monitorService.GetAllMonitorsAsync();
+        return Ok(response);
     }
 }

@@ -55,6 +55,7 @@ public class TokenServiceTests
     [Test]
     public void GenerateAccessToken_TokenContainsCorrectClaims()
     {
+        // Arrange
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -68,11 +69,13 @@ public class TokenServiceTests
             new Claim(ClaimTypes.Email, user.Email)
         };
 
+        // Act
         var token = _tokenService.GenerateAccessToken(claims);
 
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(token);
 
+        // Assert
         Assert.That(jwt.Claims.First(c => c.Type == "unique_name").Value, Is.EqualTo(user.UserName));
         Assert.That(jwt.Claims.First(c => c.Type == "email").Value, Is.EqualTo(user.Email));
     }
@@ -80,12 +83,15 @@ public class TokenServiceTests
     [Test]
     public void GenerateAccessToken_HasValidExpiration()
     {
+        // Arrange
         var claims = new[] { new Claim("dummy", "value") };
 
+        // Act
         var token = _tokenService.GenerateAccessToken(claims);
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(token);
 
+        // Assert
         Assert.That(jwt.ValidTo, Is.GreaterThan(DateTime.UtcNow));
         Assert.That(jwt.ValidTo, Is.LessThanOrEqualTo(DateTime.UtcNow.AddMinutes(15.1)));
     }
@@ -93,12 +99,15 @@ public class TokenServiceTests
     [Test]
     public void GenerateAccessToken_UsesHmacSha256Signature()
     {
+        // Arrange
         var claims = new[] { new Claim("dummy", "value") };
 
+        // Act
         var token = _tokenService.GenerateAccessToken(claims);
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(token);
 
+        // Assert
         Assert.That(jwt.Header.Alg, Is.EqualTo("HS256"));
     }
 }

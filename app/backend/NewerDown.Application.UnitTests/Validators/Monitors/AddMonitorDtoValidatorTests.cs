@@ -1,14 +1,14 @@
 ﻿using FluentValidation.TestHelper;
-using Moq;
-using NewerDown.Application.Time;
-using NewerDown.Application.Validators;
+using NewerDown.Application.Validators.Monitors;
 using NewerDown.Domain.DTOs.Service;
+using NewerDown.Domain.Enums;
 
-namespace NewerDown.Application.UnitTests.Validators;
+namespace NewerDown.Application.UnitTests.Validators.Monitors;
 
-public class UpdateMonitorValidatorTests
+[TestFixture]
+public class AddMonitorDtoValidatorTests
 {
-    private UpdateMonitorValidator _validator;
+    private AddMonitorDtoValidator _validator;
 
     [SetUp]
     public void Setup()
@@ -20,15 +20,17 @@ public class UpdateMonitorValidatorTests
     public async Task ValidateAsync_AllFieldsValid_ReturnsNoErrors()
     {
         // Arrange
-        var dto = new UpdateMonitorDto()
+        var request = new AddMonitorDto()
         {
             Name = "Test Service",
-            Url = "https://example.com",
+            Target = "https://example.com",
+            Type = MonitorType.Http,
+            IntervalSeconds = 10,
             IsActive = true,
         };
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await _validator.TestValidateAsync(request);
 
         // Assert
         result.ShouldNotHaveAnyValidationErrors();
@@ -38,18 +40,18 @@ public class UpdateMonitorValidatorTests
     public async Task ValidateAsync_EmptyFields_ReturnsValidationErrors()
     {
         // Arrange
-        var dto = new UpdateMonitorDto()
+        var request = new AddMonitorDto()
         {
             Name = string.Empty,
-            Url = string.Empty,
+            Target = string.Empty,
             IsActive = true,
         };
 
         // Act
-        var result = await _validator.TestValidateAsync(dto);
+        var result = await _validator.TestValidateAsync(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Url);
+        result.ShouldHaveValidationErrorFor(x => x.Target);
         result.ShouldHaveValidationErrorFor(x => x.Name);
     }
 }

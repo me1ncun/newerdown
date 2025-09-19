@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using NewerDown.Domain.DTOs.Service;
 
-namespace NewerDown.Application.Validators;
+namespace NewerDown.Application.Validators.Monitors;
 
-public class UpdateMonitorValidator : AbstractValidator<UpdateMonitorDto>
+public class UpdateMonitorDtoValidator : AbstractValidator<UpdateMonitorDto>
 {
-    public UpdateMonitorValidator()
+    public UpdateMonitorDtoValidator()
     {
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Type must be a valid MonitorType.");

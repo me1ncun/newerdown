@@ -10,7 +10,11 @@ using NewerDown.Infrastructure.Data;
 using System.Net;
 using System.Text;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NewerDown.Application.Time;
+using NewerDown.Domain.DTOs.Request;
 using Monitor = NewerDown.Domain.Entities.Monitor;
 
 namespace NewerDown.Application.UnitTests.Services;
@@ -22,9 +26,13 @@ public class MonitorServiceTests
     private Mock<IUserContextService> _userContextServiceMock;
     private Mock<IHttpClientFactory> _httpClientFactoryMock;
     private Mock<IScopedTimeProvider> _timeProviderMock;
+    private Mock<UserManager<User>> _userManagerMock;
+    private Mock<IUserService> _userServiceMock;
+    
     private ApplicationDbContext _context;
     private MonitorService _monitorService;
     private IMapper _mapper;
+    
     private readonly Guid _currentUserId = Guid.NewGuid();
 
     [SetUp]
@@ -34,6 +42,17 @@ public class MonitorServiceTests
         _userContextServiceMock = new();
         _httpClientFactoryMock = new();
         _timeProviderMock = new();
+        _userManagerMock = new Mock<UserManager<User>>(
+            new Mock<IUserStore<User>>().Object,
+            new Mock<IOptions<IdentityOptions>>().Object,
+            new Mock<IPasswordHasher<User>>().Object,
+            new IUserValidator<User>[0],
+            new IPasswordValidator<User>[0],
+            new Mock<ILookupNormalizer>().Object,
+            new Mock<IdentityErrorDescriber>().Object,
+            new Mock<IServiceProvider>().Object,
+            new Mock<ILogger<UserManager<User>>>().Object);
+        _userServiceMock = new();
 
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -67,7 +86,9 @@ public class MonitorServiceTests
             _userContextServiceMock.Object,
             _httpClientFactoryMock.Object,
             Mock.Of<Microsoft.Extensions.Logging.ILogger<MonitorService>>(),
-            _timeProviderMock.Object);
+            _timeProviderMock.Object,
+            _userManagerMock.Object,
+            _userServiceMock.Object);
     }
 
     [TearDown]
@@ -80,6 +101,7 @@ public class MonitorServiceTests
     [Test]
     public async Task CreateMonitorAsync_ShouldCreateMonitor()
     {
+        // Arrange
         var dto = new AddMonitorDto
         {
             Name = "Monitor1",
@@ -89,8 +111,10 @@ public class MonitorServiceTests
             IsActive = true
         };
 
+        // Act
         var result = await _monitorService.CreateMonitorAsync(dto);
 
+        // Assert
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(await _context.Monitors.AnyAsync(m => m.Name == "Monitor1"), Is.True);
     }
@@ -98,6 +122,7 @@ public class MonitorServiceTests
     [Test]
     public async Task GetMonitorByIdAsync_ShouldReturnMonitor()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -108,18 +133,27 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
+
+        var request = new GetByIdDto()
+        {
+            Id = monitor.Id
+        };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var result = await _monitorService.GetMonitorByIdAsync(monitor.Id);
+        // Act
+        var result = await _monitorService.GetMonitorByIdAsync(request);
 
+        // Assert
         Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Value.Name, Is.EqualTo("Monitor2"));
+        Assert.That(result.Value.Name, Is.EqualTo(monitor.Name));
     }
 
     [Test]
     public async Task UpdateMonitorAsync_ShouldUpdateMonitor()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -141,10 +175,12 @@ public class MonitorServiceTests
             IsActive = false
         };
 
+        // Act
         var result = await _monitorService.UpdateMonitorAsync(monitor.Id, dto);
-
-        Assert.That(result.IsSuccess, Is.True);
         var updated = await _context.Monitors.FindAsync(monitor.Id);
+        
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
         Assert.That(updated.Name, Is.EqualTo("Monitor3Updated"));
         Assert.That(updated.Target, Is.EqualTo("https://updated.com"));
         Assert.That(updated.IsActive, Is.False);
@@ -153,6 +189,7 @@ public class MonitorServiceTests
     [Test]
     public async Task DeleteMonitorAsync_ShouldDeleteMonitor()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -163,11 +200,19 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
+
+        var request = new DeleteMonitorDto()
+        {
+            Id = monitor.Id
+        };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var result = await _monitorService.DeleteMonitorAsync(monitor.Id);
+        // Act
+        var result = await _monitorService.DeleteMonitorAsync(request);
 
+        // Assert
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(await _context.Monitors.FindAsync(monitor.Id), Is.Null);
     }
@@ -175,6 +220,7 @@ public class MonitorServiceTests
     [Test]
     public async Task PauseMonitorAsync_ShouldPauseMonitor()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -185,19 +231,28 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
+
+        var request = new GetByIdDto()
+        {
+            Id = monitor.Id
+        };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var result = await _monitorService.PauseMonitorAsync(monitor.Id);
-
-        Assert.That(result.IsSuccess, Is.True);
+        // Act
+        var result = await _monitorService.PauseMonitorAsync(request);
         var paused = await _context.Monitors.FindAsync(monitor.Id);
+        
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
         Assert.That(paused.IsActive, Is.False);
     }
 
     [Test]
     public async Task ResumeMonitorAsync_ShouldResumeMonitor()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -208,19 +263,28 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = false
         };
+        
+        var request = new GetByIdDto()
+        {
+            Id = monitor.Id
+        };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var result = await _monitorService.ResumeMonitorAsync(monitor.Id);
-
-        Assert.That(result.IsSuccess, Is.True);
+        // Act
+        var result = await _monitorService.ResumeMonitorAsync(request);
         var resumed = await _context.Monitors.FindAsync(monitor.Id);
+        
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
         Assert.That(resumed.IsActive, Is.True);
     }
 
     [Test]
     public async Task GetAllMonitors_ShouldReturnMonitors()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -231,17 +295,34 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
+
+        var user = new User()
+        {
+            Id = _currentUserId
+        };
+
+        var roles = new List<string> { RoleType.Administrator.ToString() };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
+        
+        _userServiceMock.Setup(userService => userService.GetUserByIdAsync(_currentUserId))
+            .ReturnsAsync(user);
 
-        var result = await _monitorService.GetAllMonitors();
+        _userManagerMock.Setup(userManager => userManager.GetRolesAsync(user))
+            .ReturnsAsync(roles);
 
-        Assert.That(result.Any(m => m.Name == "MonitorAll"), Is.True);
+        // Act
+        var result = await _monitorService.GetAllMonitorsAsync();
+
+        // Assert
+        Assert.That(result.Any(m => m.Name == monitor.Name), Is.True);
     }
 
     [Test]
     public async Task ExportMonitorCsvAsync_ShouldReturnCsvBytes()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -252,30 +333,42 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
+        
+        var request = new GetByIdDto()
+        {
+            Id = monitor.Id
+        };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var bytes = await _monitorService.ExportMonitorCsvAsync(monitor.Id);
+        // Act
+        var bytes = await _monitorService.ExportMonitorCsvAsync(request);
 
+        // Assert
         Assert.That(bytes.Length, Is.GreaterThan(0));
     }
 
     [Test]
     public async Task ImportMonitorsFromCsvAsync_ShouldImportMonitors()
     {
+        // Arrange
         var csv = "Name,Url,Type,CheckIntervalSeconds,IsActive\nMonitorCsvImport,https://import.com,Http,60,true";
         var fileMock = new Mock<Microsoft.AspNetCore.Http.IFormFile>();
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(csv));
         fileMock.Setup(f => f.OpenReadStream()).Returns(stream);
 
+        // Act
         await _monitorService.ImportMonitorsFromCsvAsync(fileMock.Object);
 
+        // Assert
         Assert.That(await _context.Monitors.AnyAsync(m => m.Name == "MonitorCsvImport"), Is.True);
     }
 
     [Test]
     public async Task GetMonitorStatusAsync_ShouldReturnUpOrDown()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -287,20 +380,29 @@ public class MonitorServiceTests
             IsActive = true,
             Checks = new List<MonitorCheck>
             {
-                new MonitorCheck { CheckedAt = DateTime.UtcNow, IsSuccess = true }
+                new() { CheckedAt = DateTime.UtcNow, IsSuccess = true }
             }
         };
+        
+        var request = new GetByIdDto()
+        {
+            Id = monitor.Id
+        };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var status = await _monitorService.GetMonitorStatusAsync(monitor.Id);
+        // Act
+        var status = await _monitorService.GetMonitorStatusAsync(request);
 
+        // Assert
         Assert.That(status, Is.EqualTo(MonitorStatus.Up));
     }
 
     [Test]
     public async Task GetHistoryByMonitorAsync_ShouldReturnPagedChecks()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -311,8 +413,6 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
-        await _context.Monitors.AddAsync(monitor);
-        await _context.SaveChangesAsync();
 
         var check = new MonitorCheck
         {
@@ -321,17 +421,22 @@ public class MonitorServiceTests
             CheckedAt = DateTime.UtcNow,
             IsSuccess = true
         };
+        
+        await _context.Monitors.AddAsync(monitor);
         await _context.MonitorChecks.AddAsync(check);
         await _context.SaveChangesAsync();
 
+        // Act
         var paged = await _monitorService.GetHistoryByMonitorAsync(monitor.Id);
 
+        // Assert
         Assert.That(paged.TotalCount, Is.EqualTo(1));
     }
 
     [Test]
     public async Task GetUptimePercentageAsync_ShouldReturnPercentage()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -343,22 +448,26 @@ public class MonitorServiceTests
             IsActive = true,
             Checks = new List<MonitorCheck>
             {
-                new MonitorCheck { CheckedAt = DateTime.UtcNow.AddMinutes(-1), IsSuccess = true },
-                new MonitorCheck { CheckedAt = DateTime.UtcNow, IsSuccess = false }
+                new() { CheckedAt = DateTime.UtcNow.AddMinutes(-1), IsSuccess = true },
+                new() { CheckedAt = DateTime.UtcNow, IsSuccess = false }
             }
         };
+        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var dto = await _monitorService.GetUptimePercentageAsync(monitor.Id, DateTime.UtcNow.AddHours(-1),
+        // Act
+        var response = await _monitorService.GetUptimePercentageAsync(monitor.Id, DateTime.UtcNow.AddHours(-1),
             DateTime.UtcNow.AddHours(1));
 
-        Assert.That(dto.Percentage, Is.GreaterThanOrEqualTo(0));
+        // Assert
+        Assert.That(response.Percentage, Is.GreaterThanOrEqualTo(0));
     }
 
     [Test]
     public async Task GetLatencyGraph_ShouldReturnPoints()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -369,8 +478,6 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
-        await _context.Monitors.AddAsync(monitor);
-        await _context.SaveChangesAsync();
 
         var check = new MonitorCheck
         {
@@ -380,13 +487,16 @@ public class MonitorServiceTests
             IsSuccess = true,
             ResponseTimeMs = 123
         };
+        
+        await _context.Monitors.AddAsync(monitor);
         await _context.MonitorChecks.AddAsync(check);
         await _context.SaveChangesAsync();
 
-        var points =
-            await _monitorService.GetLatencyGraph(monitor.Id, DateTime.UtcNow.AddHours(-1),
+        // Act
+        var points = await _monitorService.GetLatencyGraph(monitor.Id, DateTime.UtcNow.AddHours(-1),
                 DateTime.UtcNow.AddHours(1));
 
+        // Assert
         Assert.That(points.Count, Is.EqualTo(1));
         Assert.That(points[0].ResponseTimeMs, Is.EqualTo(123));
     }
@@ -394,6 +504,7 @@ public class MonitorServiceTests
     [Test]
     public async Task GetDownTimesAsync_ShouldReturnDowntimes()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -404,8 +515,11 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
-        await _context.Monitors.AddAsync(monitor);
-        await _context.SaveChangesAsync();
+        
+        var request = new GetByIdDto()
+        {
+            Id = monitor.Id
+        };
 
         var checks = new[]
         {
@@ -420,11 +534,15 @@ public class MonitorServiceTests
                 IsSuccess = true
             }
         };
+        
+        await _context.Monitors.AddAsync(monitor);
         await _context.MonitorChecks.AddRangeAsync(checks);
         await _context.SaveChangesAsync();
 
-        var downtimes = await _monitorService.GetDownTimesAsync(monitor.Id);
+        // Act
+        var downtimes = await _monitorService.GetDownTimesAsync(request);
 
+        // Assert
         Assert.That(downtimes.Count, Is.EqualTo(1));
         Assert.That(downtimes[0].Start, Is.Not.Null);
         Assert.That(downtimes[0].End, Is.Not.Null);
@@ -433,6 +551,7 @@ public class MonitorServiceTests
     [Test]
     public async Task GetMonitorSummaryAsync_ShouldReturnSummary()
     {
+        // Arrange
         var monitor = new Monitor
         {
             Id = Guid.NewGuid(),
@@ -443,10 +562,8 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
-        await _context.Monitors.AddAsync(monitor);
-        await _context.SaveChangesAsync();
 
-        var stat = new MonitorStatistic
+        var statistic = new MonitorStatistic
         {
             Id = Guid.NewGuid(),
             MonitorId = monitor.Id,
@@ -457,11 +574,15 @@ public class MonitorServiceTests
             FailedChecks = 1,
             IncidentsCount = 1
         };
-        await _context.MonitorStatistics.AddAsync(stat);
+        
+        await _context.Monitors.AddAsync(monitor);
+        await _context.MonitorStatistics.AddAsync(statistic);
         await _context.SaveChangesAsync();
 
+        // Act
         var summary = await _monitorService.GetMonitorSummaryAsync(monitor.Id, 1);
 
+        // Assert
         Assert.That(summary.UptimePercent, Is.EqualTo(99));
         Assert.That(summary.AvgResponseTimeMs, Is.EqualTo(100));
         Assert.That(summary.TotalChecks, Is.EqualTo(10));

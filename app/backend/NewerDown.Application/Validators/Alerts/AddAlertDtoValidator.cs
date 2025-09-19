@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using NewerDown.Domain.DTOs.Alerts;
 
-namespace NewerDown.Application.Validators;
+namespace NewerDown.Application.Validators.Alerts;
 
-public class AddAlertValidator : AbstractValidator<AddAlertDto>
+public class AddAlertDtoValidator : AbstractValidator<AddAlertDto>
 {
-    public AddAlertValidator()
+    public AddAlertDtoValidator()
     {
         RuleFor(x => x.MonitorId)
             .NotEmpty().WithMessage("Monitor Id is required.");

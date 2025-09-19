@@ -1,8 +1,8 @@
-﻿using System.Net.Mime;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewerDown.Domain.DTOs.MonitorCheck;
 using NewerDown.Domain.DTOs.MonitoringResults;
+using NewerDown.Domain.DTOs.Request;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Enums;
 using NewerDown.Domain.Interfaces;
@@ -29,77 +29,108 @@ public class MonitorController : ControllerBase
     [HttpPost]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(Guid))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> CreateMonitor([FromBody] AddMonitorDto monitor)
+    public async Task<IActionResult> CreateMonitor([FromBody] AddMonitorDto request)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(monitor);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors);
         }
         
-        var result = await _monitorService.CreateMonitorAsync(monitor);
+        var result = await _monitorService.CreateMonitorAsync(request);
+        
         return result.ToDefaultApiResponse();
     }
     
     [HttpGet]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(IEnumerable<MonitorDto>))]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<MonitorDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> GetAllMonitors()
     {
-        var result = await _monitorService.GetAllMonitors();
+        var result = await _monitorService.GetAllMonitorsAsync();
       
         return Ok(result);
     }
     
-    [HttpGet("{id:guid}")]
+    [HttpGet]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> GetMonitorById(Guid id)
+    public async Task<IActionResult> GetMonitorById(GetByIdDto request)
     {
-        var result = await _monitorService.GetMonitorByIdAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var result = await _monitorService.GetMonitorByIdAsync(request);
+        
         return result.ToDefaultApiResponse();
     }
     
     [HttpPut("{id:guid}")]
     [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> UpdateMonitor(Guid id, [FromBody] UpdateMonitorDto monitor)
+    public async Task<IActionResult> UpdateMonitor(Guid id, [FromBody] UpdateMonitorDto request)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(monitor);
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
+        
+        var validationResult = await _fluentValidator.ValidateAsync(request);
         if (!validationResult.IsValid)
         {
             return BadRequest(validationResult.Errors);
         }
         
-        var result = await _monitorService.UpdateMonitorAsync(id, monitor);
+        var result = await _monitorService.UpdateMonitorAsync(id, request);
+        
         return result.ToDefaultApiResponse();
     }
     
-    [HttpDelete("{id:guid}")]
+    [HttpDelete]
     [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> DeleteMonitor(Guid id)
+    public async Task<IActionResult> DeleteMonitor(DeleteMonitorDto request)
     {
-        var result = await _monitorService.DeleteMonitorAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var result = await _monitorService.DeleteMonitorAsync(request);
        
         return result.ToDefaultApiResponse();
     }
     
-    [HttpPost("{id:guid}/pause")]
+    [HttpPost("pause")]
     [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> PauseMonitor(Guid id)
+    public async Task<IActionResult> PauseMonitor([FromBody] GetByIdDto request)
     {
-        var result = await _monitorService.PauseMonitorAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var result = await _monitorService.PauseMonitorAsync(request);
         return result.ToDefaultApiResponse();
     }
     
-    [HttpPost("{id:guid}/resume")]
+    [HttpPost("resume")]
     [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> ResumeMonitor(Guid id)
+    public async Task<IActionResult> ResumeMonitor(GetByIdDto request)
     {
-        var result = await _monitorService.ResumeMonitorAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var result = await _monitorService.ResumeMonitorAsync(request);
+        
         return result.ToDefaultApiResponse();
     }
     
@@ -112,13 +143,20 @@ public class MonitorController : ControllerBase
         return Ok();
     }
     
-    [HttpGet("{id}/export")]
+    [HttpGet("export")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> ExportMonitorCsv(Guid id)
+    public async Task<IActionResult> ExportMonitorCsv(GetByIdDto request)
     {
-        var fileContent = await _monitorService.ExportMonitorCsvAsync(id);
-        return File(fileContent, "text/csv", $"monitor_{id}.csv");
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var fileContent = await _monitorService.ExportMonitorCsvAsync(request);
+        
+        return File(fileContent, "text/csv", $"monitor_{request.Id}.csv");
     }
     
     [HttpGet("{id}/history")]
@@ -130,12 +168,19 @@ public class MonitorController : ControllerBase
         return Ok(history);
     }
     
-    [HttpGet("{id}/status")]
+    [HttpGet("status")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorStatus))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> GetMonitorStatus(Guid id)
+    public async Task<IActionResult> GetMonitorStatus(GetByIdDto request)
     {
-        var status = await _monitorService.GetMonitorStatusAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var status = await _monitorService.GetMonitorStatusAsync(request);
+        
         return Ok(status);
     }
     
@@ -148,12 +193,19 @@ public class MonitorController : ControllerBase
         return Ok(summary);
     }
     
-    [HttpGet("{id}/downtimes")]
+    [HttpGet("downtimes")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<DownTimeDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> GetMonitorDowntimes(Guid id)
+    public async Task<IActionResult> GetMonitorDowntimes(GetByIdDto request)
     {
-        var downTimes = await _monitorService.GetDownTimesAsync(id);
+        var validationResult = await _fluentValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        
+        var downTimes = await _monitorService.GetDownTimesAsync(request);
+        
         return Ok(downTimes);
     }
     

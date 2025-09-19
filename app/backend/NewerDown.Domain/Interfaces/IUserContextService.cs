@@ -6,6 +6,5 @@ namespace NewerDown.Domain.Interfaces;
 public interface IUserContextService
 {
     Guid GetUserId();
-
     Task<Result<UserDto>> GetCurrentUserAsync();
 }

@@ -5,6 +5,7 @@ using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
 using NewerDown.Domain.DTOs.Alerts;
+using NewerDown.Domain.DTOs.Request;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Enums;
 using NewerDown.Domain.Exceptions;
@@ -19,25 +20,25 @@ public class AlertServiceTests
 {
     private Mock<ICacheService> _cacheServiceMock;
     private Mock<IUserContextService> _userContextServiceMock;
+    private Mock<IScopedTimeProvider> _timeProviderMock;
     
     private ApplicationDbContext _context;
     private AlertService _alertService;
-    private IScopedTimeProvider _scopedTimeProvider;
     
-    private readonly Guid _currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
+    private readonly Guid _currentUserId = Guid.NewGuid();
     
     [SetUp]
     public void Setup()
     {
         _cacheServiceMock = new();
         _userContextServiceMock = new();
+        _timeProviderMock = new();
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         
         _context = new ApplicationDbContext(options);
-        _scopedTimeProvider = new ScopedTimeProvider(TimeProvider.System);
         _context.Database.EnsureCreated();
         
         var mapper = new MapperConfiguration(cfg =>
@@ -70,15 +71,20 @@ public class AlertServiceTests
             MonitorId = Guid.NewGuid(),
             Type = AlertType.Email,
             Target = "email@email.com",
-            CreatedAt = _scopedTimeProvider.UtcNow(),
+            CreatedAt = _timeProviderMock.Object.UtcNow(),
             UserId = _currentUserId
+        };
+
+        var request = new GetByIdDto()
+        {
+            Id = alert.Id
         };
         
         await _context.Alerts.AddAsync(alert);
         await _context.SaveChangesAsync();
         
         // Act
-        var result = await _alertService.GetAlertByIdAsync(alert.Id);
+        var result = await _alertService.GetAlertByIdAsync(request);
         
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -90,12 +96,17 @@ public class AlertServiceTests
     {
         // Arrange
         var nonExistentId = Guid.NewGuid();
+        
+        var request = new GetByIdDto()
+        {
+            Id = nonExistentId
+        };
 
         // Act & Assert
         var ex = Assert.ThrowsAsync<EntityNotFoundException>(() =>
-            _alertService.GetAlertByIdAsync(nonExistentId));
+            _alertService.GetAlertByIdAsync(request));
 
-        Assert.That(ex.Message, Is.EqualTo("Alert was not found."));
+        Assert.That(ex.Message, Is.EqualTo($"Alert not found by Id: {request.Id}"));
     }
 
 
@@ -111,7 +122,7 @@ public class AlertServiceTests
                 MonitorId = Guid.NewGuid(),
                 Type = AlertType.Email,
                 Target = "email@email.com",
-                CreatedAt = _scopedTimeProvider.UtcNow(),
+                CreatedAt = _timeProviderMock.Object.UtcNow(),
                 UserId = _currentUserId
             },
             new()
@@ -120,7 +131,7 @@ public class AlertServiceTests
                 MonitorId = Guid.NewGuid(),
                 Type = AlertType.Email,
                 Target = "email@email.com",
-                CreatedAt = _scopedTimeProvider.UtcNow(),
+                CreatedAt = _timeProviderMock.Object.UtcNow(),
                 UserId = _currentUserId
             }
         };
@@ -128,8 +139,8 @@ public class AlertServiceTests
         await _context.Alerts.AddRangeAsync(alerts);
         await _context.SaveChangesAsync();
         
-        _cacheServiceMock.Setup(x => x.GetAsync<IEnumerable<AlertDto>>(It.IsAny<string>()))
-            .ReturnsAsync((IEnumerable<AlertDto>?)null);
+        _cacheServiceMock.Setup(x => x.GetAsync<List<AlertDto>>(It.IsAny<string>()))
+            .ReturnsAsync((List<AlertDto>?)null);
 
         // Act
         var result = await _alertService.GetAllAsync();
@@ -163,8 +174,8 @@ public class AlertServiceTests
             }
         };
         
-        _cacheServiceMock.Setup(x => x.GetAsync<IEnumerable<AlertDto>>(It.IsAny<string>()))
-            .ReturnsAsync(alerts.AsEnumerable());
+        _cacheServiceMock.Setup(x => x.GetAsync<List<AlertDto>>(It.IsAny<string>()))
+            .ReturnsAsync(alerts);
 
         // Act
         var result = (await _alertService.GetAllAsync()).ToList();
@@ -186,7 +197,7 @@ public class AlertServiceTests
             Target = "https://example.com",
             UserId = _currentUserId,
             IntervalSeconds = 30,
-            CreatedAt = _scopedTimeProvider.UtcNow(),
+            CreatedAt = _timeProviderMock.Object.UtcNow(),
             IsActive = true
         };
 
@@ -220,15 +231,20 @@ public class AlertServiceTests
             MonitorId = Guid.NewGuid(),
             Type = AlertType.Email,
             Target = "email@email.com",
-            CreatedAt = _scopedTimeProvider.UtcNow(),
+            CreatedAt = _timeProviderMock.Object.UtcNow(),
             UserId = _currentUserId
+        };
+
+        var request = new DeleteAlertDto()
+        {
+            Id = alert.Id
         };
 
         await _context.Alerts.AddAsync(alert);
         await _context.SaveChangesAsync();
 
         // Act
-        await _alertService.DeleteAlertAsync(alert.Id);
+        await _alertService.DeleteAlertAsync(request);
 
         // Assert
         var deleted = await _context.Alerts.FirstOrDefaultAsync(x => x.Id == alert.Id);

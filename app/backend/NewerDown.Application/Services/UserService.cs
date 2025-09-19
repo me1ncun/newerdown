@@ -34,7 +34,7 @@ public class UserService : IUserService
         return user;
     }
     
-    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+    public async Task<List<UserDto>> GetAllUsersAsync()
     {
         var users = _context.Users
             .Include(x => x.FileAttachment)
@@ -47,7 +47,7 @@ public class UserService : IUserService
     {
         var userId = _userContextService.GetUserId();
         var user = await GetUserByIdAsync(userId);
-        if (user == null)
+        if (user is null)
             return Result<UserDto>.Failure(UserErrors.UserNotFound);
         
         _mapper.Map(request, user);
@@ -62,7 +62,7 @@ public class UserService : IUserService
     {
         var userId = _userContextService.GetUserId();
         var user = _context.Users.FirstOrDefault(x => x.Id == userId);
-        if (user == null)
+        if (user is null)
             return Result.Failure(UserErrors.UserNotFound);
 
         _context.Users.Remove(user);

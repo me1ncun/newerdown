@@ -25,7 +25,7 @@ public class IncidentService : IIncidentService
         _timeProvider = timeProvider;
     }
     
-    public async Task<IEnumerable<IncidentDto>> GetAllAsync(Guid userId)
+    public async Task<List<IncidentDto>> GetAllAsync(Guid userId)
     {
         var incidents = await _dbContext.Incidents
             .Include(x => x.Monitor)
@@ -33,7 +33,7 @@ public class IncidentService : IIncidentService
                                          && x.StartedAt < _timeProvider.UtcNow())
             .ToListAsync();
         
-        return _mapper.Map<IEnumerable<IncidentDto>>(incidents);
+        return _mapper.Map<List<IncidentDto>>(incidents);
     }
 
     public async Task<IncidentDto> GetByIdAsync(Guid id, Guid userId)

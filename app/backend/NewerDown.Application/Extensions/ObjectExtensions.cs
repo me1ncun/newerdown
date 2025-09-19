@@ -11,4 +11,13 @@ public static class ObjectExtensions
 
         return obj;
     }
+    
+    public static async Task<T> ThrowIfNullAsync<T>(this Task<T?> task, string? message = null) where T : class
+    {
+        var result = await task.ConfigureAwait(false);
+        if (result == null)
+            throw new EntityNotFoundException($"{message ?? "The requested entity"} was not found.");
+
+        return result;
+    }
 }
