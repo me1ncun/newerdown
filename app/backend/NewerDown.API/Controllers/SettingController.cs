@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Controllers;
 
@@ -6,31 +8,41 @@ namespace NewerDown.Controllers;
 [Route("api")]
 public class SettingController : ControllerBase
 {
-    [HttpGet("check-types")]
-    public IActionResult CheckTypes()
+    private readonly ApplicationDbContext _context;
+
+    public SettingController(ApplicationDbContext context)
     {
-        // Logic to check types
-        return Ok("Types checked successfully");
+        _context = context;
+    }
+    
+    [HttpGet("check-types")]
+    public async Task<IActionResult> CheckTypes()
+    {
+        var checkTypes = await _context.Monitors.Select(m => new
+        { 
+            m.Id,
+            CheckType = m.Type
+        }).ToListAsync();
+        
+        return Ok(checkTypes);
     }
     
     [HttpGet("check-intervals")]
-    public IActionResult CheckIntervals()
+    public async Task<IActionResult> CheckIntervals()
     {
-        // Logic to check types
-        return Ok("Types checked successfully");
+        var checkIntervals = await _context.Monitors.Select(m => new
+        { 
+            m.Id,
+            CheckInterval = m.IntervalSeconds
+        }).ToListAsync();
+        
+        return Ok(checkIntervals);
     }
     
     [HttpGet("status-codes")]
-    public IActionResult StatusCodes()
+    public async Task<IActionResult> StatusCodes()
     {
-        // Logic to check types
-        return Ok("Types checked successfully");
-    }
-    
-    [HttpGet("monitor-types")]
-    public IActionResult MonitorTypes()
-    {
-        // Logic to check types
-        return Ok("Types checked successfully");
+        var statusCodes = await _context.MonitorChecks.Select(mc => mc.StatusCode).Distinct().ToListAsync();
+        return Ok(statusCodes);
     }
 }

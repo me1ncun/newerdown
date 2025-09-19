@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
@@ -19,10 +20,17 @@ public class AdminService : IAdminService
     
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        var users = _dbContext.Users
+        var users = await _dbContext.Users
             .Include(x => x.FileAttachment)
             .ToListAsync();
 
-        return _mapper.Map<List<UserDto>>(await users);
+        return _mapper.Map<List<UserDto>>(users);
+    }
+
+    public async Task<IEnumerable<MonitorDto>> GetAllMonitorsAsync()
+    {
+        var monitors = await _dbContext.Monitors.ToListAsync();
+        
+        return _mapper.Map<IEnumerable<MonitorDto>>(monitors);
     }
 }

@@ -1,9 +1,10 @@
-﻿/*using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
-using NewerDown.Domain.DTOs.Notifications;
+using NewerDown.Application.Time;
+using NewerDown.Domain.DTOs.Alerts;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Enums;
 using NewerDown.Domain.Exceptions;
@@ -17,24 +18,26 @@ namespace NewerDown.Application.UnitTests.Services;
 public class AlertServiceTests
 {
     private Mock<ICacheService> _cacheServiceMock;
-    private Mock<IUserService> _userServiceMock;
+    private Mock<IUserContextService> _userContextServiceMock;
     
     private ApplicationDbContext _context;
     private AlertService _alertService;
+    private IScopedTimeProvider _scopedTimeProvider;
     
-    private readonly Guid currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
+    private readonly Guid _currentUserId = Guid.Parse("0a600fd2-cd43-4f95-b0c4-5e531288c19e");
     
     [SetUp]
     public void Setup()
     {
         _cacheServiceMock = new();
-        _userServiceMock = new();
+        _userContextServiceMock = new();
         
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         
         _context = new ApplicationDbContext(options);
+        _scopedTimeProvider = new ScopedTimeProvider(TimeProvider.System);
         _context.Database.EnsureCreated();
         
         var mapper = new MapperConfiguration(cfg =>
@@ -42,13 +45,13 @@ public class AlertServiceTests
             cfg.AddProfile(typeof(AlertMappingProfile));
         }).CreateMapper();
 
-        _userServiceMock.Setup(x => x.GetUserId()).Returns(currentUserId);
+        _userContextServiceMock.Setup(x => x.GetUserId()).Returns(_currentUserId);
 
         _alertService = new AlertService(
             _context,
             mapper,
             _cacheServiceMock.Object,
-            _userServiceMock.Object);
+            _userContextServiceMock.Object);
     }
 
     [TearDown]
@@ -58,165 +61,177 @@ public class AlertServiceTests
     }
     
     [Test]
-    public async Task GetNotificationRuleByIdAsync_ShouldReturnNotificationRule_WhenExists()
+    public async Task GetAlertByIdAsync_ShouldReturnAlert_WhenExists()
     {
         // Arrange
-        var notificationRule = new Alert
+        var alert = new Alert
         {
             Id = Guid.NewGuid(),
-            ServiceId = Guid.NewGuid(),
-            UserId = currentUserId
+            MonitorId = Guid.NewGuid(),
+            Type = AlertType.Email,
+            Target = "email@email.com",
+            CreatedAt = _scopedTimeProvider.UtcNow(),
+            UserId = _currentUserId
         };
         
-        await _context.NotificationRules.AddAsync(notificationRule);
+        await _context.Alerts.AddAsync(alert);
         await _context.SaveChangesAsync();
         
         // Act
-        var result = await _alertService.GetNotificationRuleByIdAsync(notificationRule.Id);
+        var result = await _alertService.GetAlertByIdAsync(alert.Id);
         
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(notificationRule.Id, Is.EqualTo(result.Id));
+        Assert.That(alert.Id, Is.EqualTo(result.Id));
     }
     
     [Test]
-    public void GetNotificationRuleByIdAsync_ShouldThrowException_WhenNotExists()
+    public void GetAlertByIdAsync_ShouldThrowException_WhenNotExists()
     {
         // Arrange
         var nonExistentId = Guid.NewGuid();
 
         // Act & Assert
         var ex = Assert.ThrowsAsync<EntityNotFoundException>(() =>
-            _alertService.GetNotificationRuleByIdAsync(nonExistentId));
+            _alertService.GetAlertByIdAsync(nonExistentId));
 
-        Assert.That(ex.Message, Is.EqualTo("NotificationRule was not found."));
+        Assert.That(ex.Message, Is.EqualTo("Alert was not found."));
     }
 
 
     [Test]
-    public async Task GetAllAsync_ShouldReturnAllNotificationRule_WhenExists()
+    public async Task GetAllAsync_ShouldReturnAllAlerts_WhenExists()
     {
         // Arrange
-        var notificationRules = new List<Alert>
+        var alerts = new List<Alert>
         {
-            new Alert
+            new()
             {
                 Id = Guid.NewGuid(),
-                ServiceId = Guid.NewGuid(),
-                UserId = currentUserId
+                MonitorId = Guid.NewGuid(),
+                Type = AlertType.Email,
+                Target = "email@email.com",
+                CreatedAt = _scopedTimeProvider.UtcNow(),
+                UserId = _currentUserId
             },
-            new Alert
+            new()
             {
                 Id = Guid.NewGuid(),
-                ServiceId = Guid.NewGuid(),
-                UserId = currentUserId
+                MonitorId = Guid.NewGuid(),
+                Type = AlertType.Email,
+                Target = "email@email.com",
+                CreatedAt = _scopedTimeProvider.UtcNow(),
+                UserId = _currentUserId
             }
         };
         
-        await _context.NotificationRules.AddRangeAsync(notificationRules);
+        await _context.Alerts.AddRangeAsync(alerts);
         await _context.SaveChangesAsync();
         
-        _cacheServiceMock.Setup(x => x.GetAsync<IEnumerable<NotificationRuleDto>>(It.IsAny<string>()))
-            .ReturnsAsync((IEnumerable<NotificationRuleDto>?)null);
+        _cacheServiceMock.Setup(x => x.GetAsync<IEnumerable<AlertDto>>(It.IsAny<string>()))
+            .ReturnsAsync((IEnumerable<AlertDto>?)null);
 
         // Act
         var result = await _alertService.GetAllAsync();
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count(), Is.EqualTo(notificationRules.Count));
+        Assert.That(result.Count(), Is.EqualTo(alerts.Count));
     }
 
     [Test]
-    public async Task GetAllAsync_ShouldReturnAllNotificationRule_WhenExistsInCache()
+    public async Task GetAllAsync_ShouldReturnAllAlerts_WhenExistsInCache()
     {
         // Arrange
-        var notificationRules = new List<NotificationRuleDto>
+        var alerts = new List<AlertDto>
         {
-            new NotificationRuleDto
+            new()
             {
                 Id = Guid.NewGuid(),
-                ServiceId = Guid.NewGuid(),
-                UserId = currentUserId
+                MonitorId = Guid.NewGuid(),
+                Type = AlertType.Email,
+                Target = "email@email.com",
+                UserId = _currentUserId
             },
-            new NotificationRuleDto
+            new()
             {
                 Id = Guid.NewGuid(),
-                ServiceId = Guid.NewGuid(),
-                UserId = currentUserId
+                MonitorId = Guid.NewGuid(),
+                Type = AlertType.Email,
+                Target = "email@email.com",
+                UserId = _currentUserId
             }
         };
         
-        _cacheServiceMock.Setup(x => x.GetAsync<IEnumerable<NotificationRuleDto>>(It.IsAny<string>()))
-            .ReturnsAsync(notificationRules.AsEnumerable());
+        _cacheServiceMock.Setup(x => x.GetAsync<IEnumerable<AlertDto>>(It.IsAny<string>()))
+            .ReturnsAsync(alerts.AsEnumerable());
 
         // Act
-        var result = await _alertService.GetAllAsync();
+        var result = (await _alertService.GetAllAsync()).ToList();
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.Count(), Is.EqualTo(notificationRules.Count));
+        Assert.That(result.Count(), Is.EqualTo(alerts.Count));
     }
 
     [Test]
-    public async Task CreateNotificationRuleAsync_ShouldAddNotificationRule_WhenServiceRuleExists()
+    public async Task CreateAlertAsync_ShouldAddAlert_WhenMonitorExists()
     {
         // Arrange
-        var service = new Monitor()
+        var monitor = new Monitor()
         {
             Id = Guid.NewGuid(),
             Name = "Test Service",
-            Url = "https://example.com",
-            UserId = currentUserId,
+            Type = MonitorType.Http,
+            Target = "https://example.com",
+            UserId = _currentUserId,
+            IntervalSeconds = 30,
+            CreatedAt = _scopedTimeProvider.UtcNow(),
+            IsActive = true
         };
 
-        await _context.Services.AddAsync(service);
+        await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var dto = new AddAlertDto
+        var alert = new AddAlertDto
         {
-            ServiceId = service.Id,
-            Channel = NotificationChannel.PushNotification,
-            Target = "new@example.com",
-            NotifyOnFailure = false,
-            NotifyOnRecovery = true
+            Type = AlertType.Email,
+            MonitorId = monitor.Id,
+            Target = "new@example.com"
         };
 
         // Act
-        await _alertService.CreateAlertAsync(dto);
+        await _alertService.CreateAlertAsync(alert);
 
         // Assert
-        var rules = await _context.NotificationRules
-            .Where(x => x.UserId == currentUserId && x.ServiceId == dto.ServiceId)
-            .ToListAsync();
+        var alerts = await _context.Alerts.FirstOrDefaultAsync(x => x.UserId == _currentUserId && x.MonitorId == alert.MonitorId);
 
-        Assert.That(rules.Count, Is.EqualTo(1));
-        Assert.That(rules.Any(r => r.Target == "new@example.com"));
+        Assert.That(alerts, Is.Not.Null);
+        Assert.That(alerts.Target == "new@example.com");
     }
     
     [Test]
-    public async Task DeleteNotificationRuleAsync_ShouldRemoveNotificationRule_WhenExists()
+    public async Task DeleteAlertAsync_ShouldRemoveAlert_WhenExists()
     {
         // Arrange
-        var rule = new Alert
+        var alert = new Alert
         {
             Id = Guid.NewGuid(),
-            ServiceId = Guid.NewGuid(),
-            UserId = currentUserId,
-            Channel = NotificationChannel.Email,
-            Target = "delete@example.com",
-            NotifyOnFailure = true,
-            NotifyOnRecovery = true
+            MonitorId = Guid.NewGuid(),
+            Type = AlertType.Email,
+            Target = "email@email.com",
+            CreatedAt = _scopedTimeProvider.UtcNow(),
+            UserId = _currentUserId
         };
 
-        await _context.NotificationRules.AddAsync(rule);
+        await _context.Alerts.AddAsync(alert);
         await _context.SaveChangesAsync();
 
         // Act
-        await _alertService.DeleteNotificationRuleAsync(rule.Id);
+        await _alertService.DeleteAlertAsync(alert.Id);
 
         // Assert
-        var deleted = await _context.NotificationRules.FirstOrDefaultAsync(x => x.Id == rule.Id);
+        var deleted = await _context.Alerts.FirstOrDefaultAsync(x => x.Id == alert.Id);
         Assert.That(deleted, Is.Null);
     }
-}*/
+}

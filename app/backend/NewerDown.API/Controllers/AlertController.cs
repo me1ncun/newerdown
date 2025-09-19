@@ -57,17 +57,10 @@ public class AlertController : ControllerBase
     }
     
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteAlert([FromBody] Guid id)
+    public async Task<IActionResult> DeleteAlert([FromRoute] Guid id)
     {
         await _alertService.DeleteAlertAsync(id);
         
         return Ok();
-    }
-    
-    [HttpPost("test")]
-    public IActionResult SendTest([FromBody] object alertData)
-    {
-        // Logic to create an alert
-        return Ok("Alert created successfully");
     }
 }
