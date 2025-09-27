@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
-import { clearError, registerUser } from '../../features/authSlice';
+import { clearError, singUpUser } from '../../features/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const RegisterPage = () => {
@@ -8,7 +8,7 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
   const { loading, error } = useAppSelector((state) => state.auth);
 
-  const [name, setName] = useState('');
+  const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -18,9 +18,9 @@ export const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const resultAction = await dispatch(registerUser({ name, email, password }));
+    const resultAction = await dispatch(singUpUser({ userName, email, password }));
 
-    if (registerUser.fulfilled.match(resultAction)) {
+    if (singUpUser.fulfilled.match(resultAction)) {
       navigate('/login');
     }
   };
@@ -40,8 +40,8 @@ export const RegisterPage = () => {
                 className="input"
                 type="text"
                 placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
                 required
               />
               <span className="icon is-small is-left">
