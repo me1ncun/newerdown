@@ -1,8 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { login, singUp, refreshToken, changePassword } from '../api/auth';
-import type { Login, SingUp, User, RefreshToken, ChangePassword } from '../shared/types/Auth';
+import {
+  login, singUp,
+  // refreshToken,
+  changePassword
+} from '../api/auth';
+import type {
+  Login, SingUp, User,
+  // RefreshToken,
+  ChangePassword
+} from '../shared/types/Auth';
 
 interface AuthState {
   token: string | null;

@@ -3,7 +3,7 @@ import type {
   Login,
   SingUp,
   ChangePassword,
-  RefreshToken,
+  // RefreshToken,
 } from '../shared/types/Auth';
 import { client } from '../utils/axiosClient';
 
@@ -19,9 +19,9 @@ export const changePassword = (data: ChangePassword) => {
   return client.post<AuthResponse>('/change-password', data);
 };
 
-export const refreshToken = (data: RefreshToken) => {
-  return client.post<AuthResponse>('/token/refresh', data);
-};
+// export const refreshToken = (data: RefreshToken) => {
+//   return client.post<AuthResponse>('/token/refresh', data);
+// };
 
 // export const logout = () => {
 //   return client.post('/logout');

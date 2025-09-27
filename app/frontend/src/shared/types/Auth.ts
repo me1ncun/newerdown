@@ -24,7 +24,7 @@ export type ChangePassword = {
   newPassword: string;
 };
 
-export type RefreshToken = {
-  accessToken: string;
-  refreshToken: string;
-};
+// export type RefreshToken = {
+//   accessToken: string;
+//   refreshToken: string;
+// };
