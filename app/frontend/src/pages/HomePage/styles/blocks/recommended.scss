@@ -2,7 +2,7 @@
 @use '../utils/variables.scss' as *;
 
 .recommended {
-  &__products { 
+  &__products {
     row-gap: 40px;
 
     @include page-grid;

@@ -23,9 +23,10 @@ export default tseslint.config([
     ],
     rules: {
       ...prettierPlugin.configs.recommended.rules,
+      'prettier/prettier': ['warn', { endOfLine: 'lf' }],
       'no-console': 'warn',
       eqeqeq: 'warn',
-      "react-refresh/only-export-components": "off",
+      'react-refresh/only-export-components': 'off',
     },
     languageOptions: {
       ecmaVersion: 2020,

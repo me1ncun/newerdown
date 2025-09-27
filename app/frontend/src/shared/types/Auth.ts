@@ -8,8 +8,8 @@ export type AuthResponse = {
   user?: User;
 };
 
-export type Register = {
-  name: string;
+export type SingUp = {
+  userName: string;
   email: string;
   password: string;
 };
@@ -18,3 +18,13 @@ export type Login = {
   email: string;
   password: string;
 };
+
+export type ChangePassword = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+// export type RefreshToken = {
+//   accessToken: string;
+//   refreshToken: string;
+// };

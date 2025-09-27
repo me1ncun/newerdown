@@ -1,8 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { login, register, logout } from '../api/auth';
-import type { Login, Register, User } from '../shared/types/Auth';
+import {
+  login, singUp,
+  // refreshToken,
+  changePassword
+} from '../api/auth';
+import type {
+  Login, SingUp, User,
+  // RefreshToken,
+  ChangePassword
+} from '../shared/types/Auth';
 
 interface AuthState {
   token: string | null;
@@ -50,14 +58,14 @@ export const loginUser = createAsyncThunk(
   },
 );
 
-export const registerUser = createAsyncThunk(
-  'auth/registerUser',
-  async (userData: Register, { rejectWithValue }) => {
+export const singUpUser = createAsyncThunk(
+  'auth/singUpUser',
+  async (userData: SingUp, { rejectWithValue }) => {
     try {
-      const response = await register(userData);
+      const response = await singUp(userData);
       return response;
     } catch (error: any) {
-      console.error('Error in registerUser:', error.message);
+      console.error('Error in singUpUser:', error.message);
 
       try {
         const parsedError = JSON.parse(error.message);
@@ -66,22 +74,48 @@ export const registerUser = createAsyncThunk(
           return rejectWithValue(errorMessages);
         }
       } catch {
-        return rejectWithValue('Register error');
+        return rejectWithValue('singUp1 error');
       }
 
-      return rejectWithValue('Register error');
+      return rejectWithValue('singUp2 error');
     }
   },
 );
 
-export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { rejectWithValue }) => {
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
   try {
-    await logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
     return null;
   } catch (error: any) {
-    return rejectWithValue(error.message);
+    console.log('Error in logoutUser:', error.message);
   }
 });
+
+export const changePasswordUser = createAsyncThunk(
+  'auth/changePasswordUser',
+  async (passwordData: ChangePassword, { rejectWithValue }) => {
+    try {
+      const response = await changePassword(passwordData);
+      return response;
+    } catch (error: any) {
+      console.error('Error in changePasswordUser:', error.message);
+
+      try {
+        const parsedError = JSON.parse(error.message);
+        if (Array.isArray(parsedError)) {
+          const errorMessages = parsedError.map((err) => err.description).join('\n');
+          return rejectWithValue(errorMessages);
+        }
+      } catch {
+        return rejectWithValue('changePassword1 error');
+      }
+
+      return rejectWithValue('changePassword2 error');
+    }
+  },
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -111,11 +145,11 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(registerUser.pending, (state) => {
+      .addCase(singUpUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(singUpUser.fulfilled, (state, action) => {
         state.loading = false;
 
         if (action.payload.token) {
@@ -125,11 +159,28 @@ const authSlice = createSlice({
           }
         }
       })
-      .addCase(registerUser.rejected, (state, action) => {
+      .addCase(singUpUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
+        state.token = null;
+        state.user = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(changePasswordUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changePasswordUser.fulfilled, (state) => {
         state.loading = false;
         state.token = null;
         state.user = null;
@@ -137,7 +188,7 @@ const authSlice = createSlice({
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       })
-      .addCase(logoutUser.rejected, (state, action) => {
+      .addCase(changePasswordUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
