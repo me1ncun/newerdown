@@ -133,17 +133,12 @@ public class MonitorServiceTests
             IntervalSeconds = 60,
             IsActive = true
         };
-
-        var request = new GetByIdDto()
-        {
-            Id = monitor.Id
-        };
         
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _monitorService.GetMonitorByIdAsync(request);
+        var result = await _monitorService.GetMonitorByIdAsync(monitor.Id);
 
         // Assert
         Assert.That(result.IsSuccess, Is.True);
@@ -334,16 +329,11 @@ public class MonitorServiceTests
             IsActive = true
         };
         
-        var request = new GetByIdDto()
-        {
-            Id = monitor.Id
-        };
-        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
         // Act
-        var bytes = await _monitorService.ExportMonitorCsvAsync(request);
+        var bytes = await _monitorService.ExportMonitorCsvAsync(monitor.Id);
 
         // Assert
         Assert.That(bytes.Length, Is.GreaterThan(0));
@@ -393,7 +383,7 @@ public class MonitorServiceTests
         await _context.SaveChangesAsync();
 
         // Act
-        var status = await _monitorService.GetMonitorStatusAsync(request);
+        var status = await _monitorService.GetMonitorStatusAsync(monitor.Id);
 
         // Assert
         Assert.That(status, Is.EqualTo(MonitorStatus.Up));
@@ -540,7 +530,7 @@ public class MonitorServiceTests
         await _context.SaveChangesAsync();
 
         // Act
-        var downtimes = await _monitorService.GetDownTimesAsync(request);
+        var downtimes = await _monitorService.GetDownTimesAsync(monitor.Id);
 
         // Assert
         Assert.That(downtimes.Count, Is.EqualTo(1));

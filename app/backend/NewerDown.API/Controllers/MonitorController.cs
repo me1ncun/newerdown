@@ -52,18 +52,15 @@ public class MonitorController : ControllerBase
         return Ok(result);
     }
     
-    [HttpGet(("by-id"))]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorDto))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> GetMonitorById(GetByIdDto request)
+    public async Task<IActionResult> GetMonitorById(Guid id)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
         
-        var result = await _monitorService.GetMonitorByIdAsync(request);
+        var result = await _monitorService.GetMonitorByIdAsync(id);
         
         return result.ToDefaultApiResponse();
     }
@@ -118,7 +115,7 @@ public class MonitorController : ControllerBase
         return result.ToDefaultApiResponse();
     }
     
-    [HttpPost("resume")]
+    [HttpPost("{id}/resume")]
     [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
     public async Task<IActionResult> ResumeMonitor(GetByIdDto request)
@@ -143,20 +140,17 @@ public class MonitorController : ControllerBase
         return Ok();
     }
     
-    [HttpGet("export")]
+    [HttpGet("{id}/export")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(string))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> ExportMonitorCsv(GetByIdDto request)
+    public async Task<IActionResult> ExportMonitorCsv(Guid id)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
         
-        var fileContent = await _monitorService.ExportMonitorCsvAsync(request);
+        var fileContent = await _monitorService.ExportMonitorCsvAsync(id);
         
-        return File(fileContent, "text/csv", $"monitor_{request.Id}.csv");
+        return File(fileContent, "text/csv", $"monitor_{id}.csv");
     }
     
     [HttpGet("{id}/history")]
@@ -168,18 +162,15 @@ public class MonitorController : ControllerBase
         return Ok(history);
     }
     
-    [HttpGet("status")]
+    [HttpGet("{id}/status")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(MonitorStatus))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> GetMonitorStatus(GetByIdDto request)
+    public async Task<IActionResult> GetMonitorStatus(Guid id)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
         
-        var status = await _monitorService.GetMonitorStatusAsync(request);
+        var status = await _monitorService.GetMonitorStatusAsync(id);
         
         return Ok(status);
     }
@@ -193,18 +184,15 @@ public class MonitorController : ControllerBase
         return Ok(summary);
     }
     
-    [HttpGet("downtimes")]
+    [HttpGet("{id}/downtimes")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<DownTimeDto>))]
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
-    public async Task<IActionResult> GetMonitorDowntimes(GetByIdDto request)
+    public async Task<IActionResult> GetMonitorDowntimes(Guid id)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
         
-        var downTimes = await _monitorService.GetDownTimesAsync(request);
+        var downTimes = await _monitorService.GetDownTimesAsync(id);
         
         return Ok(downTimes);
     }

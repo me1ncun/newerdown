@@ -6,7 +6,7 @@ namespace NewerDown.Domain.Interfaces;
 public interface IAlertService
 {
     Task<List<AlertDto>> GetAllAsync();
-    Task<AlertDto> GetAlertByIdAsync(GetByIdDto request);
+    Task<AlertDto> GetAlertByIdAsync(Guid id);
     Task UpdateAlertAsync(Guid id, UpdateAlertDto request);
     Task CreateAlertAsync(AddAlertDto request);
     Task DeleteAlertAsync(DeleteAlertDto request);

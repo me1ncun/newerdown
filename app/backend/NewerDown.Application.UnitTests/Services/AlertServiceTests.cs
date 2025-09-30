@@ -74,17 +74,12 @@ public class AlertServiceTests
             CreatedAt = _timeProviderMock.Object.UtcNow(),
             UserId = _currentUserId
         };
-
-        var request = new GetByIdDto()
-        {
-            Id = alert.Id
-        };
         
         await _context.Alerts.AddAsync(alert);
         await _context.SaveChangesAsync();
         
         // Act
-        var result = await _alertService.GetAlertByIdAsync(request);
+        var result = await _alertService.GetAlertByIdAsync(alert.Id);
         
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -96,17 +91,12 @@ public class AlertServiceTests
     {
         // Arrange
         var nonExistentId = Guid.NewGuid();
-        
-        var request = new GetByIdDto()
-        {
-            Id = nonExistentId
-        };
 
         // Act & Assert
         var ex = Assert.ThrowsAsync<EntityNotFoundException>(() =>
-            _alertService.GetAlertByIdAsync(request));
+            _alertService.GetAlertByIdAsync(nonExistentId));
 
-        Assert.That(ex.Message, Is.EqualTo($"Alert not found by Id: {request.Id}"));
+        Assert.That(ex.Message, Is.EqualTo($"Alert not found by Id: {nonExistentId}"));
     }
 
 

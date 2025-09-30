@@ -41,16 +41,13 @@ public class AlertController : ControllerBase
         return Ok(alerts);
     }
     
-    [HttpGet("by-id")]
-    public async Task<IActionResult> GetById(GetByIdDto request)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var validationResult = await _fluentValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
+        if(id == Guid.Empty)
+            return BadRequest("Id cannot be empty");
         
-        var alert = await _alertService.GetAlertByIdAsync(request);
+        var alert = await _alertService.GetAlertByIdAsync(id);
         
         return Ok(alert);
     }
