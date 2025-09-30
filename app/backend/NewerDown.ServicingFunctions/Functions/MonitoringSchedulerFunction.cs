@@ -23,7 +23,7 @@ public class MonitoringSchedulerFunction
     public async Task<IEnumerable<string>> Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer)
     {
         var now = DateTime.UtcNow;
-
+        
         var monitors = await _context.Monitors
             .Where(m => m.IsActive)
             .Include(m => m.Checks.OrderByDescending(c => c.CheckedAt).Take(1))

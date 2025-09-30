@@ -90,11 +90,11 @@ public class AlertService : IAlertService
         await _cacheService.RemoveAsync(_cacheKey);
     }
     
-    public async Task<AlertDto> GetAlertByIdAsync(GetByIdDto request)
+    public async Task<AlertDto> GetAlertByIdAsync(Guid id)
     {
-        var alert = await _context.Alerts.FirstOrDefaultAsync(nr => nr.Id == request.Id);
+        var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.Id == id);
         if(alert is null)
-            throw new EntityNotFoundException($"Alert not found by Id: {request.Id}");
+            throw new EntityNotFoundException($"Alert not found by Id: {id}");
         
         return _mapper.Map<AlertDto>(alert);
     }

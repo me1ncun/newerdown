@@ -147,9 +147,9 @@ public class MonitorService : IMonitorService
         return Result.Success();
     }
 
-    public async Task<Result<MonitorDto>> GetMonitorByIdAsync(GetByIdDto request)
+    public async Task<Result<MonitorDto>> GetMonitorByIdAsync(Guid id)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id
                                     && m.UserId == _userContextService.GetUserId());
         if (monitor is null)
             return Result<MonitorDto>.Failure(MonitorErrors.MonitorNotFound);
@@ -186,11 +186,11 @@ public class MonitorService : IMonitorService
         return Result.Success();
     }
 
-    public async Task<byte[]> ExportMonitorCsvAsync(GetByIdDto request)
+    public async Task<byte[]> ExportMonitorCsvAsync(Guid id)
     {
-        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == request.Id && m.UserId == _userContextService.GetUserId());
+        var monitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
         if (monitor is null)
-            throw new EntityNotFoundException($"Monitor with id: {request.Id} not found");
+            throw new EntityNotFoundException($"Monitor with id: {id} not found");
 
         await using var memoryStream = new MemoryStream();
         await using var streamWriter = new StreamWriter(memoryStream);
@@ -236,18 +236,18 @@ public class MonitorService : IMonitorService
         await _cacheService.RemoveAsync(_cacheKey);
     }
     
-    public async Task<MonitorStatus> GetMonitorStatusAsync(GetByIdDto request)
+    public async Task<MonitorStatus> GetMonitorStatusAsync(Guid id)
     {
         var monitor = await _context.Monitors
             .Include(m => m.Checks.OrderByDescending(mc => mc.CheckedAt).Take(1))
-            .FirstOrDefaultAsync(m => m.Id == request.Id && m.UserId == _userContextService.GetUserId());
+            .FirstOrDefaultAsync(m => m.Id == id && m.UserId == _userContextService.GetUserId());
 
         if (monitor is null)
-            throw new EntityNotFoundException($"No checks found for monitor with id: {request.Id}");
+            throw new EntityNotFoundException($"No checks found for monitor with id: {id}");
 
         var lastCheck = monitor.Checks.FirstOrDefault();
         if (lastCheck is null)
-            throw new EntityNotFoundException($"Monitor with id: {request.Id} has no check history yet");
+            throw new EntityNotFoundException($"Monitor with id: {id} has no check history yet");
 
         return lastCheck.IsSuccess ? MonitorStatus.Up : MonitorStatus.Down;
     }
@@ -297,10 +297,10 @@ public class MonitorService : IMonitorService
         return points;
     }
 
-    public async Task<List<DownTimeDto>> GetDownTimesAsync(GetByIdDto request)
+    public async Task<List<DownTimeDto>> GetDownTimesAsync(Guid id)
     {
         var checks = await _context.MonitorChecks
-            .Where(c => c.MonitorId == request.Id)
+            .Where(c => c.MonitorId == id)
             .OrderBy(c => c.CheckedAt)
             .ToListAsync();
 
