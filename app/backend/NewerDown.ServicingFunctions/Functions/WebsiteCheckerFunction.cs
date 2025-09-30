@@ -24,10 +24,10 @@ public class WebsiteCheckerFunction
         [ServiceBusTrigger("monitoring", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
-        var monitorDto = JsonSerializer.Deserialize<MonitorDto>(Encoding.UTF8.GetString(message.Body)) ??
+        var req = Encoding.UTF8.GetString(message.Body);
+        var monitor = JsonSerializer.Deserialize<MonitorDto>(req) ??
                          throw new InvalidOperationException("Invalid monitor message");
         
-        var result = await _webSiteCheckService.CheckWebsiteAsync(monitorDto);
-        _logger.LogInformation("Website check completed for monitor {MonitorId}, success={Success}", monitorDto.Id, result);
+        await _webSiteCheckService.CheckWebsiteAsync(monitor, CancellationToken.None);
     }
 }

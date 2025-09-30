@@ -12,7 +12,7 @@ namespace NewerDown.ServicingFunctions.Services
 {
     public interface IWebSiteCheckService
     {
-        Task<bool> CheckWebsiteAsync(MonitorDto dto);
+        Task CheckWebsiteAsync(MonitorDto request, CancellationToken cancellationToken);
     }
 
     public class WebSiteCheckService : IWebSiteCheckService
@@ -35,33 +35,35 @@ namespace NewerDown.ServicingFunctions.Services
             _queueSender = queueSenderFactory.Create(QueueType.Notifications.GetQueueName());
         }
 
-        public async Task<bool> CheckWebsiteAsync(MonitorDto dto)
+        public async Task CheckWebsiteAsync(MonitorDto request, CancellationToken cancellationToken)
         {
+            bool isSuccess = false;
             var monitor = await _context.Monitors
                 .Include(m => m.User)
-                .FirstOrDefaultAsync(m => m.Id == dto.Id);
+                .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken: cancellationToken);
 
             if (monitor is null)
             {
-                _logger.LogWarning("Monitor {MonitorId} not found", dto.Id);
-                return false;
+                _logger.LogWarning("Monitor {MonitorId} not found", request.Id);
+                return;
             }
 
             var stopwatch = Stopwatch.StartNew();
             HttpResponseMessage? response = null;
-            bool isSuccess = false;
             string? error = null;
 
             try
             {
-                response = await _httpClientFactory.CreateClient().GetAsync(monitor.Target);
+                var client = _httpClientFactory.CreateClient("MonitorClient");
+                response = await client.GetAsync(monitor?.Target, cancellationToken);
                 stopwatch.Stop();
                 isSuccess = response.IsSuccessStatusCode;
+                _logger.LogDebug("Monitor {MonitorId} responded {StatusCode} in {Elapsed}ms", monitor.Id, (int)response.StatusCode, stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                error = ex.Message;
+                error = ex.ToString();
                 _logger.LogError(ex, "Error checking monitor {MonitorId}", monitor.Id);
             }
 
@@ -78,32 +80,42 @@ namespace NewerDown.ServicingFunctions.Services
 
             _context.MonitorChecks.Add(check);
 
+            Alert? alert = null;
             if (!isSuccess)
             {
-                var alert = new Alert
+                alert = new Alert
                 {
                     Id = Guid.NewGuid(),
                     MonitorId = monitor.Id,
                     CreatedAt = DateTime.UtcNow,
                     Message = error ?? $"Unexpected status code {(int?)response?.StatusCode}"
                 };
-
                 _context.Alerts.Add(alert);
-
-                await _queueSender.SendAsync(new NotificationDto()
+            }
+       
+            await _context.SaveChangesAsync(cancellationToken);
+            
+            if (!isSuccess && alert is not null)
+            {
+                var notification = new NotificationDto
                 {
                     UserName = monitor.User.UserName,
                     Email = monitor.User.Email,
                     AlertType = alert.Type,
                     Target = monitor.Target,
                     Message = alert.Message
-                });
+                };
+                try
+                {
+                    await _queueSender.SendAsync(notification);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send notification for monitor {MonitorId}", monitor.Id);
+                }
             }
-
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Website check completed for monitor {MonitorId}, success={Success}", monitor.Id, isSuccess);
-
-            return isSuccess;
+            
+            _logger.LogInformation("Website check for monitor {MonitorId} completed, success={Success}", monitor.Id, isSuccess);
         }
     }
 }
