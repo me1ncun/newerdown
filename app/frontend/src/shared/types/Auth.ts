@@ -23,8 +23,3 @@ export type ChangePassword = {
   currentPassword: string;
   newPassword: string;
 };
-
-// export type RefreshToken = {
-//   accessToken: string;
-//   refreshToken: string;
-// };

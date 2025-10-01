@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type AxiosRequestConfig, type Method } from 'axios';
+import { refreshToken } from '../api/auth';
+import type { AuthResponse } from '../shared/types/Auth';
 
 const BASE_URL = 'https://app-newerdown.azurewebsites.net';
 
@@ -22,6 +24,62 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/token/refresh')
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshSubscribers.push((token: string) => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            resolve(instance(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response: AuthResponse = await refreshToken();
+
+        const newToken = response.token;
+        if (newToken) {
+          localStorage.setItem('token', newToken);
+          instance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+          onRefreshed(newToken);
+        }
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        console.error('update token error', refreshError);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 async function request<T>(url: string, method: Method = 'GET', data: any = null): Promise<T> {
   await wait(300);
 
@@ -31,19 +89,8 @@ async function request<T>(url: string, method: Method = 'GET', data: any = null)
     data,
   };
 
-  try {
-    const response = await instance.request<T>(config);
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      console.error('Request error:', error.response.data);
-      throw new Error(JSON.stringify(error.response.data));
-    } else if (error.request) {
-      throw new Error('No response from server');
-    } else {
-      throw new Error(error.message);
-    }
-  }
+  const response = await instance.request<T>(config);
+  return response.data;
 }
 
 export const client = {
@@ -53,3 +100,4 @@ export const client = {
   put: <T>(url: string, data?: any) => request<T>(url, 'PUT', data),
   delete: (url: string) => request(url, 'DELETE'),
 };
+
