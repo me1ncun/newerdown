@@ -77,7 +77,7 @@ instance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 async function request<T>(url: string, method: Method = 'GET', data: any = null): Promise<T> {
@@ -100,4 +100,3 @@ export const client = {
   put: <T>(url: string, data?: any) => request<T>(url, 'PUT', data),
   delete: (url: string) => request(url, 'DELETE'),
 };
-
