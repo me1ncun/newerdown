@@ -9,13 +9,13 @@ export const AccountPage = () => {
   const { user, loading, error } = useAppSelector((state) => state.userAccount);
 
   useEffect(() => {
-    dispatch(refreshAccessToken());
     dispatch(getInformation());
   }, [dispatch]);
 
   return (
     <main className="section">
       <div className="container">
+        <button onClick={() => dispatch(refreshAccessToken())}>bt</button>
         <h1 className="title">Account Page</h1>
         {loading && <Loader />}
         {error && <p style={{ color: 'red' }}>{error}</p>}
