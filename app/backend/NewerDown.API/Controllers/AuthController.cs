@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NewerDown.Domain.DTOs.Account;
 using NewerDown.Domain.DTOs.Token;
 using NewerDown.Domain.Interfaces;
@@ -16,7 +17,7 @@ public class AuthController : ControllerBase
     {
         _signInService = signInService;
     }
-
+    
     [HttpPost("token/refresh")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(void))]                  
     [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(ProblemDetails))]
@@ -64,7 +65,7 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = true, 
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7)
         });
         
