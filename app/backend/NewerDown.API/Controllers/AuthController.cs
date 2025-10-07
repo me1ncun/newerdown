@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(7)
+            Expires = DateTime.UtcNow.AddMinutes(1)
         });
 
         return Ok(new { accessToken = result.AccessToken });
@@ -66,7 +66,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true, 
             SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddDays(7)
+            Expires = DateTime.UtcNow.AddMinutes(1)
         });
         
         return Ok(result.Value.AccessToken);
