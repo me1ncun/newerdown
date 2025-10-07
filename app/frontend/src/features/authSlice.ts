@@ -27,9 +27,9 @@ export const refreshAccessToken = createAsyncThunk(
     try {
       const response: AuthResponse = await refreshToken();
 
-      if (response?.token) {
-        localStorage.setItem('token', response.token);
-        return { token: response.token };
+      if (response?.accessToken) {
+        localStorage.setItem('token', response.accessToken);
+        return { token: response.accessToken };
       }
 
       return rejectWithValue('No token returned');
@@ -158,9 +158,9 @@ const authSlice = createSlice({
       })
       .addCase(singUpUser.fulfilled, (state, action) => {
         state.loading = false;
-        if (action.payload.token) {
-          state.token = action.payload.token;
-          localStorage.setItem('token', action.payload.token);
+        if (action.payload.accessToken) {
+          state.token = action.payload.accessToken;
+          localStorage.setItem('token', action.payload.accessToken);
           if (action.payload.user) {
             state.user = action.payload.user;
             localStorage.setItem('user', JSON.stringify(action.payload.user));

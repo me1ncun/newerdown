@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
 import { getInformation } from '../../features/userAccountSlice';
-import { refreshAccessToken } from '../../features/authSlice';
+// import { refreshAccessToken } from '../../features/authSlice';
 import { Loader } from '../Loader';
 
 export const AccountPage = () => {
@@ -15,7 +15,7 @@ export const AccountPage = () => {
   return (
     <main className="section">
       <div className="container">
-        <button onClick={() => dispatch(refreshAccessToken())}>bt</button>
+        <button onClick={() => dispatch(getInformation())}>bt</button>
         <h1 className="title">Account Page</h1>
         {loading && <Loader />}
         {error && <p style={{ color: 'red' }}>{error}</p>}

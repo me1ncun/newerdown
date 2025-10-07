@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type AxiosRequestConfig, type Method } from 'axios';
 import { refreshToken } from '../api/auth';
@@ -28,56 +29,81 @@ instance.interceptors.request.use((config) => {
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-function onRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb(token));
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(newToken: string) {
+  refreshSubscribers.forEach((cb) => cb(newToken));
   refreshSubscribers = [];
 }
 
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token && config.headers) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 instance.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes('/token/refresh')
-    ) {
+    if (error.response?.status === 401 && error.config && !originalRequest._isRetry) {
+      originalRequest._isRetry = true;
+
       if (isRefreshing) {
         return new Promise((resolve) => {
-          refreshSubscribers.push((token: string) => {
-            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+          subscribeTokenRefresh((newToken) => {
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
             resolve(instance(originalRequest));
           });
         });
       }
 
-      originalRequest._retry = true;
       isRefreshing = true;
 
       try {
         const response: AuthResponse = await refreshToken();
+        console.log('REFRESH RESPONSE:', response);
 
-        const newToken = response.token;
-        if (newToken) {
-          localStorage.setItem('token', newToken);
-          instance.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-          onRefreshed(newToken);
+        const newToken = response.accessToken;
+        localStorage.setItem('token', newToken);
+        console.log('TOKEN UPDATED IN LOCAL STORAGE:', newToken);
+
+        onRefreshed(newToken);
+        isRefreshing = false;
+
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        return instance(originalRequest);
+      } catch (err: unknown) {
+        isRefreshing = false;
+
+        if (axios.isAxiosError(err)) {
+          const detail = err.response?.data?.detail;
+          console.error('Refresh token error:', detail);
+
+          if (detail === 'Invalid refresh token. Please login again.') {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+          }
+        } else {
+          console.error('Unexpected error:', err);
         }
 
-        return instance(originalRequest);
-      } catch (refreshError) {
-        console.error('update token error', refreshError);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
+        throw err;
       }
     }
 
-    return Promise.reject(error);
+    if (error.config?.url?.includes('/token/refresh') && error.response?.status === 400) {
+      console.error('Refresh token invalid. Logging out.');
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+
+    throw error;
   },
 );
 
@@ -90,8 +116,19 @@ async function request<T>(url: string, method: Method = 'GET', data: any = null)
     data,
   };
 
-  const response = await instance.request<T>(config);
-  return response.data;
+  try {
+    const response = await instance.request<T>(config);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Request error:', error.response.data);
+      throw new Error(JSON.stringify(error.response.data));
+    } else if (error.request) {
+      throw new Error('No response from server');
+    } else {
+      throw new Error(error.message);
+    }
+  }
 }
 
 export const client = {
