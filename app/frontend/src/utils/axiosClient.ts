@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { type AxiosRequestConfig, type Method } from 'axios';
+import { refreshToken } from '../api/auth';
+import type { AuthResponse } from '../shared/types/Auth';
 
 const BASE_URL = 'https://app-newerdown.azurewebsites.net';
 
@@ -12,6 +15,7 @@ const instance = axios.create({
   headers: {
     'Content-Type': 'application/json; charset=UTF-8',
   },
+  withCredentials: true,
 });
 
 instance.interceptors.request.use((config) => {
@@ -21,6 +25,87 @@ instance.interceptors.request.use((config) => {
   }
   return config;
 });
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(newToken: string) {
+  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers = [];
+}
+
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token && config.headers) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+instance.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && error.config && !originalRequest._isRetry) {
+      originalRequest._isRetry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((newToken) => {
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+            resolve(instance(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const response: AuthResponse = await refreshToken();
+        console.log('REFRESH RESPONSE:', response);
+
+        const newToken = response.accessToken;
+        localStorage.setItem('token', newToken);
+        console.log('TOKEN UPDATED IN LOCAL STORAGE:', newToken);
+
+        onRefreshed(newToken);
+        isRefreshing = false;
+
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        return instance(originalRequest);
+      } catch (err: unknown) {
+        isRefreshing = false;
+
+        if (axios.isAxiosError(err)) {
+          const detail = err.response?.data?.detail;
+          console.error('Refresh token error:', detail);
+
+          if (detail === 'Invalid refresh token. Please login again.') {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+          }
+        } else {
+          console.error('Unexpected error:', err);
+        }
+
+        throw err;
+      }
+    }
+
+    if (error.config?.url?.includes('/token/refresh') && error.response?.status === 400) {
+      console.error('Refresh token invalid. Logging out.');
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+
+    throw error;
+  },
+);
 
 async function request<T>(url: string, method: Method = 'GET', data: any = null): Promise<T> {
   await wait(300);

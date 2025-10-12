@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from './shared/hooks/reduxHooks';
-import { logoutUser } from './features/authSlice';
+import { logout } from './features/authSlice';
 import { useEffect } from 'react';
 import './App.scss';
 
@@ -15,7 +15,7 @@ export const App = () => {
   const { token } = useAppSelector((state) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logoutUser());
+    dispatch(logout());
   };
 
   useEffect(() => {

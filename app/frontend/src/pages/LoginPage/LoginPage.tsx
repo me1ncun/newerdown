@@ -21,7 +21,7 @@ export const LoginPage = () => {
     dispatch(loginUser({ email, password }));
   };
 
-  const redirectPath = useMemo(() => state?.pathname || '/rooms', [state?.pathname]);
+  const redirectPath = useMemo(() => state?.pathname || '/account', [state?.pathname]);
 
   useEffect(() => {
     if (token) {
