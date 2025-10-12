@@ -80,14 +80,14 @@ public class SignInService : ISignInService
             {
                 Username = user.UserName,
                 RefreshToken = refreshToken,
-                ExpiredAt = DateTime.UtcNow.AddDays(7)
+                ExpiredAt = DateTime.UtcNow.AddMinutes(1)
             };
             _context.TokenInfos.Add(ti);
         }
         else
         {
             tokenInfo.RefreshToken = refreshToken;
-            tokenInfo.ExpiredAt = DateTime.UtcNow.AddDays(7);
+            tokenInfo.ExpiredAt = DateTime.UtcNow.AddMinutes(1);
         }
         
         await _context.SaveChangesAsync();
