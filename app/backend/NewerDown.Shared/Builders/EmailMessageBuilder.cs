@@ -1,4 +1,4 @@
-﻿namespace NewerDown.Domain.Builders;
+﻿namespace NewerDown.Shared.Builders;
 
 public class EmailMessageBuilder
 {

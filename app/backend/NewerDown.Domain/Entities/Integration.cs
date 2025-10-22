@@ -1,4 +1,7 @@
-﻿namespace NewerDown.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace NewerDown.Domain.Entities;
 
 public class Integration
 {
@@ -13,4 +16,16 @@ public class Integration
     public Guid UserId { get; set; }
     
     public User User { get; set; } = default!;
+}
+
+public sealed class IntegrationConfiguration : IEntityTypeConfiguration<Integration>
+{
+    public void Configure(EntityTypeBuilder<Integration> builder)
+    {
+        builder
+            .HasOne(i => i.User)
+            .WithMany()
+            .HasForeignKey(i => i.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }

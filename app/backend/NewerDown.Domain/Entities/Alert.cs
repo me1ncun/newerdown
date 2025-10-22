@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NewerDown.Domain.Enums;
 
 namespace NewerDown.Domain.Entities;
@@ -25,4 +27,20 @@ public class Alert
     public Guid UserId { get; set; }
     
     public User User { get; set; } = default!;
+}
+
+public sealed class AlertConfiguration : IEntityTypeConfiguration<Alert>
+{
+    public void Configure(EntityTypeBuilder<Alert> builder)
+    {
+        builder.HasOne(a => a.User)
+            .WithMany() 
+            .HasForeignKey(a => a.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(a => a.Monitor)
+            .WithMany(m => m.Alerts)
+            .HasForeignKey(a => a.MonitorId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }

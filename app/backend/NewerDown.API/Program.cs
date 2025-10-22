@@ -1,7 +1,9 @@
 using Azure.Identity;
-using NewerDown;
+using NewerDown.Shared.Interfaces;
 
-public partial class Program : IApiMarker
+namespace NewerDown;
+
+public class Program : IApiMarker
 {
     public static void Main(string[] args)
     {

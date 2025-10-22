@@ -1,4 +1,6 @@
-﻿using NewerDown.Domain.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NewerDown.Domain.Enums;
 
 namespace NewerDown.Domain.Entities;
 
@@ -28,4 +30,15 @@ public class Monitor
     public ICollection<MonitorCheck> Checks { get; set; } = new List<MonitorCheck>();
     
     public ICollection<Alert> Alerts { get; set; } = new List<Alert>();
+}
+
+public sealed class MonitorConfiguration : IEntityTypeConfiguration<Monitor>
+{
+    public void Configure(EntityTypeBuilder<Monitor> builder)
+    {
+        builder.HasOne(m => m.User)
+            .WithMany(u => u.Monitors)
+            .HasForeignKey(m => m.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }

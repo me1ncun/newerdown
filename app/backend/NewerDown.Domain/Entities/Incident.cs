@@ -1,4 +1,7 @@
-﻿namespace NewerDown.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace NewerDown.Domain.Entities;
 
 public class Incident
 {
@@ -19,4 +22,15 @@ public class Incident
     public bool IsAcknowledged { get; set; }
 
     public ICollection<IncidentComment> Comments { get; set; } = new List<IncidentComment>();
+}
+
+public sealed class IncidentConfiguration : IEntityTypeConfiguration<Incident>
+{
+    public void Configure(EntityTypeBuilder<Incident> builder)
+    {
+        builder.HasOne(i => i.Monitor)
+            .WithMany()
+            .HasForeignKey(i => i.MonitorId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }
