@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
+using NewerDown.Application.UnitTests.Helpers;
 using NewerDown.Domain.DTOs.Alerts;
 using NewerDown.Domain.DTOs.Request;
 using NewerDown.Domain.Entities;
@@ -33,12 +35,8 @@ public class AlertServiceTests
         _cacheServiceMock = new();
         _userContextServiceMock = new();
         _timeProviderMock = new();
-        
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        
-        _context = new ApplicationDbContext(options);
+
+        _context = new DbContextProvider().BuildDbContext();
         _context.Database.EnsureCreated();
         
         var mapper = new MapperConfiguration(cfg =>

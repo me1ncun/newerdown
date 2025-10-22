@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using NewerDown.Application.Errors;
 using NewerDown.Application.Extensions;
 using NewerDown.Domain.DTOs.Account;
-using NewerDown.Domain.DTOs.Email;
 using NewerDown.Domain.DTOs.Token;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Enums;
@@ -29,6 +28,7 @@ public class SignInService : ISignInService
     private readonly SignInManager<User> _signInManager;
     private readonly IQueueSender _queueSender;
     private readonly ApplicationDbContext _context;
+    private readonly IEmailMessageService _emailMessageService;
 
     public SignInService(
         UserManager<User> userManager,
@@ -38,7 +38,8 @@ public class SignInService : ISignInService
         ILogger<SignInService> logger,
         SignInManager<User> signInManager,
         IQueueSenderFactory queueSenderFactory,
-        ApplicationDbContext context)
+        ApplicationDbContext context,
+        IEmailMessageService emailMessageService)
     {
         _userManager = userManager;
         _tokenService = tokenService;
@@ -46,6 +47,7 @@ public class SignInService : ISignInService
         _mapper = mapper;
         _logger = logger;
         _signInManager = signInManager;
+        _emailMessageService = emailMessageService;
         _queueSender = queueSenderFactory.Create(QueueType.Emails.GetQueueName());
         _context = context;
     }
@@ -123,9 +125,12 @@ public class SignInService : ISignInService
         
         await _signInManager.SignInAsync(user, isPersistent: false);
         await _userManager.AddToRoleAsync(user, nameof(RoleType.Administrator));
-        
-        var email = new EmailDto(user.Email, user.UserName, DateTime.UtcNow);
-        await _queueSender.SendAsync(email, sessionId: email.Id);
+
+        if (user.Email is not null && user.UserName is not null)
+        {
+            var email = _emailMessageService.CreateWelcomeMessage(user.Email, user.UserName);
+            await _queueSender.SendAsync(email);
+        }
         
         return Result.Success();
     }

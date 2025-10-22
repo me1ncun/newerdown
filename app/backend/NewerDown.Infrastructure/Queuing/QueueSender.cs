@@ -1,12 +1,8 @@
 ﻿using Azure.Messaging.ServiceBus;
+using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Extensions;
 
 namespace NewerDown.Infrastructure.Queuing;
-
-public interface IQueueSender
-{
-    Task SendAsync<T>(T value, Guid sessionId = default, string contentType = null, bool useXml = false);
-}
 
 public class QueueSender : IQueueSender
 {

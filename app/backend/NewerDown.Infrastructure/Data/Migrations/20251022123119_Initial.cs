@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NewerDown.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,6 +31,7 @@ namespace NewerDown.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Uri = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -38,6 +39,39 @@ namespace NewerDown.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FileAttachments", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MonitorStatistics",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MonitorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UptimePercent = table.Column<double>(type: "float", nullable: false),
+                    AvgResponseTimeMs = table.Column<double>(type: "float", nullable: false),
+                    TotalChecks = table.Column<int>(type: "int", nullable: false),
+                    FailedChecks = table.Column<int>(type: "int", nullable: false),
+                    IncidentsCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MonitorStatistics", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TokenInfos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TokenInfos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,7 +100,13 @@ namespace NewerDown.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FileAttachmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrganizationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SubscriptionPlan = table.Column<int>(type: "int", nullable: true),
+                    SubscriptionExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TimeZone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Language = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileAttachmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Role = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -206,6 +246,7 @@ namespace NewerDown.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Target = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Port = table.Column<int>(type: "int", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
                     IntervalSeconds = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -230,6 +271,8 @@ namespace NewerDown.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Target = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MonitorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LastTriggeredAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -288,6 +331,8 @@ namespace NewerDown.Infrastructure.Migrations
                     MonitorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CheckedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    StatusCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsSuccess = table.Column<bool>(type: "bit", nullable: false),
                     ResponseTimeMs = table.Column<double>(type: "float", nullable: true),
                     ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -326,7 +371,7 @@ namespace NewerDown.Infrastructure.Migrations
                         column: x => x.IncidentId,
                         principalTable: "Incidents",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -375,6 +420,13 @@ namespace NewerDown.Infrastructure.Migrations
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                table: "AspNetUsers",
+                column: "Email",
+                unique: true,
+                filter: "[Email] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_FileAttachmentId",
@@ -448,6 +500,12 @@ namespace NewerDown.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "MonitorChecks");
+
+            migrationBuilder.DropTable(
+                name: "MonitorStatistics");
+
+            migrationBuilder.DropTable(
+                name: "TokenInfos");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

@@ -3,6 +3,5 @@
 public enum AlertType
 {
     Email = 0,
-    Webhook = 1,
-    Slack = 2
+    Webhook = 1
 }

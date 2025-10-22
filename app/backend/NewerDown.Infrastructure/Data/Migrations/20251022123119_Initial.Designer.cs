@@ -9,18 +9,18 @@ using NewerDown.Infrastructure.Data;
 
 #nullable disable
 
-namespace NewerDown.Infrastructure.Data.Migrations
+namespace NewerDown.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250830132744_AddTokenInfo")]
-    partial class AddTokenInfo
+    [Migration("20251022123119_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "8.0.19")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -162,8 +162,14 @@ namespace NewerDown.Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("LastTriggeredAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("MonitorId")
                         .HasColumnType("uniqueidentifier");
@@ -328,6 +334,9 @@ namespace NewerDown.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("Port")
+                        .HasColumnType("int");
+
                     b.Property<string>("Target")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -357,6 +366,9 @@ namespace NewerDown.Infrastructure.Data.Migrations
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("MonitorId")
                         .HasColumnType("uniqueidentifier");
 
@@ -366,11 +378,49 @@ namespace NewerDown.Infrastructure.Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<string>("StatusCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MonitorId");
 
                     b.ToTable("MonitorChecks");
+                });
+
+            modelBuilder.Entity("NewerDown.Domain.Entities.MonitorStatistic", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("AvgResponseTimeMs")
+                        .HasColumnType("float");
+
+                    b.Property<int>("FailedChecks")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IncidentsCount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("MonitorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TotalChecks")
+                        .HasColumnType("int");
+
+                    b.Property<double>("UptimePercent")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MonitorStatistics");
                 });
 
             modelBuilder.Entity("NewerDown.Domain.Entities.TokenInfo", b =>
@@ -420,6 +470,9 @@ namespace NewerDown.Infrastructure.Data.Migrations
                     b.Property<Guid?>("FileAttachmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Language")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -434,6 +487,9 @@ namespace NewerDown.Infrastructure.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("OrganizationName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -447,6 +503,15 @@ namespace NewerDown.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SubscriptionExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("SubscriptionPlan")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TimeZone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -565,7 +630,7 @@ namespace NewerDown.Infrastructure.Data.Migrations
                     b.HasOne("NewerDown.Domain.Entities.Incident", "Incident")
                         .WithMany("Comments")
                         .HasForeignKey("IncidentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NewerDown.Domain.Entities.User", "User")

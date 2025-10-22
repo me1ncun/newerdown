@@ -26,13 +26,13 @@ public static class ApplicationExtensions
         services.AddScoped<IAlertService, AlertService>();
         services.AddScoped<IMonitorService, MonitorService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IEmailMessageService, EmailMessageService>();
         services.AddScoped<IUserContextService, UserContextService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IBlobStorageService, BlobStorageService>();
         services.AddScoped<IIncidentService, IncidentService>();
         
         services.AddScoped<IUserPhotoProvider, UserPhotoProvider>();
-
         services.AddScoped<IScopedTimeProvider, ScopedTimeProvider>();
 
         return services;

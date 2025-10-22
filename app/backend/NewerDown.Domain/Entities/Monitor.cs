@@ -10,12 +10,13 @@ public class Monitor
     
     public string Target { get; set; } = default!;
     
+    public int? Port { get; set; }
+    
     public MonitorType Type { get; set; }
     
     public int IntervalSeconds { get; set; }
     
     public bool IsActive { get; set; }
-    
     
     public DateTime CreatedAt { get; set; }
     
