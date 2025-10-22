@@ -36,7 +36,7 @@ public class MonitoringSchedulerFunction
             var shouldCheck = lastCheck == null || (now - lastCheck.CheckedAt).TotalSeconds >= monitor.IntervalSeconds;
             if (shouldCheck)
             {
-                var dto = new MonitorDto { Id = monitor.Id, Url = monitor.Target };
+                var dto = new MonitorDto { Id = monitor.Id, Url = monitor.Target, Type =  monitor.Type };
                 var json = JsonSerializer.Serialize(dto);
 
                 _logger.LogInformation("Scheduling check for monitor {MonitorId} at {Now}", monitor.Id, now);

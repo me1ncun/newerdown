@@ -1,4 +1,6 @@
-﻿namespace NewerDown.Domain.DTOs.Service;
+﻿using NewerDown.Domain.Enums;
+
+namespace NewerDown.Domain.DTOs.Service;
 
 public class MonitorDto
 {
@@ -11,6 +13,8 @@ public class MonitorDto
     public int CheckIntervalSeconds { get; set; }
     
     public bool IsActive { get; set; }
+    
+    public MonitorType Type { get; set; }
     
     public DateTime CreatedAt { get; set; }
     

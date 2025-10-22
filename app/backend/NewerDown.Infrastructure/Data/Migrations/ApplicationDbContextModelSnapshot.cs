@@ -166,7 +166,6 @@ namespace NewerDown.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Message")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("MonitorId")
@@ -331,6 +330,9 @@ namespace NewerDown.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Port")
+                        .HasColumnType("int");
 
                     b.Property<string>("Target")
                         .IsRequired()

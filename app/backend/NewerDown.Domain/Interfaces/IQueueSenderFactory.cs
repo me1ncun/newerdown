@@ -1,4 +1,6 @@
-﻿namespace NewerDown.Infrastructure.Queuing;
+﻿using NewerDown.Domain.Interfaces;
+
+namespace NewerDown.Infrastructure.Queuing;
 
 public interface IQueueSenderFactory
 {

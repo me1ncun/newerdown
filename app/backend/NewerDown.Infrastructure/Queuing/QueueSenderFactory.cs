@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Azure.Messaging.ServiceBus;
+using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Infrastructure.Queuing;
 

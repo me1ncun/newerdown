@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NewerDown.Application.Constants;
+using NewerDown.Domain.Builders;
 using NewerDown.Domain.DTOs.Alerts;
-using NewerDown.Domain.DTOs.Request;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
@@ -89,7 +90,7 @@ public class AlertService : IAlertService
         
         await _cacheService.RemoveAsync(_cacheKey);
     }
-    
+
     public async Task<AlertDto> GetAlertByIdAsync(Guid id)
     {
         var alert = await _context.Alerts.FirstOrDefaultAsync(a => a.Id == id);
@@ -98,4 +99,5 @@ public class AlertService : IAlertService
         
         return _mapper.Map<AlertDto>(alert);
     }
+    
 }

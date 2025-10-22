@@ -19,7 +19,7 @@ public static class ServicesExtensions
     {
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseSqlServer(configuration["DatabaseConnection"]);
+            options.UseSqlServer(configuration["DataConnection"]);
         });
 
         return services;

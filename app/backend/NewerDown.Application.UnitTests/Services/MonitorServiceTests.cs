@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NewerDown.Application.Time;
+using NewerDown.Application.UnitTests.Helpers;
 using NewerDown.Domain.DTOs.Request;
 using Monitor = NewerDown.Domain.Entities.Monitor;
 
@@ -42,23 +43,10 @@ public class MonitorServiceTests
         _userContextServiceMock = new();
         _httpClientFactoryMock = new();
         _timeProviderMock = new();
-        _userManagerMock = new Mock<UserManager<User>>(
-            new Mock<IUserStore<User>>().Object,
-            new Mock<IOptions<IdentityOptions>>().Object,
-            new Mock<IPasswordHasher<User>>().Object,
-            new IUserValidator<User>[0],
-            new IPasswordValidator<User>[0],
-            new Mock<ILookupNormalizer>().Object,
-            new Mock<IdentityErrorDescriber>().Object,
-            new Mock<IServiceProvider>().Object,
-            new Mock<ILogger<UserManager<User>>>().Object);
+        _userManagerMock = CreateUserManagerMock();
         _userServiceMock = new();
 
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-
-        _context = new ApplicationDbContext(options);
+        _context = new DbContextProvider().BuildDbContext();
         _context.Database.EnsureCreated();
         
         _cacheServiceMock.Invocations.Clear(); 
@@ -85,10 +73,22 @@ public class MonitorServiceTests
             _cacheServiceMock.Object,
             _userContextServiceMock.Object,
             _httpClientFactoryMock.Object,
-            Mock.Of<Microsoft.Extensions.Logging.ILogger<MonitorService>>(),
+            Mock.Of<ILogger<MonitorService>>(),
             _timeProviderMock.Object,
             _userManagerMock.Object,
             _userServiceMock.Object);
+    }
+    
+    private Mock<UserManager<User>> CreateUserManagerMock()
+    {
+        return new Mock<UserManager<User>>(
+            new Mock<IUserStore<User>>().Object,
+            new Mock<IOptions<IdentityOptions>>().Object,
+            new Mock<IPasswordHasher<User>>().Object, Array.Empty<IUserValidator<User>>(), Array.Empty<IPasswordValidator<User>>(),
+            new Mock<ILookupNormalizer>().Object,
+            new Mock<IdentityErrorDescriber>().Object,
+            new Mock<IServiceProvider>().Object,
+            new Mock<ILogger<UserManager<User>>>().Object);
     }
 
     [TearDown]
@@ -99,10 +99,10 @@ public class MonitorServiceTests
     }
 
     [Test]
-    public async Task CreateMonitorAsync_ShouldCreateMonitor()
+    public async Task CreateMonitorAsync_WithValidHttp_ShouldCreateMonitor()
     {
         // Arrange
-        var dto = new AddMonitorDto
+        var request = new AddMonitorDto
         {
             Name = "Monitor1",
             Target = "https://example.com",
@@ -112,11 +112,34 @@ public class MonitorServiceTests
         };
 
         // Act
-        var result = await _monitorService.CreateMonitorAsync(dto);
+        var result = await _monitorService.CreateMonitorAsync(request);
 
         // Assert
         Assert.That(result.IsSuccess, Is.True);
-        Assert.That(await _context.Monitors.AnyAsync(m => m.Name == "Monitor1"), Is.True);
+        Assert.That(await _context.Monitors.AnyAsync(m => m.Name == request.Name), Is.True);
+    }
+    
+    [Test]
+    public async Task CreateMonitorAsync_WithTcpType_ShouldCreateMonitor()
+    {
+        // Arrange
+        var request = new AddMonitorDto
+        {
+            Name = "Monitor1",
+            Target = "https://example.com",
+            Type = MonitorType.Tcp,
+            Port = 80,
+            IntervalSeconds = 60,
+            IsActive = true
+        };
+
+        // Act
+        var result = await _monitorService.CreateMonitorAsync(request);
+        var createdMonitor = await _context.Monitors.FirstOrDefaultAsync(m => m.Name == request.Name);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(createdMonitor, Is.EqualTo(createdMonitor));
     }
 
     [Test]
@@ -146,7 +169,7 @@ public class MonitorServiceTests
     }
 
     [Test]
-    public async Task UpdateMonitorAsync_ShouldUpdateMonitor()
+    public async Task UpdateMonitorAsync_WithValidHttp_ShouldUpdateMonitor()
     {
         // Arrange
         var monitor = new Monitor
@@ -162,7 +185,7 @@ public class MonitorServiceTests
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
-        var dto = new UpdateMonitorDto
+        var request = new UpdateMonitorDto
         {
             Name = "Monitor3Updated",
             Url = "https://updated.com",
@@ -171,13 +194,52 @@ public class MonitorServiceTests
         };
 
         // Act
-        var result = await _monitorService.UpdateMonitorAsync(monitor.Id, dto);
+        var result = await _monitorService.UpdateMonitorAsync(monitor.Id, request);
         var updated = await _context.Monitors.FindAsync(monitor.Id);
         
         // Assert
         Assert.That(result.IsSuccess, Is.True);
-        Assert.That(updated.Name, Is.EqualTo("Monitor3Updated"));
-        Assert.That(updated.Target, Is.EqualTo("https://updated.com"));
+        Assert.That(updated.Name, Is.EqualTo(request.Name));
+        Assert.That(updated.Target, Is.EqualTo(request.Url));
+        Assert.That(updated.IsActive, Is.False);
+    }
+    
+    [Test]
+    public async Task UpdateMonitorAsync_WithValidTcp_ShouldUpdateMonitor()
+    {
+        // Arrange
+        var monitor = new Monitor
+        {
+            Id = Guid.NewGuid(),
+            UserId = _currentUserId,
+            Name = "Monitor3",
+            Target = "https://example.com",
+            Type = MonitorType.Tcp,
+            Port = 80,
+            IntervalSeconds = 60,
+            IsActive = true
+        };
+        await _context.Monitors.AddAsync(monitor);
+        await _context.SaveChangesAsync();
+
+        var request = new UpdateMonitorDto
+        {
+            Name = "Monitor3Updated",
+            Url = "https://updated.com",
+            Type = MonitorType.Tcp,
+            Port = 8080,
+            IsActive = false
+        };
+
+        // Act
+        var result = await _monitorService.UpdateMonitorAsync(monitor.Id, request);
+        var updated = await _context.Monitors.FindAsync(monitor.Id);
+        
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(updated.Name, Is.EqualTo(request.Name));
+        Assert.That(updated.Target, Is.EqualTo(request.Url));
+        Assert.That(updated.Port, Is.EqualTo(request.Port));
         Assert.That(updated.IsActive, Is.False);
     }
 
@@ -374,11 +436,6 @@ public class MonitorServiceTests
             }
         };
         
-        var request = new GetByIdDto()
-        {
-            Id = monitor.Id
-        };
-        
         await _context.Monitors.AddAsync(monitor);
         await _context.SaveChangesAsync();
 
@@ -447,8 +504,7 @@ public class MonitorServiceTests
         await _context.SaveChangesAsync();
 
         // Act
-        var response = await _monitorService.GetUptimePercentageAsync(monitor.Id, DateTime.UtcNow.AddHours(-1),
-            DateTime.UtcNow.AddHours(1));
+        var response = await _monitorService.GetUptimePercentageAsync(monitor.Id, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
 
         // Assert
         Assert.That(response.Percentage, Is.GreaterThanOrEqualTo(0));
@@ -483,8 +539,7 @@ public class MonitorServiceTests
         await _context.SaveChangesAsync();
 
         // Act
-        var points = await _monitorService.GetLatencyGraph(monitor.Id, DateTime.UtcNow.AddHours(-1),
-                DateTime.UtcNow.AddHours(1));
+        var points = await _monitorService.GetLatencyGraph(monitor.Id, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
 
         // Assert
         Assert.That(points.Count, Is.EqualTo(1));
@@ -504,11 +559,6 @@ public class MonitorServiceTests
             Type = MonitorType.Http,
             IntervalSeconds = 60,
             IsActive = true
-        };
-        
-        var request = new GetByIdDto()
-        {
-            Id = monitor.Id
         };
 
         var checks = new[]

@@ -10,6 +10,8 @@ public class AddMonitorDto
     
     public MonitorType Type { get; set; }
     
+    public int? Port { get; set; }
+    
     public int IntervalSeconds { get; set; }
     
     public bool IsActive { get; set; }

@@ -4,6 +4,7 @@ using Moq;
 using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
+using NewerDown.Application.UnitTests.Helpers;
 using NewerDown.Domain.DTOs.Incidents;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Exceptions;
@@ -14,7 +15,7 @@ namespace NewerDown.Application.UnitTests.Services;
 [TestFixture]
     public class IncidentServiceTests
     {
-        private ApplicationDbContext _dbContext;
+        private ApplicationDbContext _context;
         private IMapper _mapper;
         private Mock<IScopedTimeProvider> _timeProviderMock;
         private IncidentService _incidentService;
@@ -24,11 +25,7 @@ namespace NewerDown.Application.UnitTests.Services;
         [SetUp]
         public void SetUp()
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            _dbContext = new ApplicationDbContext(options);
+            _context = new DbContextProvider().BuildDbContext();
 
             var mapperConfig = new MapperConfiguration(cfg =>
             {
@@ -39,13 +36,13 @@ namespace NewerDown.Application.UnitTests.Services;
             _timeProviderMock = new Mock<IScopedTimeProvider>();
             _timeProviderMock.Setup(x => x.UtcNow()).Returns(DateTime.UtcNow);
 
-            _incidentService = new IncidentService(_dbContext, _mapper, _timeProviderMock.Object);
+            _incidentService = new IncidentService(_context, _mapper, _timeProviderMock.Object);
         }
         
         [TearDown]
         public void TearDown()
         {
-            _dbContext.Dispose();
+            _context.Dispose();
         }
 
         [Test]
@@ -67,9 +64,9 @@ namespace NewerDown.Application.UnitTests.Services;
                 StartedAt = DateTime.UtcNow.AddMinutes(-10)
             };
             
-            _dbContext.Monitors.Add(monitor);
-            _dbContext.Incidents.Add(incident);
-            await _dbContext.SaveChangesAsync();
+            _context.Monitors.Add(monitor);
+            _context.Incidents.Add(incident);
+            await _context.SaveChangesAsync();
 
             // Act
             var result = await _incidentService.GetAllAsync(_userId);
@@ -98,9 +95,9 @@ namespace NewerDown.Application.UnitTests.Services;
                 StartedAt = DateTime.UtcNow.AddMinutes(-5)
             };
             
-            _dbContext.Monitors.Add(monitor);
-            _dbContext.Incidents.Add(incident);
-            await _dbContext.SaveChangesAsync();
+            _context.Monitors.Add(monitor);
+            _context.Incidents.Add(incident);
+            await _context.SaveChangesAsync();
 
             // Act
             var result = await _incidentService.GetByIdAsync(incident.Id, _userId);
@@ -140,14 +137,14 @@ namespace NewerDown.Application.UnitTests.Services;
                 IsAcknowledged = false
             };
             
-            _dbContext.Monitors.Add(monitor);
-            _dbContext.Incidents.Add(incident);
-            await _dbContext.SaveChangesAsync();
+            _context.Monitors.Add(monitor);
+            _context.Incidents.Add(incident);
+            await _context.SaveChangesAsync();
 
             // Act
             await _incidentService.AcknowledgeIncidentAsync(incident.Id, _userId);
 
-            var updated = await _dbContext.Incidents.FindAsync(incident.Id);
+            var updated = await _context.Incidents.FindAsync(incident.Id);
 
             // Assert
             Assert.That(updated.IsAcknowledged, Is.True);
@@ -181,9 +178,9 @@ namespace NewerDown.Application.UnitTests.Services;
                 Monitor = monitor
             };
             
-            _dbContext.Monitors.Add(monitor);
-            _dbContext.Incidents.Add(incident);
-            await _dbContext.SaveChangesAsync();
+            _context.Monitors.Add(monitor);
+            _context.Incidents.Add(incident);
+            await _context.SaveChangesAsync();
 
             var commentDto = new CreateIncidentCommentDto
             {
@@ -196,7 +193,7 @@ namespace NewerDown.Application.UnitTests.Services;
             await _incidentService.CommentIncidentAsync(commentDto);
 
             // Assert
-            var comment = await _dbContext.IncidentComments.FirstOrDefaultAsync();
+            var comment = await _context.IncidentComments.FirstOrDefaultAsync();
             Assert.That(comment, Is.Not.Null);
             Assert.That(comment!.Comment, Is.EqualTo(commentDto.Comment));
         }
@@ -227,10 +224,10 @@ namespace NewerDown.Application.UnitTests.Services;
                 Comment = "Already exists"
             };
 
-            _dbContext.Monitors.Add(monitor);
-            _dbContext.Incidents.Add(incident);
-            _dbContext.IncidentComments.Add(existingComment);
-            await _dbContext.SaveChangesAsync();
+            _context.Monitors.Add(monitor);
+            _context.Incidents.Add(incident);
+            _context.IncidentComments.Add(existingComment);
+            await _context.SaveChangesAsync();
 
             var dto = new CreateIncidentCommentDto
             {

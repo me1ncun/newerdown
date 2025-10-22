@@ -1,9 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using Microsoft.EntityFrameworkCore;
 using NewerDown.Domain.DTOs.Notification;
 using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Enums;
+using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
 using NewerDown.Infrastructure.Extensions;
 using NewerDown.Infrastructure.Queuing;
@@ -49,16 +53,32 @@ namespace NewerDown.ServicingFunctions.Services
             }
 
             var stopwatch = Stopwatch.StartNew();
-            HttpResponseMessage? response = null;
+            string? statusCode = null;
             string? error = null;
 
             try
             {
+                switch (monitor.Type)
+                {
+                    case MonitorType.Http:
+                        (isSuccess, statusCode, error) = await CheckHttpAsync(monitor.Target, cancellationToken);
+                        break;
+
+                    case MonitorType.Tcp:
+                        (isSuccess, statusCode, error) = await CheckTcpAsync(monitor.Target, monitor.Port.Value);
+                        break;
+
+                    case MonitorType.Ping:
+                        (isSuccess, statusCode, error) = await CheckPingAsync(monitor.Target);
+                        break;
+                }
+                
+                
                 var client = _httpClientFactory.CreateClient("MonitorClient");
-                response = await client.GetAsync(monitor?.Target, cancellationToken);
+                var response = await client.GetAsync(monitor?.Target, cancellationToken);
                 stopwatch.Stop();
                 isSuccess = response.IsSuccessStatusCode;
-                _logger.LogDebug("Monitor {MonitorId} responded {StatusCode} in {Elapsed}ms", monitor.Id, (int)response.StatusCode, stopwatch.ElapsedMilliseconds);
+                _logger.LogDebug("Monitor {MonitorId} responded {StatusCode} in {Elapsed}ms", monitor.Id, statusCode, stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
@@ -73,7 +93,7 @@ namespace NewerDown.ServicingFunctions.Services
                 MonitorId = monitor.Id,
                 CheckedAt = DateTime.UtcNow,
                 ResponseTimeMs = (int)stopwatch.ElapsedMilliseconds,
-                StatusCode = response?.StatusCode.ToString(),
+                StatusCode = statusCode,
                 IsSuccess = isSuccess,
                 ErrorMessage = error
             };
@@ -88,8 +108,9 @@ namespace NewerDown.ServicingFunctions.Services
                     Id = Guid.NewGuid(),
                     MonitorId = monitor.Id,
                     CreatedAt = DateTime.UtcNow,
-                    Message = error ?? $"Unexpected status code {(int?)response?.StatusCode}"
+                    Message = error ?? $"Unexpected status code {statusCode}"
                 };
+                
                 _context.Alerts.Add(alert);
             }
        
@@ -105,17 +126,63 @@ namespace NewerDown.ServicingFunctions.Services
                     Target = monitor.Target,
                     Message = alert.Message
                 };
-                try
-                {
-                    await _queueSender.SendAsync(notification);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to send notification for monitor {MonitorId}", monitor.Id);
-                }
+                
+                await _queueSender.SendAsync(notification);
             }
             
             _logger.LogInformation("Website check for monitor {MonitorId} completed, success={Success}", monitor.Id, isSuccess);
+        }
+        
+        private async Task<(bool success, string? status, string? error)> CheckHttpAsync(string url, CancellationToken ct)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("MonitorClient");
+                var response = await client.GetAsync(url, ct);
+                return (response.IsSuccessStatusCode, ((int)response.StatusCode).ToString(), null);
+            }
+            catch (Exception ex)
+            {
+                return (false, null, ex.Message);
+            }
+        }
+        
+        private async Task<(bool success, string? status, string? error)> CheckTcpAsync(string host, int port)
+        {
+            try
+            {
+                using var client = new TcpClient();
+                var connectTask = client.ConnectAsync(host, port);
+                var timeoutTask = Task.Delay(5000); 
+                var finished = await Task.WhenAny(connectTask, timeoutTask);
+
+                if (finished == timeoutTask)
+                    return (false, null, "TCP connection timeout");
+
+                return (client.Connected, "TCP Connected", null);
+            }
+            catch (Exception ex)
+            {
+                return (false, null, ex.Message);
+            }
+        }
+        
+        private async Task<(bool success, string? status, string? error)> CheckPingAsync(string host)
+        {
+            try
+            {
+                using var ping = new Ping();
+                var reply = await ping.SendPingAsync(host, 5000); 
+                if (reply.Status == IPStatus.Success)
+                {
+                    return (true, "Ping Success", null);
+                }
+                return (false, reply.Status.ToString(), null);
+            }
+            catch (Exception ex)
+            {
+                return (false, null, ex.Message);
+            }
         }
     }
 }

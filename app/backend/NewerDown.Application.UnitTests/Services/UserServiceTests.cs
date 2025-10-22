@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
+using NewerDown.Application.UnitTests.Helpers;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Interfaces;
@@ -26,11 +27,7 @@ public class UserServiceTests
     {
         _userContextServiceMock = new();
         
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        
-        _context = new ApplicationDbContext(options);
+        _context = new DbContextProvider().BuildDbContext();
         _context.Database.EnsureCreated();
         
         _mapper = new MapperConfiguration(cfg => { 

@@ -29,6 +29,11 @@ jobs:
       - name: Build
         run: dotnet build --no-restore app/backend/NewerDown.sln --configuration Release
 
+      - name: Apply Migrations
+        run: |
+          cd app/backend
+          dotnet ef database update --project NewerDown.Infrastructure/NewerDown.Infrastructure.csproj --startup-project NewerDown.API/NewerDown.API.csproj --context ApplicationDbContext
+
       - name: dotnet publish
         run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish --no-build
 
