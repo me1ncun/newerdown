@@ -31,6 +31,7 @@ jobs:
 
       - name: Apply Migrations
         run: |
+          dotnet tool install --global dotnet-ef
           cd app/backend
           dotnet ef database update --project NewerDown.Infrastructure/NewerDown.Infrastructure.csproj --startup-project NewerDown.API/NewerDown.API.csproj --context ApplicationDbContext
 
