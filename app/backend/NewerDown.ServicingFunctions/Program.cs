@@ -14,14 +14,6 @@ using NewerDown.ServicingFunctions.Services;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
-var keyVaultUrl = builder.Configuration["KeyVaultUrl"];
-if (!string.IsNullOrEmpty(keyVaultUrl))
-{
-    builder.Configuration.AddAzureKeyVault(
-        new Uri(keyVaultUrl),
-        new DefaultAzureCredential());
-}
-
 builder.ConfigureFunctionsWebApplication();
 
 builder.Services
