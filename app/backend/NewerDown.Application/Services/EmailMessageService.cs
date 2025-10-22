@@ -1,7 +1,7 @@
 ﻿using NewerDown.Application.Time;
-using NewerDown.Domain.Builders;
 using NewerDown.Domain.DTOs.Email;
 using NewerDown.Domain.Interfaces;
+using NewerDown.Shared.Builders;
 
 namespace NewerDown.Application.Services;
 

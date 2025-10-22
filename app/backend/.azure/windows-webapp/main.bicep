@@ -5,7 +5,7 @@ param webAppName string
 @description('App Service Plan SKU (e.g. P1v3)')
 param appServicePlanSkuName string
 
-@description('Runtime stack (e.g. "DOTNET|6.0")')
+@description('Runtime stack (e.g. "DOTNET|8.0")')
 param runtimeStack string
 
 //VARIABLES

@@ -25,6 +25,7 @@
     <ItemGroup>
       <ProjectReference Include="..\NewerDown.Domain\NewerDown.Domain.csproj" />
       <ProjectReference Include="..\NewerDown.Infrastructure\NewerDown.Infrastructure.csproj" />
+      <ProjectReference Include="..\NewerDown.Shared\NewerDown.Shared.csproj" />
     </ItemGroup>
 
 </Project>

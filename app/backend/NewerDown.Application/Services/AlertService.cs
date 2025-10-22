@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NewerDown.Application.Constants;
-using NewerDown.Domain.Builders;
 using NewerDown.Domain.DTOs.Alerts;
 using NewerDown.Domain.Entities;
 using NewerDown.Domain.Exceptions;

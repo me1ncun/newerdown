@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NewerDown.Infrastructure.Data;
 using NewerDown.IntegrationTests.Helpers;
 using NewerDown.IntegrationTests.Services;
+using NewerDown.Shared.Interfaces;
 using Respawn;
 using Testcontainers.MsSql;
 
@@ -20,9 +21,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>, IA
     
     private DbConnection _dbConnection = null!;
     private Respawner _respawner = null!;
-    
-    public HttpClient HttpClient { get; private set; } = null!;
-    
+
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
@@ -30,7 +29,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<IApiMarker>, IA
         _dbConnection = new SqlConnection(_dbContainer.GetConnectionString());
         await _dbConnection.OpenAsync();
         
-        HttpClient = CreateClient();
+        CreateClient();
         
         await ApplyMigrationsAsync();
         await InitializeRespawnerAsync();

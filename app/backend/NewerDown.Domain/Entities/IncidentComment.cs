@@ -1,4 +1,7 @@
-﻿namespace NewerDown.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace NewerDown.Domain.Entities;
 
 public class IncidentComment
 {
@@ -16,4 +19,15 @@ public class IncidentComment
     public string Comment { get; set; } = default!;
     
     public DateTime CreatedAt { get; set; }
+}
+
+public sealed class IncidentCommentConfiguration : IEntityTypeConfiguration<IncidentComment>
+{
+    public void Configure(EntityTypeBuilder<IncidentComment> builder)
+    {
+        builder.HasOne(ic => ic.Incident)
+            .WithMany(i => i.Comments) 
+            .HasForeignKey(ic => ic.IncidentId)
+            .OnDelete(DeleteBehavior.Cascade); 
+    }
 }

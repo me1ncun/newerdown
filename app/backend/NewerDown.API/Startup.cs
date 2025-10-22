@@ -76,7 +76,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
         
-        app.UseGraphQL<AppSchema>("/graphql"); 
+        app.UseGraphQL<AppSchema>(); 
         app.UseGraphQLGraphiQL("/ui/graphql");
 
         app.UseIdentityServer();
