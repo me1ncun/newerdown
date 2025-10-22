@@ -30,6 +30,8 @@ jobs:
         run: dotnet build --no-restore app/backend/NewerDown.sln --configuration Release
 
       - name: Apply Migrations
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
         run: |
           dotnet tool install --global dotnet-ef
           cd app/backend
