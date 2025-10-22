@@ -9,7 +9,7 @@ public class ApplicationDbContextFactory: IDesignTimeDbContextFactory<Applicatio
     {
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings_DefaultConnection");
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 
         optionsBuilder.UseSqlServer(connectionString);
 
