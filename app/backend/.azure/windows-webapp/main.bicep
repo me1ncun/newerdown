@@ -10,6 +10,7 @@ param runtimeStack string
 
 //VARIABLES
 var webAppName = 'app-${webAppName}'
+var webAppAdminName = 'app-${webAppName}-admin'
 var appServicePlanName = 'asp-${webAppName}'
 var appInsightsName = 'appi-${webAppName}'
 var functionAppName = 'func-${webAppName}-servicingfunctions'
@@ -43,6 +44,18 @@ module webApp './modules/appService.bicep' = {
   name: webAppName
   params: {
     webAppName: webAppName
+    serverFarmId: appServicePlan.outputs.serverFarmId
+    appInsightsInstrumentationKey: appInsights.outputs.appInsightsInstrumentationKey
+    appInsightsPrimaryConnectionString: appInsights.outputs.appInsightsPrimaryConnectionString
+    runtimeStack: runtimeStack
+  }
+}
+
+// WEBAPP ADMIN
+module webAppAdmin './modules/appServiceAdmin.bicep' = {
+  name: webAppAdminName
+  params: {
+    webAppName: webAppAdminName
     serverFarmId: appServicePlan.outputs.serverFarmId
     appInsightsInstrumentationKey: appInsights.outputs.appInsightsInstrumentationKey
     appInsightsPrimaryConnectionString: appInsights.outputs.appInsightsPrimaryConnectionString
