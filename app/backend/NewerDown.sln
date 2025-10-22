@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewerDown.IntegrationTests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewerDown.ServicingFunctions", "NewerDown.ServicingFunctions\NewerDown.ServicingFunctions.csproj", "{1CC842CE-6DFE-4914-A183-5950F38CBEA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewerDown.AdminPanel", "NewerDown.AdminPanel\NewerDown.AdminPanel.csproj", "{6636F8AC-2F58-4968-894B-6C275A50C4C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{1CC842CE-6DFE-4914-A183-5950F38CBEA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CC842CE-6DFE-4914-A183-5950F38CBEA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CC842CE-6DFE-4914-A183-5950F38CBEA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6636F8AC-2F58-4968-894B-6C275A50C4C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6636F8AC-2F58-4968-894B-6C275A50C4C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6636F8AC-2F58-4968-894B-6C275A50C4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6636F8AC-2F58-4968-894B-6C275A50C4C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
