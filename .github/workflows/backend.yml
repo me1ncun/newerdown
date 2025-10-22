@@ -37,14 +37,23 @@ jobs:
           cd app/backend
           dotnet ef database update --project NewerDown.Infrastructure/NewerDown.Infrastructure.csproj --startup-project NewerDown.API/NewerDown.API.csproj --context ApplicationDbContext
 
-      - name: dotnet publish
-        run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish --no-build
+      - name: Publish API
+        run: dotnet publish app/backend/NewerDown.API/NewerDown.API.csproj -c Release -o ./publish-api --no-build
 
-      - name: Upload artifact for deployment job
+      - name: Publish Admin Panel
+        run: dotnet publish app/backend/NewerDown.AdminPanel/NewerDown.AdminPanel.csproj -c Release -o ./publish-admin --no-build
+
+      - name: Upload API artifact
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ./publish
+          name: publish-api
+          path: ./publish-api
+
+      - name: Upload Admin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-admin
+          path: ./publish-admin
 
       - name: Execute unit tests
         run: dotnet test app/backend/NewerDown.Application.UnitTests/NewerDown.Application.UnitTests.csproj
@@ -60,11 +69,17 @@ jobs:
       contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download API artifact
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-          path: ./publish
+          name: publish-api
+          path: ./publish-api
+
+      - name: Download Admin artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-admin
+          path: ./publish-admin
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -73,10 +88,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
+      - name: Deploy API to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'app-newerdown'
           slot-name: 'Production'
-          package: ./publish
+          package: ./publish-api
+
+      - name: Deploy Admin Panel to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'app-newerdown-admin'
+          slot-name: 'Production'
+          package: ./publish-admin
