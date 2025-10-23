@@ -6,4 +6,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\NewerDown.API\NewerDown.API.csproj" />
+      <ProjectReference Include="..\NewerDown.Application\NewerDown.Application.csproj" />
+      <ProjectReference Include="..\NewerDown.Domain\NewerDown.Domain.csproj" />
+      <ProjectReference Include="..\NewerDown.Infrastructure\NewerDown.Infrastructure.csproj" />
+      <ProjectReference Include="..\NewerDown.Shared\NewerDown.Shared.csproj" />
+    </ItemGroup>
+
 </Project>
