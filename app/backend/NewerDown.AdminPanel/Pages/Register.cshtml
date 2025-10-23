@@ -1,0 +1,130 @@
+﻿@page
+@model NewerDown.AdminPanel.Pages.Register
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .register-container {
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .register-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.3rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4b6bfb;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #4b6bfb;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .register-button:hover {
+            background-color: #3652d9;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        a {
+            color: #4b6bfb;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="register-title">Create Account</div>
+    <form method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" name="Username" type="text" required />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="Email" type="email" required />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" name="Password" type="password" required />
+        </div>
+        <button class="register-button" type="submit">Sign Up</button>
+    </form>
+    <div class="footer-text">
+        Already have an account?
+        <a asp-page="/Login">Sign in</a>
+    </div>
+</div>
+</body>
+</html>
