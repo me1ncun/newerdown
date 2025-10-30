@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
 import { clearError, singUpUser } from '../../features/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const RegisterPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error } = useAppSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
@@ -31,10 +33,10 @@ export const RegisterPage = () => {
       style={{ height: '100vh' }}
     >
       <div className="box" style={{ maxWidth: '400px', width: '100%' }}>
-        <h1 className="title has-text-centered">Register</h1>
+        <h1 className="title has-text-centered">{t('registerPage.register')}</h1>
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label className="label">Name</label>
+            <label className="label">{t('registerPage.name')}</label>
             <div className="control has-icons-left">
               <input
                 className="input"
@@ -51,7 +53,7 @@ export const RegisterPage = () => {
           </div>
 
           <div className="field">
-            <label className="label">Email</label>
+            <label className="label">{t('registerPage.email')}</label>
             <div className="control has-icons-left">
               <input
                 className="input"
@@ -68,7 +70,7 @@ export const RegisterPage = () => {
           </div>
 
           <div className="field">
-            <label className="label">Password</label>
+            <label className="label">{t('registerPage.password')}</label>
             <div className="control has-icons-left">
               <input
                 className="input"
@@ -92,9 +94,9 @@ export const RegisterPage = () => {
         </form>
 
         <p className="has-text-centered mt-4">
-          Already have an account?{' '}
+          {t('registerPage.have')}{' '}
           <Link to="/login" className="has-text-link">
-            Login
+            {t('registerPage.login')}
           </Link>
         </p>
       </div>

@@ -3,11 +3,13 @@ import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
 import { getInformation } from '../../features/userAccountSlice';
 import { Loader } from '../Loader';
 import defailtAvatar from '../../shared/assets/avatar-default.svg';
+import { useTranslation } from 'react-i18next';
 import './AccountPage.module.scss';
 
 export const AccountPage = () => {
   const dispatch = useAppDispatch();
   const { user, loading, error } = useAppSelector((state) => state.userAccount);
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(getInformation());
@@ -16,7 +18,7 @@ export const AccountPage = () => {
   return (
     <main className="account">
       <div className="container">
-        <h1 className="account__title title">Account Page</h1>
+        <h1 className="account__title title">{t('accountPage.account')}</h1>
 
         {loading && <Loader />}
         {error && (
@@ -41,16 +43,16 @@ export const AccountPage = () => {
 
               <div className="account__details content">
                 <p>
-                  <strong>Organization:</strong> {user.organizationName || '-'}
+                  <strong>{t('accountPage.organization')}:</strong> {user.organizationName || '-'}
                 </p>
                 <p>
-                  <strong>Phone:</strong> {user.phoneNumber || '-'}
+                  <strong>{t('accountPage.phone')}:</strong> {user.phoneNumber || '-'}
                 </p>
                 <p>
-                  <strong>Language:</strong> {user.language || '-'}
+                  <strong>{t('accountPage.language')}</strong> {user.language || '-'}
                 </p>
                 <p>
-                  <strong>Time zone:</strong> {user.timeZone || '-'}
+                  <strong>{t('accountPage.timeZone')}</strong> {user.timeZone || '-'}
                 </p>
               </div>
             </div>

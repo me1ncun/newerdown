@@ -43,15 +43,15 @@ export const App = () => {
                 {token ? (
                   <>
                     <NavLink className={getLinkActiveClass} to="/account">
-                      {t('main.account')}
+                      {t('app.account')}
                     </NavLink>
                     <button className="topbar_main__logout" onClick={handleLogout}>
-                      {t('main.logout', 'Logout')}
+                      {t('app.logout')}
                     </button>
                   </>
                 ) : (
                   <NavLink className={getLinkActiveClass} to="/login">
-                    {t('main.login', 'Login')}
+                    {t('app.login')}
                   </NavLink>
                 )}
 
@@ -62,10 +62,10 @@ export const App = () => {
 
               <nav className="topbar_main__nav">
                 <NavLink className={getLinkActiveClass} to="/">
-                  {t('main.home', 'Home')}
+                  {t('app.home')}
                 </NavLink>
                 <NavLink className={getLinkActiveClass} to="/monitoring">
-                  {t('main.monitoring', 'Monitoring')}
+                  {t('app.monitoring')}
                 </NavLink>
               </nav>
             </div>
