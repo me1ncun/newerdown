@@ -29,7 +29,7 @@ public class TokenService : ITokenService
             Issuer = _configuration["JWT:ValidIssuer"],
             Audience = _configuration["JWT:ValidAudience"],
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddSeconds(15),
+            Expires = DateTime.Now.AddMinutes(5),
             SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         };
 

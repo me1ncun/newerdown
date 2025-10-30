@@ -35,9 +35,9 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddMinutes(1)
+            Secure = true, 
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddDays(5)
         });
 
         return Ok(new { accessToken = result.AccessToken });
@@ -66,7 +66,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true, 
             SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddMinutes(1)
+            Expires = DateTime.UtcNow.AddDays(5)
         });
         
         return Ok(result.Value.AccessToken);
