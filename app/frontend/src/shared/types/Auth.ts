@@ -4,7 +4,7 @@ export type User = {
 };
 
 export type AuthResponse = {
-  token: string;
+  accessToken: string;
   user?: User;
 };
 
@@ -23,8 +23,3 @@ export type ChangePassword = {
   currentPassword: string;
   newPassword: string;
 };
-
-// export type RefreshToken = {
-//   accessToken: string;
-//   refreshToken: string;
-// };

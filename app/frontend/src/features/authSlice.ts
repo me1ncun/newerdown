@@ -1,16 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  login, singUp,
-  // refreshToken,
-  changePassword
-} from '../api/auth';
-import type {
-  Login, SingUp, User,
-  // RefreshToken,
-  ChangePassword
-} from '../shared/types/Auth';
+import { login, singUp, refreshToken, changePassword } from '../api/auth';
+import type { Login, SingUp, User, ChangePassword, AuthResponse } from '../shared/types/Auth';
 
 interface AuthState {
   token: string | null;
@@ -28,6 +20,32 @@ const initialState: AuthState = {
   loading: false,
   error: null,
 };
+
+export const refreshAccessToken = createAsyncThunk(
+  'auth/refreshAccessToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response: AuthResponse = await refreshToken();
+
+      if (response?.accessToken) {
+        localStorage.setItem('token', response.accessToken);
+        return { token: response.accessToken };
+      }
+
+      return rejectWithValue('No token returned');
+    } catch (error: any) {
+      console.error('Error in refreshAccessToken:', error);
+
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
+      }
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return rejectWithValue(error.message || 'Unknown refresh token error');
+    }
+  },
+);
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
@@ -53,7 +71,13 @@ export const loginUser = createAsyncThunk(
         return rejectWithValue(response || 'Authentication error');
       }
     } catch (error: any) {
-      return rejectWithValue('Error network or server');
+      console.error('Error in loginUser:', error);
+
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
+      }
+
+      return rejectWithValue(error.message || 'Unknown login error');
     }
   },
 );
@@ -65,33 +89,16 @@ export const singUpUser = createAsyncThunk(
       const response = await singUp(userData);
       return response;
     } catch (error: any) {
-      console.error('Error in singUpUser:', error.message);
+      console.error('Error in singUpUser:', error);
 
-      try {
-        const parsedError = JSON.parse(error.message);
-        if (Array.isArray(parsedError)) {
-          const errorMessages = parsedError.map((err) => err.description).join('\n');
-          return rejectWithValue(errorMessages);
-        }
-      } catch {
-        return rejectWithValue('singUp1 error');
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
       }
 
-      return rejectWithValue('singUp2 error');
+      return rejectWithValue(error.message || 'Unknown signup error');
     }
   },
 );
-
-export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
-  try {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-
-    return null;
-  } catch (error: any) {
-    console.log('Error in logoutUser:', error.message);
-  }
-});
 
 export const changePasswordUser = createAsyncThunk(
   'auth/changePasswordUser',
@@ -100,19 +107,13 @@ export const changePasswordUser = createAsyncThunk(
       const response = await changePassword(passwordData);
       return response;
     } catch (error: any) {
-      console.error('Error in changePasswordUser:', error.message);
+      console.error('Error in changePasswordUser:', error);
 
-      try {
-        const parsedError = JSON.parse(error.message);
-        if (Array.isArray(parsedError)) {
-          const errorMessages = parsedError.map((err) => err.description).join('\n');
-          return rejectWithValue(errorMessages);
-        }
-      } catch {
-        return rejectWithValue('changePassword1 error');
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
       }
 
-      return rejectWithValue('changePassword2 error');
+      return rejectWithValue(error.message || 'Unknown change password error');
     }
   },
 );
@@ -123,6 +124,12 @@ const authSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    logout: (state) => {
+      state.token = null;
+      state.user = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     },
   },
   extraReducers: (builder) => {
@@ -151,28 +158,16 @@ const authSlice = createSlice({
       })
       .addCase(singUpUser.fulfilled, (state, action) => {
         state.loading = false;
-
-        if (action.payload.token) {
-          state.token = action.payload.token;
+        if (action.payload.accessToken) {
+          state.token = action.payload.accessToken;
+          localStorage.setItem('token', action.payload.accessToken);
           if (action.payload.user) {
             state.user = action.payload.user;
+            localStorage.setItem('user', JSON.stringify(action.payload.user));
           }
         }
       })
       .addCase(singUpUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      .addCase(logoutUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.loading = false;
-        state.token = null;
-        state.user = null;
-      })
-      .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
@@ -184,16 +179,28 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = null;
         state.user = null;
-
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       })
       .addCase(changePasswordUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(refreshAccessToken.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(refreshAccessToken.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+      })
+      .addCase(refreshAccessToken.rejected, (state, action) => {
+        state.loading = false;
+        state.token = null;
+        state.user = null;
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, logout } = authSlice.actions;
 export default authSlice.reducer;
