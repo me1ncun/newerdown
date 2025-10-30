@@ -1,0 +1,9 @@
+{
+  "main": {
+    "account": "Account",
+    "logout": "Logout",
+    "login": "Login",
+    "home": "Home",
+    "monitoring": "Monitoring"
+  }
+}

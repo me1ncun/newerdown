@@ -7,8 +7,3 @@ export type UserInformation = {
   displayName?: string | null;
   phoneNumber?: string | null;
 };
-
-export type UserResponse = {
-  token: string;
-  user?: UserInformation;
-};

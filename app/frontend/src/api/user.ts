@@ -1,12 +1,12 @@
-import type { UserInformation, UserResponse } from '../shared/types/User';
+import type { UserInformation } from '../shared/types/User';
 import { client } from '../utils/axiosClient';
 
 export const getUserInformation = () => {
-  return client.get<UserResponse>('/api/users/me');
+  return client.get<UserInformation>('/api/users/me');
 };
 
 export const setUserInformation = (data: UserInformation) => {
-  return client.patch<UserResponse>('/api/users/me', data);
+  return client.patch<UserInformation>('/api/users/me', data);
 };
 
 export const deleteUserInformation = () => {
@@ -14,7 +14,7 @@ export const deleteUserInformation = () => {
 };
 
 // export const uploadUserAvatar = () => {
-//   return client.post<UserResponse>('/api/users/me/upload-photo');
+//   return client.post<UserInformation>('/api/users/me/upload-photo');
 // };
 
 // export const deleteUserAvatar = () => {

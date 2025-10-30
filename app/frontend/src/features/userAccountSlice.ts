@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getUserInformation } from '../api/user';
-import type { UserInformation, UserResponse } from '../shared/types/User';
+import type { UserInformation } from '../shared/types/User';
 
 interface AuthState {
   loading: boolean;
@@ -20,7 +20,7 @@ export const getInformation = createAsyncThunk(
   'user/getInformation',
   async (_, { rejectWithValue }) => {
     try {
-      const response: UserResponse = await getUserInformation();
+      const response: UserInformation = await getUserInformation();
       return response;
     } catch (error: any) {
       console.error('Error in getUserInformation:', error);
@@ -46,7 +46,7 @@ const authSlice = createSlice({
       })
       .addCase(getInformation.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user ?? null;
+        state.user = action.payload ?? null;
       })
       .addCase(getInformation.rejected, (state, action) => {
         state.loading = false;

@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
 import { getInformation } from '../../features/userAccountSlice';
-// import { refreshAccessToken } from '../../features/authSlice';
 import { Loader } from '../Loader';
+import defailtAvatar from '../../shared/assets/avatar-default.svg';
+import './AccountPage.module.scss';
 
 export const AccountPage = () => {
   const dispatch = useAppDispatch();
@@ -13,39 +14,47 @@ export const AccountPage = () => {
   }, [dispatch]);
 
   return (
-    <main className="section">
+    <main className="account">
       <div className="container">
-        <button onClick={() => dispatch(getInformation())}>bt</button>
-        <h1 className="title">Account Page</h1>
+        <h1 className="account__title title">Account Page</h1>
+
         {loading && <Loader />}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {user && (
-          <div>
-            <p>
-              <strong>name:</strong> {user.userName || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>Email:</strong> {user.email || <span style={{ color: '#aaa' }}>.</span>}
-            </p>
-            <p>
-              <strong>org:</strong>{' '}
-              {user.organizationName || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>utc:</strong> {user.timeZone || <span style={{ color: '#aaa' }}>.</span>}
-            </p>
-            <p>
-              <strong>lang:</strong> {user.language || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>visib name:</strong>{' '}
-              {user.displayName || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>tell:</strong>{' '}
-              {user.phoneNumber || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-          </div>
+        {error && (
+          <p data-cy="accountPageError" className="account__error has-text-danger">
+            Something went wrong: {error}
+          </p>
+        )}
+        {user && !loading && !error && (
+          <section className="account__card card">
+            <div className="card-content">
+              <div className="account__header media">
+                <div className="media-left">
+                  <figure className="image is-64x64 account__avatar">
+                    <img src={defailtAvatar} alt={user.userName || 'User avatar'} />
+                  </figure>
+                </div>
+                <div className="media-content">
+                  <p className="account__name title is-4">{user.displayName || user.userName}</p>
+                  <p className="account__email subtitle is-6">{user.email}</p>
+                </div>
+              </div>
+
+              <div className="account__details content">
+                <p>
+                  <strong>Organization:</strong> {user.organizationName || '-'}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {user.phoneNumber || '-'}
+                </p>
+                <p>
+                  <strong>Language:</strong> {user.language || '-'}
+                </p>
+                <p>
+                  <strong>Time zone:</strong> {user.timeZone || '-'}
+                </p>
+              </div>
+            </div>
+          </section>
         )}
       </div>
     </main>
