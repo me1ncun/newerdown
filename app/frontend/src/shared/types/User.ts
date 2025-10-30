@@ -6,4 +6,5 @@ export type UserInformation = {
   language?: string | null;
   displayName?: string | null;
   phoneNumber?: string | null;
+  id?: string | null;
 };

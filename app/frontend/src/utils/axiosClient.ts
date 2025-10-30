@@ -58,6 +58,7 @@ instance.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        console.log('Attempting to refresh token...');
         const response: AuthResponse = await refreshToken();
         console.log('REFRESH RESPONSE:', response);
 

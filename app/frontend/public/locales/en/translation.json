@@ -26,11 +26,16 @@
     "organization": "Organization",
     "phone": "Phone",
     "language": "Language",
-    "timeZone": "Time zone"
+    "timeZone": "Time zone",
+    "deleteUser": "Delete Account",
+    "confirmDeleteTitle": "Confirm Account Deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
   },
   "notFoundPage": {
     "oops": "Oops! Page not found.",
-    "notFound": "The page you are looking for doesn't exist or has been moved.",
-    "goHome": "Go to Home Page"
+    "doesNotExist": "The page you are looking for doesn't exist or has been moved.",
+    "goHome": "Go Home"
   }
 }

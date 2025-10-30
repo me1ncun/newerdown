@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
-import { getInformation } from '../../features/userAccountSlice';
+import { getInformation, deleteUser } from '../../features/userAccountSlice';
 import { Loader } from '../Loader';
 import defailtAvatar from '../../shared/assets/avatar-default.svg';
 import { useTranslation } from 'react-i18next';
+import { ConfirmModal } from '../../shared/components/ConfirmModal';
 import './AccountPage.module.scss';
 
 export const AccountPage = () => {
@@ -11,9 +12,16 @@ export const AccountPage = () => {
   const { user, loading, error } = useAppSelector((state) => state.userAccount);
   const { t } = useTranslation();
 
+  const [showConfirm, setShowConfirm] = useState(false);
+
   useEffect(() => {
     dispatch(getInformation());
   }, [dispatch]);
+
+  const handleDeleteUser = () => {
+    dispatch(deleteUser());
+    setShowConfirm(false);
+  };
 
   return (
     <main className="account">
@@ -26,6 +34,7 @@ export const AccountPage = () => {
             Something went wrong: {error}
           </p>
         )}
+
         {user && !loading && !error && (
           <section className="account__card card">
             <div className="card-content">
@@ -55,9 +64,25 @@ export const AccountPage = () => {
                   <strong>{t('accountPage.timeZone')}</strong> {user.timeZone || '-'}
                 </p>
               </div>
+
+              <div className="account__actions mt-4">
+                <button className="button is-danger" onClick={() => setShowConfirm(true)}>
+                  {t('accountPage.deleteUser')}
+                </button>
+              </div>
             </div>
           </section>
         )}
+
+        <ConfirmModal
+          isOpen={showConfirm}
+          title={t('accountPage.confirmDeleteTitle')}
+          message={t('accountPage.confirmDeleteMessage')}
+          onConfirm={handleDeleteUser}
+          onCancel={() => setShowConfirm(false)}
+          confirmText={t('accountPage.confirm')}
+          cancelText={t('accountPage.cancel')}
+        />
       </div>
     </main>
   );

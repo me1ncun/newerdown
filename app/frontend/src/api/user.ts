@@ -9,7 +9,7 @@ export const setUserInformation = (data: UserInformation) => {
   return client.patch<UserInformation>('/api/users/me', data);
 };
 
-export const deleteUserInformation = () => {
+export const deleteUserAccount = () => {
   return client.delete('/api/users/me');
 };
 
