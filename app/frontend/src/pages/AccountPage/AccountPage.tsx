@@ -1,52 +1,88 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
-import { getInformation } from '../../features/userAccountSlice';
-// import { refreshAccessToken } from '../../features/authSlice';
+import { getInformation, deleteUser } from '../../features/userAccountSlice';
 import { Loader } from '../Loader';
+import defailtAvatar from '../../shared/assets/avatar-default.svg';
+import { useTranslation } from 'react-i18next';
+import { ConfirmModal } from '../../shared/components/ConfirmModal';
+import './AccountPage.module.scss';
 
 export const AccountPage = () => {
   const dispatch = useAppDispatch();
   const { user, loading, error } = useAppSelector((state) => state.userAccount);
+  const { t } = useTranslation();
+
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     dispatch(getInformation());
   }, [dispatch]);
 
+  const handleDeleteUser = () => {
+    dispatch(deleteUser());
+    setShowConfirm(false);
+  };
+
   return (
-    <main className="section">
+    <main className="account">
       <div className="container">
-        <button onClick={() => dispatch(getInformation())}>bt</button>
-        <h1 className="title">Account Page</h1>
+        <h1 className="account__title title">{t('accountPage.account')}</h1>
+
         {loading && <Loader />}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {user && (
-          <div>
-            <p>
-              <strong>name:</strong> {user.userName || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>Email:</strong> {user.email || <span style={{ color: '#aaa' }}>.</span>}
-            </p>
-            <p>
-              <strong>org:</strong>{' '}
-              {user.organizationName || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>utc:</strong> {user.timeZone || <span style={{ color: '#aaa' }}>.</span>}
-            </p>
-            <p>
-              <strong>lang:</strong> {user.language || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>visib name:</strong>{' '}
-              {user.displayName || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-            <p>
-              <strong>tell:</strong>{' '}
-              {user.phoneNumber || <span style={{ color: '#aaa' }}>...</span>}
-            </p>
-          </div>
+        {error && (
+          <p data-cy="accountPageError" className="account__error has-text-danger">
+            Something went wrong: {error}
+          </p>
         )}
+
+        {user && !loading && !error && (
+          <section className="account__card card">
+            <div className="card-content">
+              <div className="account__header media">
+                <div className="media-left">
+                  <figure className="image is-64x64 account__avatar">
+                    <img src={defailtAvatar} alt={user.userName || 'User avatar'} />
+                  </figure>
+                </div>
+                <div className="media-content">
+                  <p className="account__name title is-4">{user.displayName || user.userName}</p>
+                  <p className="account__email subtitle is-6">{user.email}</p>
+                </div>
+              </div>
+
+              <div className="account__details content">
+                <p>
+                  <strong>{t('accountPage.organization')}:</strong> {user.organizationName || '-'}
+                </p>
+                <p>
+                  <strong>{t('accountPage.phone')}:</strong> {user.phoneNumber || '-'}
+                </p>
+                <p>
+                  <strong>{t('accountPage.language')}</strong> {user.language || '-'}
+                </p>
+                <p>
+                  <strong>{t('accountPage.timeZone')}</strong> {user.timeZone || '-'}
+                </p>
+              </div>
+
+              <div className="account__actions mt-4">
+                <button className="button is-danger" onClick={() => setShowConfirm(true)}>
+                  {t('accountPage.deleteUser')}
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <ConfirmModal
+          isOpen={showConfirm}
+          title={t('accountPage.confirmDeleteTitle')}
+          message={t('accountPage.confirmDeleteMessage')}
+          onConfirm={handleDeleteUser}
+          onCancel={() => setShowConfirm(false)}
+          confirmText={t('accountPage.confirm')}
+          cancelText={t('accountPage.cancel')}
+        />
       </div>
     </main>
   );

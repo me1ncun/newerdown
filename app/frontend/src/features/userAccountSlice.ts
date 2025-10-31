@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getUserInformation } from '../api/user';
-import type { UserInformation, UserResponse } from '../shared/types/User';
+import { getUserInformation, deleteUserAccount } from '../api/user';
+import type { UserInformation } from '../shared/types/User';
 
 interface AuthState {
   loading: boolean;
@@ -20,7 +20,7 @@ export const getInformation = createAsyncThunk(
   'user/getInformation',
   async (_, { rejectWithValue }) => {
     try {
-      const response: UserResponse = await getUserInformation();
+      const response: UserInformation = await getUserInformation();
       return response;
     } catch (error: any) {
       console.error('Error in getUserInformation:', error);
@@ -34,6 +34,21 @@ export const getInformation = createAsyncThunk(
   },
 );
 
+export const deleteUser = createAsyncThunk('user/deleteUser', async (_, { rejectWithValue }) => {
+  try {
+    await deleteUserAccount();
+    return;
+  } catch (error: any) {
+    console.error('Error in deleteUser:', error);
+
+    if (error.response?.data?.error?.description) {
+      return rejectWithValue(error.response.data.error.description);
+    }
+
+    return rejectWithValue(error.message || 'Unknown delete user acc');
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -46,9 +61,23 @@ const authSlice = createSlice({
       })
       .addCase(getInformation.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user ?? null;
+        state.user = action.payload ?? null;
       })
       .addCase(getInformation.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

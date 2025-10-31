@@ -1,0 +1,41 @@
+{
+  "app": {
+    "account": "Account",
+    "logout": "Logout",
+    "login": "Login",
+    "home": "Home",
+    "monitoring": "Monitoring"
+  },
+  "loginPage": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "notAcc": "Don't have an account?",
+    "Register": "Register"
+  },
+  "registerPage": {
+    "register": "Register",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "have": "Already have an account?",
+    "login": "Login"
+  },
+  "accountPage": {
+    "account": "Account Page",
+    "organization": "Organization",
+    "phone": "Phone",
+    "language": "Language",
+    "timeZone": "Time zone",
+    "deleteUser": "Delete Account",
+    "confirmDeleteTitle": "Confirm Account Deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "notFoundPage": {
+    "oops": "Oops! Page not found.",
+    "doesNotExist": "The page you are looking for doesn't exist or has been moved.",
+    "goHome": "Go Home"
+  }
+}

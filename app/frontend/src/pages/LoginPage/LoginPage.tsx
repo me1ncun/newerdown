@@ -2,12 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
 import { clearError, loginUser } from '../../features/authSlice';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const { loading, error, token } = useAppSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,10 +37,10 @@ export const LoginPage = () => {
       style={{ height: '100vh' }}
     >
       <div className="box" style={{ width: '400px' }}>
-        <h1 className="title has-text-centered">Login</h1>
+        <h1 className="title has-text-centered">{t('loginPage.login')}</h1>
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label className="label">Email</label>
+            <label className="label">{t('loginPage.email')}</label>
             <div className="control has-icons-left">
               <input
                 className="input"
@@ -55,7 +57,7 @@ export const LoginPage = () => {
           </div>
 
           <div className="field">
-            <label className="label">Password</label>
+            <label className="label">{t('loginPage.password')}</label>
             <div className="control has-icons-left">
               <input
                 className="input"
@@ -81,9 +83,9 @@ export const LoginPage = () => {
         </form>
 
         <p className="has-text-centered mt-3">
-          Don't have an account?{' '}
+          {t('loginPage.notAcc')}{' '}
           <Link to="/register" className="has-text-link">
-            Register
+            {t('loginPage.Register')}
           </Link>
         </p>
       </div>
