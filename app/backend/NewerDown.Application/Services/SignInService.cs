@@ -155,17 +155,12 @@ public class SignInService : ISignInService
         var username = principal.Identity?.Name;
 
         var tokenInfo = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
-        if (tokenInfo == null 
-            || tokenInfo.RefreshToken != tokenDto.RefreshToken 
-            || tokenInfo.ExpiredAt <= DateTime.UtcNow)
-        {
-            throw new InvalidAccessException("Invalid refresh token. Please login again.");
-        }
 
         var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-        tokenInfo.RefreshToken = newRefreshToken;
+        if (tokenInfo != null){ tokenInfo.RefreshToken = newRefreshToken;}
+        
         await _context.SaveChangesAsync();
 
         return new TokenDto
