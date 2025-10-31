@@ -82,14 +82,14 @@ public class SignInService : ISignInService
             {
                 Username = user.UserName,
                 RefreshToken = refreshToken,
-                ExpiredAt = DateTime.UtcNow.AddMinutes(1)
+                ExpiredAt = DateTime.UtcNow.AddMinutes(5)
             };
             _context.TokenInfos.Add(ti);
         }
         else
         {
             tokenInfo.RefreshToken = refreshToken;
-            tokenInfo.ExpiredAt = DateTime.UtcNow.AddMinutes(1);
+            tokenInfo.ExpiredAt = DateTime.UtcNow.AddMinutes(5);
         }
         
         await _context.SaveChangesAsync();
