@@ -1,16 +1,20 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getUserInformation, deleteUserAccount } from '../api/user';
+import { getUserInformation, deleteUserAccount, setUserInformation } from '../api/user';
 import type { UserInformation } from '../shared/types/User';
 
-interface AuthState {
+interface UserState {
+  token: string | null;
   loading: boolean;
   error: string | null;
   user: UserInformation | null;
 }
 
-const initialState: AuthState = {
+const storedToken = localStorage.getItem('token') || null;
+
+const initialState: UserState = {
+  token: storedToken,
   loading: false,
   error: null,
   user: null,
@@ -49,6 +53,24 @@ export const deleteUser = createAsyncThunk('user/deleteUser', async (_, { reject
   }
 });
 
+export const updateUserInformation = createAsyncThunk(
+  'user/updateUserInformation',
+  async (data: UserInformation, { rejectWithValue }) => {
+    try {
+      const response: UserInformation = await setUserInformation(data);
+      return response;
+    } catch (error: any) {
+      console.error('Error in updateUserInformation:', error);
+
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
+      }
+
+      return rejectWithValue(error.message || 'Unknown update user information');
+    }
+  },
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -73,11 +95,23 @@ const authSlice = createSlice({
       })
       .addCase(deleteUser.fulfilled, (state) => {
         state.loading = false;
+        state.token = null;
         state.user = null;
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
       })
       .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateUserInformation.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserInformation.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(updateUserInformation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

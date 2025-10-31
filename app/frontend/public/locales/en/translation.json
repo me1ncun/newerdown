@@ -26,16 +26,35 @@
     "organization": "Organization",
     "phone": "Phone",
     "language": "Language",
-    "timeZone": "Time zone",
     "deleteUser": "Delete Account",
     "confirmDeleteTitle": "Confirm Account Deletion",
     "confirmDeleteMessage": "Are you sure you want to delete your account? This action cannot be undone.",
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "editProfile": "Edit Profile",
+    "displayName": "Display Name",
+    "email": "Email",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "changeUserData": "Change User Data",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "userName": "User Name"
   },
   "notFoundPage": {
     "oops": "Oops! Page not found.",
     "doesNotExist": "The page you are looking for doesn't exist or has been moved.",
     "goHome": "Go Home"
+  },
+  "language": {
+    "ua": "Ukrainian",
+    "en": "English"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Please enter a valid email address.",
+    "minLength": "This field must be at least 8 characters long.",
+    "passwordMismatch": "New password and confirmation do not match.",
+    "phone": "Please enter a valid phone number."
   }
 }
