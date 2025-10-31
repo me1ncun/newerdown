@@ -1,3 +1,41 @@
-button {
-  background: red;
+.account {
+  &__title {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  &__error {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  &__card {
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .account__header {
+      margin-bottom: 1rem;
+
+      .account__avatar {
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      .account__name {
+        margin-bottom: 0.25rem;
+      }
+
+      .account__email {
+        color: #7a7a7a;
+      }
+    }
+
+    .account__details {
+      p {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
 }

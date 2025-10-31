@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { login, singUp, refreshToken, changePassword } from '../api/auth';
-import type { Login, SingUp, User, ChangePassword, AuthResponse } from '../shared/types/Auth';
+import { login, singUp, changePassword } from '../api/auth';
+import type { Login, SingUp, User, ChangePassword } from '../shared/types/Auth';
 
 interface AuthState {
   token: string | null;
@@ -20,32 +20,6 @@ const initialState: AuthState = {
   loading: false,
   error: null,
 };
-
-export const refreshAccessToken = createAsyncThunk(
-  'auth/refreshAccessToken',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response: AuthResponse = await refreshToken();
-
-      if (response?.accessToken) {
-        localStorage.setItem('token', response.accessToken);
-        return { token: response.accessToken };
-      }
-
-      return rejectWithValue('No token returned');
-    } catch (error: any) {
-      console.error('Error in refreshAccessToken:', error);
-
-      if (error.response?.data?.error?.description) {
-        return rejectWithValue(error.response.data.error.description);
-      }
-
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      return rejectWithValue(error.message || 'Unknown refresh token error');
-    }
-  },
-);
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
@@ -184,19 +158,6 @@ const authSlice = createSlice({
       })
       .addCase(changePasswordUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
-      })
-      .addCase(refreshAccessToken.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(refreshAccessToken.fulfilled, (state, action) => {
-        state.loading = false;
-        state.token = action.payload.token;
-      })
-      .addCase(refreshAccessToken.rejected, (state, action) => {
-        state.loading = false;
-        state.token = null;
-        state.user = null;
         state.error = action.payload as string;
       });
   },

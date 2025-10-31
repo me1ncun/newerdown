@@ -38,14 +38,6 @@ function onRefreshed(newToken: string) {
   refreshSubscribers = [];
 }
 
-instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token && config.headers) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
-});
-
 instance.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -66,6 +58,7 @@ instance.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        console.log('Attempting to refresh token...');
         const response: AuthResponse = await refreshToken();
         console.log('REFRESH RESPONSE:', response);
 
@@ -87,7 +80,6 @@ instance.interceptors.response.use(
 
           if (detail === 'Invalid refresh token. Please login again.') {
             localStorage.removeItem('token');
-            window.location.href = '/login';
           }
         } else {
           console.error('Unexpected error:', err);
@@ -100,7 +92,6 @@ instance.interceptors.response.use(
     if (error.config?.url?.includes('/token/refresh') && error.response?.status === 400) {
       console.error('Refresh token invalid. Logging out.');
       localStorage.removeItem('token');
-      window.location.href = '/login';
     }
 
     throw error;

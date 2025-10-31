@@ -6,9 +6,5 @@ export type UserInformation = {
   language?: string | null;
   displayName?: string | null;
   phoneNumber?: string | null;
-};
-
-export type UserResponse = {
-  token: string;
-  user?: UserInformation;
+  id?: string | null;
 };
