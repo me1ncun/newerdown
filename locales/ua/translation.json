@@ -39,7 +39,11 @@
     "changeUserData": "Змінити дані користувача",
     "saving": "Збереження...",
     "saveChanges": "Зберегти зміни",
-    "userName": "Ім’я користувача"
+    "userName": "Ім’я користувача",
+    "confirmRemoveAvatarTitle": "Підтвердження видалення аватара",
+    "confirmRemoveAvatarMessage": "Ви впевнені, що хочете видалити свій аватар?",
+    "removeAvatar": "Видалити аватар",
+    "changeAvatar": "Змінити аватар"
   },
   "notFoundPage": {
     "oops": "Ой! Сторінку не знайдено.",
