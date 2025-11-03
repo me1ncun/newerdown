@@ -43,7 +43,9 @@
     "confirmRemoveAvatarTitle": "Confirm Avatar Removal",
     "confirmRemoveAvatarMessage": "Are you sure you want to remove your avatar?",
     "removeAvatar": "Remove Avatar",
-    "changeAvatar": "Change Avatar"
+    "changeAvatar": "Change Avatar",
+    "changePassword": "Change Password",
+    "edit": "Edit"
   },
   "notFoundPage": {
     "oops": "Oops! Page not found.",
