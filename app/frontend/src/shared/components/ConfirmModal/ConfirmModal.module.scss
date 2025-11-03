@@ -1,0 +1,160 @@
+@use "sass:color";
+
+:root {
+  --bg-dark: #1e2025;
+  --card-bg: #272a30;
+  --border-color: #3a3f4a;
+  --text-primary: #ffffff;
+  --text-secondary: #a8b0c1;
+  --text-link: #6c9cff;
+  --red: #dc3545;
+  --red-hover: #{color.adjust(#dc3545, $lightness: -10%)};
+  --link-hover: #{color.adjust(#6c9cff, $lightness: 5%)};
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modalCard {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+
+  animation: scaleIn 0.15s ease-out;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalTitleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dangerIcon {
+  color: var(--red);
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0.25rem;
+  line-height: 1;
+  border-radius: 50%;
+  display: inline-flex;
+  transition: all 0.2s;
+
+  &:hover {
+    color: var(--text-primary);
+    background-color: var(--border-color);
+  }
+}
+
+.modalBody {
+  padding: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--bg-dark);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 8px 8px;
+}
+
+.button {
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.buttonPrimary {
+  background-color: var(--text-link);
+  color: #ffffff;
+  &:hover:not(:disabled) {
+    background-color: var(--link-hover);
+  }
+}
+
+.buttonLight {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+  &:hover:not(:disabled) {
+    background-color: red;
+  }
+}
+
+.buttonDanger {
+  background-color: var(--red);
+  color: #ffffff;
+  &:hover:not(:disabled) {
+    background-color: var(--red-hover);
+  }
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

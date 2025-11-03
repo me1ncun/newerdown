@@ -43,7 +43,9 @@
     "confirmRemoveAvatarTitle": "Підтвердження видалення аватара",
     "confirmRemoveAvatarMessage": "Ви впевнені, що хочете видалити свій аватар?",
     "removeAvatar": "Видалити аватар",
-    "changeAvatar": "Змінити аватар"
+    "changeAvatar": "Змінити аватар",
+    "changePassword": "Змінити пароль",
+    "edit": "Редагувати"
   },
   "notFoundPage": {
     "oops": "Ой! Сторінку не знайдено.",

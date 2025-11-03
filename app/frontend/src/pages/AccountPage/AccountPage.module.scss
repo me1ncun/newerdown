@@ -1,44 +1,62 @@
-$danger-color: #f14668;
+@use "sass:color";
 
-.account {
-  &__title {
-    margin-bottom: 2rem;
-    text-align: center;
+:root {
+  --bg-dark: #1e2025;
+  --card-bg: #272a30;
+  --border-color: #3a3f4a;
+  --text-primary: #ffffff;
+  --text-secondary: #a8b0c1;
+  --text-link: #6c9cff;
+  --red: #dc3545;
+  --red-hover: #{color.adjust(#dc3545, $lightness: -10%)};
+}
+
+.accountPage {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.error {
+  color: var(--red);
+  text-align: center;
+  padding: 2rem;
+}
+
+.accountHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--card-bg);
+  padding: 1.5rem 2rem;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.userInfo {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
   }
-
-  &__error {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  &__card {
-    max-width: 500px;
-    margin: 0 auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-    &__header {
-      margin-bottom: 1rem;
-
-      &__avatar {
-        border-radius: 50%;
-        overflow: hidden;
-      }
-
-      &__name {
-        margin-bottom: 0.25rem;
-      }
-
-      &__email {
-        color: #7a7a7a;
-      }
-    }
-
-    &__details {
-      p {
-        margin-bottom: 0.5rem;
-      }
-    }
+  p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
   }
 }
 
@@ -47,71 +65,228 @@ $danger-color: #f14668;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 64px;
+  width: 80px;
 }
 
 .avatarFigure {
   position: relative;
-  cursor: pointer;
   border-radius: 50%;
   overflow: hidden;
   transition: transform 0.2s ease;
+  height: 80px;
+  width: 80px;
 
-  &:hover {
-    transform: scale(1.05);
-
-    .avatarOverlay {
-      opacity: 1;
+  &[title] {
+    cursor: pointer;
+    &:hover {
+      transform: scale(1.05);
+      .avatarOverlay {
+        opacity: 1;
+      }
     }
   }
 
   img {
     border-radius: 50%;
     object-fit: cover;
-    height: 64px;
-    width: 64px;
+    height: 100%;
+    width: 100%;
     display: block;
   }
+}
 
-  .avatarOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.55);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
+.avatarOverlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
 
-    span {
-      font-size: 0.75rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 1.2;
+.avatarRemoveBtn {
+  margin-top: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--red);
+  text-decoration: none;
+  padding: 0;
+  height: auto;
+  font-size: 0.85rem;
+  cursor: pointer;
+  
+  &:hover {
+    color: var(--red-hover);
+    text-decoration: underline;
+  }
+}
+
+.formCard {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 0 0 8px 8px;
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.formSectionTitle {
+  grid-column: 1 / -1;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-top: 1rem;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.input, .select {
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  padding: 0.75rem;
+  width: 100%;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--text-link);
+    box-shadow: 0 0 0 2px rgba(var(--text-link), 0.2);
+  }
+
+  &.isError {
+    border-color: var(--red);
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(var(--red), 0.2);
     }
   }
 }
 
-.avatarRemoveBtn {
-  &.button.is-danger {
-    margin-top: 0.5rem;
-    background-color: transparent;
-    color: $danger-color;
-    text-decoration: none;
-    padding: 0;
-    height: auto;
-    font-size: 0.85rem;
+.selectWrapper {
+  position: relative;
+  &::after {
+    content: '▼';
+    color: var(--text-secondary);
+    position: absolute;
+    right: 1rem;
+    top: 0.85rem;
+    font-size: 0.75rem;
+    pointer-events: none;
+  }
+}
 
-    &:hover,
-    &:focus {
-      background-color: transparent;
-      color: #d91039;
-      text-decoration: underline;
+.select {
+  appearance: none;
+}
+
+.errorMsg {
+  color: var(--red);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.button {
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.buttonPrimary {
+  background-color: var(--text-link);
+  color: #ffffff;
+  &:hover:not(:disabled) {
+    background-color: red;
+  }
+}
+
+.buttonLight {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+  &:hover:not(:disabled) {
+    background-color: green;
+  }
+}
+
+.buttonDanger {
+  background-color: var(--red);
+  color: #ffffff;
+  &:hover:not(:disabled) {
+    background-color: var(--red-hover);
+  }
+}
+
+.formActions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .accountHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .formActions {
+    flex-direction: column-reverse;
+    gap: 1rem;
+    align-items: stretch;
+    
+    .button {
+      justify-content: center;
     }
   }
 }

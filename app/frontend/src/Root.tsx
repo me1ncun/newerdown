@@ -2,12 +2,13 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import { App } from './App';
 import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
-import { LoginPage } from './pages/LoginPage/LoginPage';
-import { RegisterPage } from './pages/RegisterPage/RegisterPage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
-import { RequireAuth } from './pages/RequireAuth/RequireAuth';
-import { AccountPage } from './pages/AccountPage/AccountPage';
+import { RequireAuth } from './pages/RequireAuth';
+import { AccountPage } from './pages/AccountPage';
+import { MonitoringPage } from './pages/MonitoringPage';
 
 export const Root = () => (
   <Provider store={store}>
@@ -16,7 +17,7 @@ export const Root = () => (
         <Route path="/" element={<App />}>
           <Route index element={<HomePage />} />
           <Route element={<RequireAuth />}>
-            <Route path="monitoring" element={<NotFoundPage />} />
+            <Route path="monitoring" element={<MonitoringPage />} />
             <Route path="account" element={<AccountPage />} />
           </Route>
           <Route path="login" element={<LoginPage />} />
