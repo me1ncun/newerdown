@@ -13,10 +13,10 @@ export const deleteUserAccount = () => {
   return client.delete('/api/users/me');
 };
 
-// export const uploadUserAvatar = () => {
-//   return client.post<UserInformation>('/api/users/me/upload-photo');
-// };
+export const uploadUserAvatar = (file: File): Promise<UserInformation> => {
+  return client.postForm<UserInformation>('/api/users/me/upload-photo', file, 'file');
+};
 
-// export const deleteUserAvatar = () => {
-//   return client.delete('/api/users/me/upload-photo');
-// };
+export const deleteUserAvatar = () => {
+  return client.delete('/api/users/me/delete-photo');
+};

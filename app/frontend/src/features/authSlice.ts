@@ -12,11 +12,10 @@ interface AuthState {
 }
 
 const storedToken = localStorage.getItem('token') || null;
-const storedUser = localStorage.getItem('user');
 
 const initialState: AuthState = {
   token: storedToken,
-  user: storedUser ? JSON.parse(storedUser) : null,
+  user: null,
   loading: false,
   error: null,
 };
@@ -103,7 +102,6 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
     },
   },
   extraReducers: (builder) => {
@@ -154,7 +152,6 @@ const authSlice = createSlice({
         state.token = null;
         state.user = null;
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
       })
       .addCase(changePasswordUser.rejected, (state, action) => {
         state.loading = false;
