@@ -39,7 +39,11 @@
     "changeUserData": "Change User Data",
     "saving": "Saving...",
     "saveChanges": "Save Changes",
-    "userName": "User Name"
+    "userName": "User Name",
+    "confirmRemoveAvatarTitle": "Confirm Avatar Removal",
+    "confirmRemoveAvatarMessage": "Are you sure you want to remove your avatar?",
+    "removeAvatar": "Remove Avatar",
+    "changeAvatar": "Change Avatar"
   },
   "notFoundPage": {
     "oops": "Oops! Page not found.",

@@ -1,6 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
-import { getInformation, deleteUser, updateUserInformation } from '../../features/userAccountSlice';
+import {
+  getInformation,
+  deleteUser,
+  updateUserInformation,
+  updateUserAvatar,
+  removeUserAvatar,
+} from '../../features/userAccountSlice';
 import { useTranslation } from 'react-i18next';
 import { changePasswordUser } from '../../features/authSlice';
 import { Loader } from '../Loader';
@@ -9,8 +15,7 @@ import { AccountEditForm } from '../../shared/components/AccountEditForm';
 import type { UserInformation } from '../../shared/types/User';
 import type { ChangePassword } from '../../shared/types/Auth';
 import defailtAvatar from '../../shared/assets/avatar-default.svg';
-
-import './AccountPage.module.scss';
+import styles from './AccountPage.module.scss';
 
 export const AccountPage = () => {
   const dispatch = useAppDispatch();
@@ -19,10 +24,12 @@ export const AccountPage = () => {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showRemoveAvatarModal, setShowRemoveAvatarModal] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     dispatch(getInformation());
-    console.log('Fetching user information', user);
   }, [dispatch]);
 
   const handleDeleteUser = () => {
@@ -38,6 +45,25 @@ export const AccountPage = () => {
     await dispatch(updateUserInformation(data));
     await dispatch(getInformation());
     setShowEditForm(false);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await dispatch(updateUserAvatar(file));
+      await dispatch(getInformation());
+    }
+    if (e.target) e.target.value = '';
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveAvatarConfirm = async () => {
+    await dispatch(removeUserAvatar());
+    await dispatch(getInformation());
+    setShowRemoveAvatarModal(false);
   };
 
   return (
@@ -57,10 +83,39 @@ export const AccountPage = () => {
             <div className="card-content">
               <div className="account__header media">
                 <div className="media-left">
-                  <figure className="image is-64x64 account__avatar">
-                    <img src={defailtAvatar} alt={user.userName || 'User avatar'} />
-                  </figure>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+
+                  <div className={styles.avatarWrapper}>
+                    <figure
+                      className={`image is-64x64 ${styles.avatarFigure}`}
+                      onClick={handleUploadClick}
+                    >
+                      <img
+                        src={user.filePath || defailtAvatar}
+                        alt={user.userName || 'User avatar'}
+                      />
+                      <div className={styles.avatarOverlay}>
+                        <span>{t('accountPage.changeAvatar')}</span>
+                      </div>
+                    </figure>
+
+                    {user.filePath && (
+                      <button
+                        className={`button is-danger is-small ${styles.avatarRemoveBtn}`}
+                        onClick={() => setShowRemoveAvatarModal(true)}
+                      >
+                        {t('accountPage.removeAvatar')}
+                      </button>
+                    )}
+                  </div>
                 </div>
+
                 <div className="media-content">
                   <p className="account__name title is-4">{user.displayName || user.userName}</p>
                   <p className="account__email subtitle is-6">{user.email}</p>
@@ -112,6 +167,16 @@ export const AccountPage = () => {
           message={t('accountPage.confirmDeleteMessage')}
           onConfirm={handleDeleteUser}
           onCancel={() => setShowConfirm(false)}
+          confirmText={t('accountPage.confirm')}
+          cancelText={t('accountPage.cancel')}
+        />
+
+        <ConfirmModal
+          isOpen={showRemoveAvatarModal}
+          title={t('accountPage.confirmRemoveAvatarTitle')}
+          message={t('accountPage.confirmRemoveAvatarMessage')}
+          onConfirm={handleRemoveAvatarConfirm}
+          onCancel={() => setShowRemoveAvatarModal(false)}
           confirmText={t('accountPage.confirm')}
           cancelText={t('accountPage.cancel')}
         />

@@ -11,7 +11,7 @@ import { AccountPage } from './pages/AccountPage/AccountPage';
 
 export const Root = () => (
   <Provider store={store}>
-    <Router>
+    <Router basename="/newerdown">
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={<HomePage />} />

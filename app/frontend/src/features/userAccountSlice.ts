@@ -1,7 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getUserInformation, deleteUserAccount, setUserInformation } from '../api/user';
+import {
+  getUserInformation,
+  deleteUserAccount,
+  setUserInformation,
+  uploadUserAvatar,
+  deleteUserAvatar,
+} from '../api/user';
 import type { UserInformation } from '../shared/types/User';
 
 interface UserState {
@@ -71,7 +77,43 @@ export const updateUserInformation = createAsyncThunk(
   },
 );
 
-const authSlice = createSlice({
+export const updateUserAvatar = createAsyncThunk(
+  'user/uploadUserAvatar',
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const response: UserInformation = await uploadUserAvatar(file);
+      return response;
+    } catch (error: any) {
+      console.error('Error in uploadUserAvatar:', error);
+
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
+      }
+
+      return rejectWithValue(error.message || 'Unknown upload user avatar');
+    }
+  },
+);
+
+export const removeUserAvatar = createAsyncThunk(
+  'user/deleteUserAvatar',
+  async (_, { rejectWithValue }) => {
+    try {
+      await deleteUserAvatar();
+      return;
+    } catch (error: any) {
+      console.error('Error in deleteUserAvatar:', error);
+
+      if (error.response?.data?.error?.description) {
+        return rejectWithValue(error.response.data.error.description);
+      }
+
+      return rejectWithValue(error.message || 'Unknown delete user avatar');
+    }
+  },
+);
+
+export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {},
@@ -112,6 +154,36 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(updateUserInformation.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateUserAvatar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserAvatar.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload) {
+          state.user = action.payload;
+        }
+      })
+      .addCase(updateUserAvatar.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(removeUserAvatar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeUserAvatar.fulfilled, (state) => {
+        state.loading = false;
+        if (state.user) {
+          state.user.filePath = null;
+          state.user.fileAttachmentId = null;
+        }
+      })
+      .addCase(removeUserAvatar.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

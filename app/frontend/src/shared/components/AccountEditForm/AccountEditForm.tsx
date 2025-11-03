@@ -73,7 +73,7 @@ export const AccountEditForm = ({ user, onUpdate, onChangePassword, onCancel }: 
         {errors.userName && <p className="help is-danger">{errors.userName.message}</p>}
       </div>
 
-      <div className="field">
+      {/* <div className="field">
         <label className="label">{t('accountPage.displayName')}</label>
         <div className="control">
           <input
@@ -83,7 +83,7 @@ export const AccountEditForm = ({ user, onUpdate, onChangePassword, onCancel }: 
           />
         </div>
         {errors.displayName && <p className="help is-danger">{errors.displayName.message}</p>}
-      </div>
+      </div> */}
 
       <div className="field">
         <label className="label">{t('accountPage.email')}</label>
