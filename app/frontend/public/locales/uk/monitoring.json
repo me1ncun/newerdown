@@ -1,0 +1,29 @@
+{
+  "monitoring": {
+    "monitoringPageTitle": "Сторінка моніторингу",
+    "addMonitor": "Додати монітор",
+    "searchPlaceholder": "Пошук моніторів...",
+    "status": "Статус",
+    "uptime": "Час роботи",
+    "responseTime": "Час відповіді",
+    "lastChecked": "Остання перевірка",
+    "actions": "Дії",
+    "edit": "Редагувати",
+    "delete": "Видалити",
+    "confirmDeleteTitle": "Підтвердження видалення монітора",
+    "confirmDeleteMessage": "Ви впевнені, що хочете видалити цей монітор? Цю дію неможливо скасувати.",
+    "confirm": "Підтвердити",
+    "cancel": "Скасувати",
+    "monitorType": "Тип монітора",
+    "url": "URL",
+    "interval": "Інтервал перевірки (хвилини)",
+    "createMonitor": "Створити монітор",
+    "editMonitor": "Редагувати монітор",
+    "saving": "Збереження...",
+    "saveChanges": "Зберегти зміни",
+    "http": "HTTP",
+    "ping": "Ping",
+    "keyword": "Ключове слово",
+    "LatestIncidents": "Останні інциденти"
+  }
+}

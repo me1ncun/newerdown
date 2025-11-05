@@ -173,7 +173,7 @@ export const AccountEditForm = ({ user, onUpdate, onChangePassword, onCancel }: 
         <div className="control">
           <div className="select">
             <select {...register('language')}>
-              <option value="ua">{t('language.ua')}</option>
+              <option value="uk">{t('language.uk')}</option>
               <option value="en">{t('language.en')}</option>
             </select>
           </div>

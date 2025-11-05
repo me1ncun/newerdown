@@ -8,10 +8,15 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    detection: {
+      order: ["localStorage", "navigator"],
+      caches: ["localStorage"],
+      lookupLocalStorage: "i18nextLng",
+    },
     fallbackLng: 'en',
     debug: true,
-    ns: ['translation'],
-    defaultNS: 'translation',
+    ns: ['common', 'monitoring'],
+    defaultNS: 'common',
     backend: {
       loadPath: `${import.meta.env.BASE_URL}/locales/{{lng}}/{{ns}}.json`,
     },

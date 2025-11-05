@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 // import { useParams } from 'react-router-dom';
 import styles from './MonitoringPage.module.scss';
 import {
@@ -64,6 +65,7 @@ export const MonitoringPage = () => {
   const [monitor, setMonitor] = useState<MonitorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation('monitoring');
 
   useEffect(() => {
     if (!id) return;
@@ -216,7 +218,7 @@ export const MonitoringPage = () => {
       </div>
 
       <div className={styles.incidentsCard}>
-        <h3 className={styles.cardTitle}>Latest incidents</h3>
+        <h3 className={styles.cardTitle}>{t('monitoring.LatestIncidents')}</h3>
         {monitor.latestIncidents.length === 0 ? (
           <div className={styles.noIncidents}>
             <ThumbsUp size={24} />

@@ -1,0 +1,129 @@
+@use "sass:color";
+
+$bg-dark: #1e2025;
+$card-bg: #272a30;
+$border-color: #3a3f4a;
+$text-primary: #ffffff;
+$text-secondary: #a8b0c1;
+$text-link: #6c9cff;
+$text-link-hover: #{color.adjust($text-link, $lightness: 5%)};
+$red: #dc3545;
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: $bg-dark;
+  color: $text-primary;
+}
+
+.topbar {
+  background-color: $card-bg;
+  border-bottom: 1px solid $border-color;
+  padding: 0.75rem 0;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leftNav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $text-primary;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $text-link-hover;
+  }
+}
+
+.mainNav {
+  display: flex;
+  gap: 1rem;
+}
+
+.rightNav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navLink {
+  color: $text-secondary;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $text-primary;
+    background-color: $border-color;
+  }
+
+  &.active {
+    color: $text-link;
+    font-weight: 600;
+  }
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: $text-secondary;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  span {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &:hover {
+    color: $text-primary;
+    background-color: $border-color;
+  }
+}
+
+.logoutButton {
+  &:hover {
+    color: $red;
+    background-color: rgba($red, 0.1);
+  }
+}
+
+.outletContainer {
+  width: 100%;
+  flex-grow: 1;
+}

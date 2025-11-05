@@ -1,0 +1,29 @@
+{
+  "monitoring": {
+    "monitoringPageTitle": "Monitoring Page",
+    "addMonitor": "Add Monitor",
+    "searchPlaceholder": "Search monitors...",
+    "status": "Status",
+    "uptime": "Uptime",
+    "responseTime": "Response Time",
+    "lastChecked": "Last Checked",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDeleteTitle": "Confirm Monitor Deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete this monitor? This action cannot be undone.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "monitorType": "Monitor Type",
+    "url": "URL",
+    "interval": "Check Interval (minutes)",
+    "createMonitor": "Create Monitor",
+    "editMonitor": "Edit Monitor",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "http": "HTTP",
+    "ping": "Ping",
+    "keyword": "Keyword",
+    "LatestIncidents": "Latest incidents"
+  }
+}

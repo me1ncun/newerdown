@@ -53,7 +53,7 @@ export const AccountPage = () => {
         email: user.email || '',
         organizationName: user.organizationName || '',
         phoneNumber: user.phoneNumber || '',
-        language: user.language || 'ua',
+        language: user.language || 'EN',
         currentPassword: '',
         newPassword: '',
       });
@@ -218,7 +218,7 @@ export const AccountPage = () => {
                   </label>
                   <div className={styles.selectWrapper}>
                     <select id="language" className={styles.select} {...register('language')}>
-                      <option value="ua">{t('language.ua')}</option>
+                      <option value="uk">{t('language.uk')}</option>
                       <option value="en">{t('language.en')}</option>
                     </select>
                   </div>
