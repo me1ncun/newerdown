@@ -1,0 +1,224 @@
+.createMonitorPage {
+  background-color: var(--bg-dark, #1e2025);
+  color: var(--text-primary, #ffffff);
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #a8b0c1);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--text-primary, #ffffff);
+  }
+}
+
+.formCard {
+  background: var(--card-bg, #272a30);
+  border: 1px solid var(--border-color, #3a3f4a);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.formTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary, #ffffff);
+}
+
+.formSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #a8b0c1);
+  margin: 0 0 2rem 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+}
+
+.required {
+  color: var(--red, #dc3545);
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-dark, #1e2025);
+  border: 1px solid var(--border-color, #3a3f4a);
+  border-radius: 8px;
+  color: var(--text-primary, #ffffff);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--text-link, #6c9cff);
+    box-shadow: 0 0 0 3px rgba(108, 156, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary, #a8b0c1);
+  }
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a8b0c1' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.inputError {
+  border-color: var(--red, #dc3545);
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+  }
+}
+
+.errorMessage {
+  font-size: 0.75rem;
+  color: var(--red, #dc3545);
+}
+
+.helpText {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #a8b0c1);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-primary, #ffffff);
+  cursor: pointer;
+
+  span {
+    user-select: none;
+  }
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--text-link, #6c9cff);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color, #3a3f4a);
+}
+
+.buttonPrimary,
+.buttonSecondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.buttonPrimary {
+  background: var(--text-link, #6c9cff);
+  color: #ffffff;
+
+  &:hover:not(:disabled) {
+    background: #5a8aef;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(108, 156, 255, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.buttonSecondary {
+  background: transparent;
+  color: var(--text-secondary, #a8b0c1);
+  border: 1px solid var(--border-color, #3a3f4a);
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary, #ffffff);
+    border-color: var(--text-link, #6c9cff);
+  }
+}
+
+@media (max-width: 768px) {
+  .createMonitorPage {
+    padding: 1rem;
+  }
+
+  .formCard {
+    padding: 1.5rem;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

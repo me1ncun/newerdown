@@ -1,0 +1,80 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary, #888);
+
+  p {
+    margin-top: 1rem;
+    font-size: 1rem;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary-color, #4a9eff);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  h3 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary, #ffffff);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary, #888);
+    font-size: 1rem;
+  }
+}
+
+.emptyIcon {
+  color: var(--text-secondary, #888);
+  opacity: 0.5;
+}
+
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}

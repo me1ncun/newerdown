@@ -9,6 +9,8 @@ import { store } from './app/store';
 import { RequireAuth } from './pages/RequireAuth';
 import { AccountPage } from './pages/AccountPage';
 import { MonitoringPage } from './pages/MonitoringPage';
+import { CreateMonitorPage } from './pages/CreateMonitorPage';
+import { EditMonitorPage } from './pages/EditMonitorPage';
 
 export const Root = () => (
   <Provider store={store}>
@@ -18,6 +20,8 @@ export const Root = () => (
           <Route index element={<HomePage />} />
           <Route element={<RequireAuth />}>
             <Route path="monitoring" element={<MonitoringPage />} />
+            <Route path="monitoring/create" element={<CreateMonitorPage />} />
+            <Route path="monitoring/:id/edit" element={<EditMonitorPage />} />
             <Route path="account" element={<AccountPage />} />
           </Route>
           <Route path="login" element={<LoginPage />} />
