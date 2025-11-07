@@ -1,6 +1,7 @@
-import { Search, Plus, Filter } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Plus, Filter, Upload } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styles from './MonitorsFilters.module.scss';
 
 export interface FilterOptions {
@@ -13,11 +14,18 @@ export interface FilterOptions {
 interface MonitorsFiltersProps {
   filters: FilterOptions;
   onFiltersChange: (filters: FilterOptions) => void;
+  onImport?: (file: File) => void;
 }
 
-export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFiltersChange }) => {
+export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({
+  filters,
+  onFiltersChange,
+  onImport,
+}) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('monitoring');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({ ...filters, search: e.target.value });
@@ -48,6 +56,18 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
     navigate('/monitoring/create');
   };
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImport) {
+      onImport(file);
+      e.target.value = '';
+    }
+  };
+
   return (
     <div className={styles.filtersContainer}>
       <div className={styles.mainFilters}>
@@ -55,7 +75,7 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
           <Search size={20} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Search monitors..."
+            placeholder={t('monitoring.searchPlaceholder')}
             value={filters.search}
             onChange={handleSearchChange}
             className={styles.searchInput}
@@ -64,12 +84,29 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
 
         <button className={styles.filterToggle} onClick={() => setShowAdvanced(!showAdvanced)}>
           <Filter size={20} />
-          <span>Filters</span>
+          <span>{t('monitoring.filters')}</span>
         </button>
+
+        {onImport && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              className={styles.fileInput}
+              aria-label={t('monitoring.selectFile')}
+            />
+            <button className={styles.importButton} onClick={handleImportClick}>
+              <Upload size={20} />
+              <span>{t('monitoring.import')}</span>
+            </button>
+          </>
+        )}
 
         <button className={styles.createButton} onClick={handleCreateClick}>
           <Plus size={20} />
-          <span>Create Monitor</span>
+          <span>{t('monitoring.createMonitor')}</span>
         </button>
       </div>
 
@@ -77,7 +114,7 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
         <div className={styles.advancedFilters}>
           <div className={styles.filterGroup}>
             <label htmlFor="status" className={styles.filterLabel}>
-              Status:
+              {t('monitoring.status')}:
             </label>
             <select
               id="status"
@@ -85,15 +122,15 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
               onChange={handleStatusChange}
               className={styles.filterSelect}
             >
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
+              <option value="all">{t('monitoring.statusAll')}</option>
+              <option value="active">{t('monitoring.statusActive')}</option>
+              <option value="paused">{t('monitoring.statusPaused')}</option>
             </select>
           </div>
 
           <div className={styles.filterGroup}>
             <label htmlFor="sortBy" className={styles.filterLabel}>
-              Sort by:
+              {t('monitoring.sortBy')}:
             </label>
             <select
               id="sortBy"
@@ -101,15 +138,15 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
               onChange={handleSortByChange}
               className={styles.filterSelect}
             >
-              <option value="name">Name</option>
-              <option value="createdAt">Created Date</option>
-              <option value="interval">Check Interval</option>
+              <option value="name">{t('monitoring.sortByName')}</option>
+              <option value="createdAt">{t('monitoring.sortByCreatedAt')}</option>
+              <option value="interval">{t('monitoring.sortByInterval')}</option>
             </select>
           </div>
 
           <div className={styles.filterGroup}>
             <label htmlFor="sortOrder" className={styles.filterLabel}>
-              Order:
+              {t('monitoring.sortOrder')}:
             </label>
             <select
               id="sortOrder"
@@ -117,8 +154,8 @@ export const MonitorsFilters: React.FC<MonitorsFiltersProps> = ({ filters, onFil
               onChange={handleSortOrderChange}
               className={styles.filterSelect}
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="asc">{t('monitoring.sortOrderAsc')}</option>
+              <option value="desc">{t('monitoring.sortOrderDesc')}</option>
             </select>
           </div>
         </div>

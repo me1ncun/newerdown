@@ -147,6 +147,15 @@
   }
 }
 
+.buttonExport {
+  background: var(--export-button-bg, #0891b2);
+  color: #ffffff;
+
+  &:hover {
+    background: var(--export-button-hover, #0e7490);
+  }
+}
+
 .buttonDelete {
   background: var(--delete-button-bg, #dc2626);
   color: #ffffff;

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Languages, LogOut } from 'lucide-react';
 import styles from './App.module.scss';
 import { Loader } from './pages/Loader';
+import { TranslationSourceToggle } from './shared/components/TranslationSourceToggle/TranslationSourceToggle';
 
 const getLinkActiveClass = ({ isActive }: { isActive: boolean }) =>
   classNames(styles.navLink, {
@@ -23,7 +24,9 @@ export const App = () => {
   };
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'uk' : 'en';
+    const currentLang = i18n.language;
+    const isUkrainian = currentLang === 'uk' || currentLang === 'uk-UA';
+    const newLang = isUkrainian ? 'en' : 'uk';
     i18n.changeLanguage(newLang);
   };
 
@@ -63,7 +66,7 @@ export const App = () => {
                   title={t('app.changeLanguage') || ''}
                 >
                   <Languages size={18} />
-                  <span>{i18n.language === 'en' ? 'UK' : 'EN'}</span>
+                  <span>{i18n.language.startsWith('uk') ? 'EN' : 'UK'}</span>
                 </button>
 
                 {token ? (
@@ -92,6 +95,8 @@ export const App = () => {
         <main className={styles.outletContainer}>
           <Outlet />
         </main>
+
+        <TranslationSourceToggle />
       </div>
     </Suspense>
   );

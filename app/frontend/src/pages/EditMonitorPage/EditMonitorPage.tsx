@@ -1,14 +1,22 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAppSelector } from '../../shared/hooks/reduxHooks';
-import { CreateMonitorRequest, MonitorType } from '../../shared/types/Monitor';
+import { useTranslation } from 'react-i18next';
+import { useAppSelector, useAppDispatch } from '../../shared/hooks/reduxHooks';
+import { updateMonitor } from '../../features/monitorsSlice';
+import {
+  CreateMonitorRequest,
+  MonitorType,
+  UpdateMonitorRequest,
+} from '../../shared/types/Monitor';
 import { ArrowLeft, Save } from 'lucide-react';
 import styles from './EditMonitorPage.module.scss';
 
 export const EditMonitorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { t } = useTranslation('monitoring');
   const { monitors } = useAppSelector((state) => state.monitors);
 
   const monitor = monitors.find((m) => m.id === id);
@@ -45,10 +53,18 @@ export const EditMonitorPage = () => {
   }, [monitor, navigate, reset]);
 
   const onSubmit = async (data: CreateMonitorRequest) => {
+    if (!id) return;
+
     try {
-      // TODO: Implement update API call when endpoint is ready
-      console.log('Update monitor:', id, data);
-      alert('Update functionality will be implemented when PUT endpoint is ready');
+      const updateData: UpdateMonitorRequest = {
+        type: data.type,
+        name: data.name,
+        port: data.port,
+        url: data.target,
+        isActive: data.isActive,
+      };
+
+      await dispatch(updateMonitor({ id, data: updateData })).unwrap();
       navigate('/monitoring');
     } catch (error) {
       console.error('Failed to update monitor:', error);
@@ -62,7 +78,7 @@ export const EditMonitorPage = () => {
   if (!monitor) {
     return (
       <div className={styles.editMonitorPage}>
-        <div className={styles.errorMessage}>Monitor not found</div>
+        <div className={styles.errorMessage}>{t('monitoring.noMonitorsFound')}</div>
       </div>
     );
   }
@@ -72,18 +88,20 @@ export const EditMonitorPage = () => {
       <div className={styles.header}>
         <button className={styles.backButton} onClick={handleCancel}>
           <ArrowLeft size={20} />
-          <span>Back to Monitors</span>
+          <span>{t('monitoring.backToMonitors')}</span>
         </button>
       </div>
 
       <div className={styles.formCard}>
-        <h1 className={styles.formTitle}>Edit Monitor</h1>
-        <p className={styles.formSubtitle}>Update the configuration for {monitor.name}</p>
+        <h1 className={styles.formTitle}>{t('monitoring.editMonitor')}</h1>
+        <p className={styles.formSubtitle}>
+          {t('monitoring.editFormSubtitle')} {monitor.name}
+        </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="name" className={styles.label}>
-              Monitor Name <span className={styles.required}>*</span>
+              {t('monitoring.monitorName')} <span className={styles.required}>*</span>
             </label>
             <input
               id="name"
@@ -91,14 +109,14 @@ export const EditMonitorPage = () => {
               className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
               placeholder="e.g., Production API"
               {...register('name', {
-                required: 'Monitor name is required',
+                required: t('monitoring.required'),
                 minLength: {
                   value: 3,
-                  message: 'Name must be at least 3 characters',
+                  message: t('monitoring.minLength', { count: 3 }),
                 },
                 maxLength: {
                   value: 100,
-                  message: 'Name must not exceed 100 characters',
+                  message: t('monitoring.maxLength', { count: 100 }),
                 },
               })}
             />
@@ -107,7 +125,7 @@ export const EditMonitorPage = () => {
 
           <div className={styles.formGroup}>
             <label htmlFor="target" className={styles.label}>
-              Target URL/IP <span className={styles.required}>*</span>
+              {t('monitoring.target')} <span className={styles.required}>*</span>
             </label>
             <input
               id="target"
@@ -115,11 +133,11 @@ export const EditMonitorPage = () => {
               className={`${styles.input} ${errors.target ? styles.inputError : ''}`}
               placeholder="e.g., https://example.com or 192.168.1.1"
               {...register('target', {
-                required: 'Target is required',
+                required: t('monitoring.required'),
                 pattern: {
                   value:
                     /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$|^(\d{1,3}\.){3}\d{1,3}$/,
-                  message: 'Please enter a valid URL or IP address',
+                  message: t('monitoring.validUrl'),
                 },
               })}
             />
@@ -129,27 +147,27 @@ export const EditMonitorPage = () => {
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label htmlFor="type" className={styles.label}>
-                Monitor Type <span className={styles.required}>*</span>
+                {t('monitoring.monitorType')} <span className={styles.required}>*</span>
               </label>
               <select
                 id="type"
                 className={`${styles.select} ${errors.type ? styles.inputError : ''}`}
                 {...register('type', {
-                  required: 'Monitor type is required',
+                  required: t('monitoring.required'),
                   valueAsNumber: true,
                 })}
               >
-                <option value={MonitorType.HTTP}>HTTP</option>
-                <option value={MonitorType.HTTPS}>HTTPS</option>
-                <option value={MonitorType.TCP}>TCP</option>
-                <option value={MonitorType.PING}>PING</option>
+                <option value={MonitorType.HTTP}>{t('monitoring.http')}</option>
+                <option value={MonitorType.HTTPS}>{t('monitoring.https')}</option>
+                <option value={MonitorType.TCP}>{t('monitoring.tcp')}</option>
+                <option value={MonitorType.PING}>{t('monitoring.ping')}</option>
               </select>
               {errors.type && <span className={styles.errorMessage}>{errors.type.message}</span>}
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="port" className={styles.label}>
-                Port <span className={styles.required}>*</span>
+                {t('monitoring.port')} <span className={styles.required}>*</span>
               </label>
               <input
                 id="port"
@@ -157,15 +175,15 @@ export const EditMonitorPage = () => {
                 className={`${styles.input} ${errors.port ? styles.inputError : ''}`}
                 placeholder="e.g., 80 or 443"
                 {...register('port', {
-                  required: 'Port is required',
+                  required: t('monitoring.required'),
                   valueAsNumber: true,
                   min: {
                     value: 1,
-                    message: 'Port must be between 1 and 65535',
+                    message: t('monitoring.validPort'),
                   },
                   max: {
                     value: 65535,
-                    message: 'Port must be between 1 and 65535',
+                    message: t('monitoring.validPort'),
                   },
                 })}
               />
@@ -175,7 +193,7 @@ export const EditMonitorPage = () => {
 
           <div className={styles.formGroup}>
             <label htmlFor="intervalSeconds" className={styles.label}>
-              Check Interval (seconds) <span className={styles.required}>*</span>
+              {t('monitoring.intervalSeconds')} <span className={styles.required}>*</span>
             </label>
             <input
               id="intervalSeconds"
@@ -183,32 +201,30 @@ export const EditMonitorPage = () => {
               className={`${styles.input} ${errors.intervalSeconds ? styles.inputError : ''}`}
               placeholder="e.g., 300 (5 minutes)"
               {...register('intervalSeconds', {
-                required: 'Check interval is required',
+                required: t('monitoring.required'),
                 valueAsNumber: true,
                 min: {
                   value: 60,
-                  message: 'Interval must be at least 60 seconds',
+                  message: t('monitoring.minInterval'),
                 },
                 max: {
                   value: 86400,
-                  message: 'Interval must not exceed 86400 seconds (24 hours)',
+                  message: t('monitoring.maxInterval'),
                 },
               })}
             />
             {errors.intervalSeconds && (
               <span className={styles.errorMessage}>{errors.intervalSeconds.message}</span>
             )}
-            <span className={styles.helpText}>
-              How often the monitor should check your service (minimum: 60 seconds)
-            </span>
+            <span className={styles.helpText}>{t('monitoring.helpInterval')}</span>
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.checkboxLabel}>
               <input type="checkbox" className={styles.checkbox} {...register('isActive')} />
-              <span>Monitor is active</span>
+              <span>{t('monitoring.isActive')}</span>
             </label>
-            <span className={styles.helpText}>Uncheck to pause monitoring for this service</span>
+            <span className={styles.helpText}>{t('monitoring.helpActive')}</span>
           </div>
 
           <div className={styles.formActions}>
@@ -218,11 +234,11 @@ export const EditMonitorPage = () => {
               onClick={handleCancel}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('monitoring.cancel')}
             </button>
             <button type="submit" className={styles.buttonPrimary} disabled={isSubmitting}>
               <Save size={18} />
-              <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
+              <span>{isSubmitting ? t('monitoring.saving') : t('monitoring.saveChanges')}</span>
             </button>
           </div>
         </form>

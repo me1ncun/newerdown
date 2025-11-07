@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MonitorCard } from '../../../shared/components/MonitorCard';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal/ConfirmModal';
 import { Monitor } from '../../../shared/types/Monitor';
@@ -11,6 +12,7 @@ interface MonitorsListProps {
   loading: boolean;
   onDelete: (id: string) => void;
   onToggleStatus: (id: string, isActive: boolean) => void;
+  onExport: (id: string) => void;
 }
 
 const ITEMS_PER_PAGE = 12;
@@ -20,8 +22,10 @@ export const MonitorsList: React.FC<MonitorsListProps> = ({
   loading,
   onDelete,
   onToggleStatus,
+  onExport,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('monitoring');
   const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [monitorToDelete, setMonitorToDelete] = useState<string | null>(null);
@@ -83,7 +87,7 @@ export const MonitorsList: React.FC<MonitorsListProps> = ({
     return (
       <div className={styles.loadingContainer}>
         <Loader2 size={48} className={styles.spinner} />
-        <p>Loading monitors...</p>
+        <p>{t('monitoring.loadingMonitors')}</p>
       </div>
     );
   }
@@ -92,8 +96,8 @@ export const MonitorsList: React.FC<MonitorsListProps> = ({
     return (
       <div className={styles.emptyState}>
         <Inbox size={64} className={styles.emptyIcon} />
-        <h3>No monitors found</h3>
-        <p>Create your first monitor to start tracking your services</p>
+        <h3>{t('monitoring.noMonitorsFound')}</h3>
+        <p>{t('monitoring.createFirstMonitor')}</p>
       </div>
     );
   }
@@ -108,6 +112,7 @@ export const MonitorsList: React.FC<MonitorsListProps> = ({
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onToggleStatus={onToggleStatus}
+            onExport={onExport}
           />
         ))}
       </div>
@@ -120,10 +125,10 @@ export const MonitorsList: React.FC<MonitorsListProps> = ({
 
       <ConfirmModal
         isOpen={deleteModalOpen}
-        title="Delete Monitor"
-        message="Are you sure you want to delete this monitor? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('monitoring.confirmDeleteTitle')}
+        message={t('monitoring.confirmDeleteMessage')}
+        confirmText={t('monitoring.confirm')}
+        cancelText={t('monitoring.cancel')}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isDanger={true}

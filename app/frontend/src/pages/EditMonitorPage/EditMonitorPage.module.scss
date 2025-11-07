@@ -1,5 +1,4 @@
-// Reuse the same styles as CreateMonitorPage
-@import '../CreateMonitorPage/CreateMonitorPage.module.scss';
+@use '../CreateMonitorPage/CreateMonitorPage.module.scss';
 
 .editMonitorPage {
   @extend .createMonitorPage;

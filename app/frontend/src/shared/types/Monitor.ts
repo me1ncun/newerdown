@@ -25,7 +25,19 @@ export interface CreateMonitorRequest {
   isActive: boolean;
 }
 
+export interface UpdateMonitorRequest {
+  type: MonitorType;
+  name: string;
+  port: number;
+  url: string;
+  isActive: boolean;
+}
+
 export interface DeleteMonitorRequest {
+  id: string;
+}
+
+export interface PauseResumeRequest {
   id: string;
 }
 

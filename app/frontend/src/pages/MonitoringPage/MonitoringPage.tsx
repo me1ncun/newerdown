@@ -1,6 +1,14 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
-import { fetchMonitors, deleteMonitor } from '../../features/monitorsSlice';
+import {
+  fetchMonitors,
+  deleteMonitor,
+  pauseMonitor,
+  resumeMonitor,
+  importMonitors,
+} from '../../features/monitorsSlice';
+import { exportMonitor } from '../../api/monitoring';
 import { MonitorsFilters, FilterOptions } from './components/MonitorsFilters';
 import { MonitorsList } from './components/MonitorsList';
 import { Monitor } from '../../shared/types/Monitor';
@@ -9,6 +17,7 @@ import styles from './MonitoringPage.module.scss';
 
 export const MonitoringPage = () => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation('monitoring');
   const { monitors, loading, error } = useAppSelector((state) => state.monitors);
 
   const [filters, setFilters] = useState<FilterOptions>({
@@ -64,21 +73,40 @@ export const MonitoringPage = () => {
     dispatch(deleteMonitor(id));
   };
 
-  const handleToggleStatus = (id: string, isActive: boolean) => {
-    // TODO: Implement pause/resume functionality when API is ready
-    console.log(`Toggle status for monitor ${id} to ${isActive ? 'active' : 'paused'}`);
+  const handleToggleStatus = async (id: string, isActive: boolean) => {
+    if (isActive) {
+      await dispatch(resumeMonitor(id));
+    } else {
+      await dispatch(pauseMonitor(id));
+    }
+  };
+
+  const handleExport = async (id: string) => {
+    try {
+      await exportMonitor(id);
+    } catch (error) {
+      console.error('Failed to export monitor:', error);
+    }
+  };
+
+  const handleImport = async (file: File) => {
+    try {
+      await dispatch(importMonitors(file)).unwrap();
+    } catch (error) {
+      console.error('Failed to import monitors:', error);
+    }
   };
 
   return (
     <div className={styles.monitorPage}>
       <header className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Monitors</h1>
-          <p className={styles.pageSubtitle}>Manage and track your service monitors</p>
+          <h1 className={styles.pageTitle}>{t('monitoring.monitoringPageTitle')}</h1>
+          <p className={styles.pageSubtitle}>{t('monitoring.pageSubtitle')}</p>
         </div>
       </header>
 
-      <MonitorsFilters filters={filters} onFiltersChange={setFilters} />
+      <MonitorsFilters filters={filters} onFiltersChange={setFilters} onImport={handleImport} />
 
       {error && (
         <div className={styles.errorBanner}>
@@ -92,6 +120,7 @@ export const MonitoringPage = () => {
         loading={loading}
         onDelete={handleDelete}
         onToggleStatus={handleToggleStatus}
+        onExport={handleExport}
       />
     </div>
   );

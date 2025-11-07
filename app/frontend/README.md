@@ -1,3 +1,16 @@
+# NewerDown Frontend
+
+## Translation Management
+
+This project supports both local and cloud-based translation management via Locize.
+
+Quick start:
+
+- **Local translations**: Set `VITE_TRANSLATION_SOURCE=local` in `.env`
+- **Locize**: Set `VITE_TRANSLATION_SOURCE=locize` in `.env`
+
+---
+
 # API Documentation
 
 ## Authentication
@@ -25,7 +38,7 @@
 - **POST `/api/monitors/{id}/pause`** — Pause a monitor (`IsActive = false`)
 - **POST `/api/monitors/{id}/resume`** — Resume a monitor (`IsActive = true`)
 - **POST `/api/monitors/import`** — Import monitors via a CSV file
-- **POST `/api/monitors/{id}/export`** — Export a monitor by ID to a CSV file
+- **GET `/api/monitors/{id}/export`** — Export a monitor by ID to a CSV file
 
 ## Incident and IncidentComment (GraphQL)
 
@@ -35,4 +48,4 @@
 - **Mutation** `commentIncident` — Add comment to incident by ID
 
 Swagger API: https://app-newerdown.azurewebsites.net/swagger/index.html
- Тут представлена документація по всіх доступних API-ендпоінтах, з можливістю тестування запитів.
+Тут представлена документація по всіх доступних API-ендпоінтах, з можливістю тестування запитів.
