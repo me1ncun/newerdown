@@ -10,9 +10,9 @@ public class Program : IApiMarker
         CreateHostBuilder(args).Build().Run();
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, config) =>
+            .ConfigureAppConfiguration((_, config) =>
             {
                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                     .AddEnvironmentVariables()
@@ -21,8 +21,7 @@ public class Program : IApiMarker
                 var builtConfig = config.Build();
                 
                 config.AddAzureKeyVault(new Uri(builtConfig["AzureKeyVault:VaultUri"]
-                                                ?? throw new ArgumentException("Key Vault Url didn't set")),
-                    new DefaultAzureCredential());
+                                                ?? throw new ArgumentException("Key Vault Url didn't set")), new DefaultAzureCredential());
             })
             .ConfigureWebHostDefaults(webBuilder =>
             {

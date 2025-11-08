@@ -67,19 +67,8 @@ public class MonitorService : IMonitorService
         var cached = await _cacheService.GetAsync<List<MonitorDto>>(_cacheKey);
         if (cached != null && cached.Any())
             return cached;
-
-        List<Monitor> monitors;
         
-        var currentUserId = _userContextService.GetUserId();
-        var currentUser = await _userService.GetUserByIdAsync(currentUserId).ThrowIfNullAsync(nameof(User));
-        var userRoles = await _userManager.GetRolesAsync(currentUser);
-        if (userRoles.Contains(RoleType.Administrator.ToString()))
-        {
-            monitors = await _context.Monitors.ToListAsync();
-            return _mapper.Map<List<MonitorDto>>(monitors);
-        }
-        
-        monitors = await _context.Monitors
+        var monitors = await _context.Monitors
             .Where(m => m.UserId == _userContextService.GetUserId())
             .ToListAsync();
 

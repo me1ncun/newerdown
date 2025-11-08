@@ -22,10 +22,9 @@ public class Monitor
     
     public DateTime CreatedAt { get; set; }
     
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
     
     public User User { get; set; }
-    
     
     public ICollection<MonitorCheck> Checks { get; set; } = new List<MonitorCheck>();
     
@@ -39,6 +38,6 @@ public sealed class MonitorConfiguration : IEntityTypeConfiguration<Monitor>
         builder.HasOne(m => m.User)
             .WithMany(u => u.Monitors)
             .HasForeignKey(m => m.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

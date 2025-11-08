@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Azure.Storage;
 using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NewerDown.Application.Time;
 using NewerDown.Domain.DTOs.File;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Enums;
 using NewerDown.Domain.Exceptions;
 using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
@@ -40,58 +42,63 @@ public class BlobStorageService : IBlobStorageService
     public async Task<FileAttachmentResponseDto> UploadFileAsync(IFormFile file)
     {
         var extension = Path.GetExtension(file.FileName);
-        var fileName = $"{Guid.NewGuid()}{extension}";
+        var blobName = $"{Guid.NewGuid()}{extension}";
         using (var stream = new MemoryStream())
         {
             await file.CopyToAsync(stream);
             stream.Position = 0;
-            await _blobContainerClient.UploadBlobAsync(fileName, stream);
+            await _blobContainerClient.UploadBlobAsync(blobName, stream);
         }
         
-        var sasToken = GetSasToken(fileName);
+        var sasUrl = await GenerateSasUrlAsync(blobName, TimeSpan.FromMinutes(30));
         
         var fileAttachmentDto = new FileAttachmentDto()
         {
             Id = Guid.NewGuid(),
             Uri = _blobContainerClient.Uri.AbsoluteUri,
-            FileName = fileName,
-            FilePath = $"{_blobContainerClient.Uri}/{fileName}?{sasToken}",
+            FileName = blobName,
             ContentType = file.ContentType,
-            Size = file.Length
+            Size = file.Length,
+            CreatedAt = _timeProvider.UtcNow(),
+            FilePath = sasUrl
         };
         
         var fileAttachment = _mapper.Map<FileAttachment>(fileAttachmentDto);
-        fileAttachment.CreatedAt = _timeProvider.UtcNow();
-        
         _context.FileAttachments.Add(fileAttachment);
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("File uploaded successfully: {FileName}", fileName);
+        _logger.LogInformation("File uploaded successfully: {FileName}", blobName);
         
         return new FileAttachmentResponseDto
         {
             FileAttachment = fileAttachmentDto,
-            Status = "Success",
+            Status = StatusType.Success.ToString(),
             Error = false
         };
     }
 
-    private string GetSasToken(string fileName)
+    public async Task<string> GenerateSasUrlAsync(string blobName, TimeSpan validFor)
     {
-        var azureStorageAccount = _configuration.GetSection("AzureStorageAccount").Value;
+        var azureStorageAccount = _configuration["AzureStorageAccount"];
         var azureStorageAccessKey = _configuration["AzureStorageAccessKey"];
-        
-        Azure.Storage.Sas.BlobSasBuilder blobSasBuilder = new Azure.Storage.Sas.BlobSasBuilder()
+
+        var blobClient = _blobContainerClient.GetBlobClient(blobName);
+
+        if (!await blobClient.ExistsAsync())
+            throw new EntityNotFoundException($"Blob '{blobName}' not found.");
+
+        var sasBuilder = new BlobSasBuilder
         {
-            BlobContainerName = _configuration["BlobContainerName"],
-            BlobName = fileName,
-            ExpiresOn = DateTime.UtcNow.AddMinutes(2),
+            BlobContainerName = _blobContainerClient.Name,
+            BlobName = blobName,
+            Resource = "b",
+            ExpiresOn = DateTimeOffset.UtcNow.Add(validFor)
         };
-        
-        blobSasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
-        
-        var sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(azureStorageAccount, azureStorageAccessKey)).ToString();
-        return sasToken;
+        sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+        var sasToken = sasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(azureStorageAccount, azureStorageAccessKey));
+
+        return $"{blobClient.Uri}?{sasToken}";
     }
     
     public async Task<FileAttachment> GetFileAttachmentByIdAsync(Guid? fileAttachmentId)

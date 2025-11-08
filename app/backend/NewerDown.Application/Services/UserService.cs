@@ -64,6 +64,10 @@ public class UserService : IUserService
         var user = _context.Users.FirstOrDefault(x => x.Id == userId);
         if (user is null)
             return Result.Failure(UserErrors.UserNotFound);
+        
+        var tokenInfo = await _context.TokenInfos.FirstOrDefaultAsync(t => t.Username == user.UserName);
+        if (tokenInfo != null)
+            _context.TokenInfos.Remove(tokenInfo);
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();

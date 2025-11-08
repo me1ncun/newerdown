@@ -9,4 +9,5 @@ public interface IBlobStorageService
     Task<FileAttachmentResponseDto> UploadFileAsync(IFormFile file);
     Task<FileAttachment> GetFileAttachmentByIdAsync(Guid? fileAttachmentId);
     Task DeleteFileAsync(Guid? fileAttachmentId);
+    Task<string> GenerateSasUrlAsync(string blobName, TimeSpan validFor);
 }

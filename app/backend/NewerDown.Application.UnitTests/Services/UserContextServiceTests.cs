@@ -7,6 +7,7 @@ using NewerDown.Application.Services;
 using NewerDown.Application.UnitTests.Helpers;
 using NewerDown.Domain.DTOs.User;
 using NewerDown.Domain.Entities;
+using NewerDown.Domain.Interfaces;
 using NewerDown.Infrastructure.Data;
 
 namespace NewerDown.Application.UnitTests.Services;
@@ -16,6 +17,7 @@ public class UserContextServiceTests
 {
     private Mock<IMapper> _mapperMock;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
+    private Mock<Lazy<IUserPhotoProvider>> _userPhotoProviderMock;
     
     private ApplicationDbContext _context;
     private UserContextService _userContextService;
@@ -27,11 +29,12 @@ public class UserContextServiceTests
     {
         _httpContextAccessorMock = new();
         _mapperMock = new ();
+        _userPhotoProviderMock = new();
         
         _context = new DbContextProvider().BuildDbContext();
         _context.Database.EnsureCreated();
         
-        _userContextService = new UserContextService(_context, _httpContextAccessorMock.Object, _mapperMock.Object);
+        _userContextService = new UserContextService(_context, _httpContextAccessorMock.Object, _mapperMock.Object, _userPhotoProviderMock.Object);
     }
     
     [TearDown]

@@ -1,5 +1,4 @@
 ﻿using FluentValidation.TestHelper;
-using NewerDown.Application.Validators.Requests;
 using NewerDown.Domain.DTOs.Request;
 
 namespace NewerDown.Application.UnitTests.Validators.Requests;

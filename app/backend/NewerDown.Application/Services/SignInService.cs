@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NewerDown.Application.Errors;
 using NewerDown.Application.Extensions;
@@ -146,6 +147,13 @@ public class SignInService : ISignInService
             return Result.Failure(UserErrors.PasswordChangeError);
         }
         
+        var token = await _context.TokenInfos.FirstOrDefaultAsync(x => x.Username == user.UserName);
+        if (token != null)
+        {
+            _context.TokenInfos.Remove(token);
+            await _context.SaveChangesAsync();
+        }
+        
         return Result.Success();
     }
     
@@ -154,12 +162,15 @@ public class SignInService : ISignInService
         var principal = _tokenService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
         var username = principal.Identity?.Name;
 
-        var tokenInfo = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
-
         var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-        if (tokenInfo != null){ tokenInfo.RefreshToken = newRefreshToken;}
+        var tokenInfo = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
+        if (tokenInfo != null)
+        {
+            tokenInfo.RefreshToken = newRefreshToken;
+            tokenInfo.ExpiredAt = DateTime.UtcNow.AddMinutes(5);
+        }
         
         await _context.SaveChangesAsync();
 

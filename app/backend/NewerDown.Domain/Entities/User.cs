@@ -38,6 +38,6 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(u => u.FileAttachment)
             .WithMany()
             .HasForeignKey(u => u.FileAttachmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

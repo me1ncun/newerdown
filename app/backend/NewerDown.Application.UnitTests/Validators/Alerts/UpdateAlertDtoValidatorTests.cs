@@ -1,5 +1,4 @@
 ﻿using FluentValidation.TestHelper;
-using NewerDown.Application.Validators.Alerts;
 using NewerDown.Domain.DTOs.Alerts;
 using NewerDown.Domain.Enums;
 

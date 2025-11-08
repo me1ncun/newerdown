@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NewerDown.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/integrations")]
 public class IntegrationController : ControllerBase
 {

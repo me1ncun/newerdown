@@ -1,6 +1,6 @@
 ﻿namespace NewerDown.Domain.DTOs.File;
 
-public class FileAttachmentDto
+public record FileAttachmentDto
 {
     public Guid Id { get; set; }
     public string Uri { get; set; }
@@ -9,4 +9,5 @@ public class FileAttachmentDto
     public long Size { get; set; }
     public string FilePath { get; set; }
     public Stream Content { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

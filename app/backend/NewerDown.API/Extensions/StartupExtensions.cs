@@ -27,7 +27,7 @@ public static class StartupExtensions
                             Id = "Bearer"
                         }
                     },
-                    new string[] { }
+                    []
                 }
             });
         });

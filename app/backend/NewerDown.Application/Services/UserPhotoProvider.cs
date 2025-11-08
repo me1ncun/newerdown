@@ -44,8 +44,10 @@ public class UserPhotoProvider : IUserPhotoProvider
         
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
-
-        return uploadedPhoto.FileAttachment.FilePath;
+        
+        var sasUrl = await _blobStorageService.GenerateSasUrlAsync(uploadedPhoto.FileAttachment.FileName, TimeSpan.FromMinutes(15));
+        
+        return sasUrl;
     }
     
     public async Task<Result<string>> GetPhotoUrlAsync()
@@ -58,8 +60,9 @@ public class UserPhotoProvider : IUserPhotoProvider
         }
 
         var fileAttachment = await _blobStorageService.GetFileAttachmentByIdAsync(user.FileAttachmentId);
+        var sasUrl = await _blobStorageService.GenerateSasUrlAsync(fileAttachment.FileName, TimeSpan.FromMinutes(15));
         
-        return Result<string>.Success(fileAttachment.FilePath);
+        return Result<string>.Success(sasUrl);
     }
     
     public async Task<Result> DeletePhotoAsync()

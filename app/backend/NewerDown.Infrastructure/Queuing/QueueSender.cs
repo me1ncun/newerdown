@@ -29,7 +29,7 @@ public class QueueSender : IQueueSender
 
         message.SetBody(value);
 
-        if (sessionId != default)
+        if (sessionId != Guid.Empty)
         {
             message.SessionId = sessionId.ToString();
         }

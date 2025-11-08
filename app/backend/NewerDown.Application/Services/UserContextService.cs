@@ -16,15 +16,18 @@ public class UserContextService : IUserContextService
     private readonly ApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
+    private readonly Lazy<IUserPhotoProvider> _userPhotoProvider;
 
     public UserContextService(
         ApplicationDbContext context,
         IHttpContextAccessor httpContextAccessor,
-        IMapper mapper)
+        IMapper mapper,
+        Lazy<IUserPhotoProvider> userPhotoProvider)
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
         _context = context;
+        _userPhotoProvider = userPhotoProvider;
     }
 
     public Guid GetUserId()
@@ -46,6 +49,9 @@ public class UserContextService : IUserContextService
         if (user == null)
             return Result<UserDto>.Failure(UserErrors.UserNotFound);
         
-        return Result<UserDto>.Success(_mapper.Map<UserDto>(user));
+        var returnedUser = _mapper.Map<UserDto>(user);
+        returnedUser.FilePath = await _userPhotoProvider.Value.GetPhotoUrlAsync() is { IsSuccess: true } ? (await _userPhotoProvider.Value.GetPhotoUrlAsync()).Value : string.Empty;
+        
+        return Result<UserDto>.Success(returnedUser);
     }
 }

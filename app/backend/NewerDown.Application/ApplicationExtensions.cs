@@ -7,7 +7,7 @@ using NewerDown.Application.GraphQL.Mutations;
 using NewerDown.Application.GraphQL.Schemas;
 using NewerDown.Application.Services;
 using NewerDown.Application.Time;
-using NewerDown.Application.Validators.Monitors;
+using NewerDown.Domain.DTOs.Service;
 using NewerDown.Domain.Interfaces;
 
 namespace NewerDown.Application;
@@ -33,6 +33,7 @@ public static class ApplicationExtensions
         services.AddScoped<IIncidentService, IncidentService>();
         
         services.AddScoped<IUserPhotoProvider, UserPhotoProvider>();
+        services.AddScoped(provider => new Lazy<IUserPhotoProvider>(provider.GetRequiredService<IUserPhotoProvider>));
         services.AddScoped<IScopedTimeProvider, ScopedTimeProvider>();
 
         return services;

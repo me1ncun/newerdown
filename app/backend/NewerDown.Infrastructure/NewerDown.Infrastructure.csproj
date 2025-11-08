@@ -32,4 +32,8 @@
       <ProjectReference Include="..\NewerDown.Domain\NewerDown.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Data\Migrations\" />
+    </ItemGroup>
+
 </Project>

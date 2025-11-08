@@ -181,16 +181,11 @@ namespace NewerDown.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("MonitorId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Alerts");
                 });
@@ -213,7 +208,6 @@ namespace NewerDown.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FilePath")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Uri")
@@ -341,7 +335,7 @@ namespace NewerDown.Infrastructure.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -520,10 +514,6 @@ namespace NewerDown.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
-
                     b.HasIndex("FileAttachmentId");
 
                     b.HasIndex("NormalizedEmail")
@@ -593,18 +583,14 @@ namespace NewerDown.Infrastructure.Migrations
                     b.HasOne("NewerDown.Domain.Entities.Monitor", "Monitor")
                         .WithMany("Alerts")
                         .HasForeignKey("MonitorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NewerDown.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("NewerDown.Domain.Entities.User", null)
                         .WithMany("Alerts")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Monitor");
 
@@ -616,7 +602,7 @@ namespace NewerDown.Infrastructure.Migrations
                     b.HasOne("NewerDown.Domain.Entities.Monitor", "Monitor")
                         .WithMany()
                         .HasForeignKey("MonitorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Monitor");
@@ -646,7 +632,7 @@ namespace NewerDown.Infrastructure.Migrations
                     b.HasOne("NewerDown.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -656,9 +642,7 @@ namespace NewerDown.Infrastructure.Migrations
                 {
                     b.HasOne("NewerDown.Domain.Entities.User", "User")
                         .WithMany("Monitors")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -678,8 +662,7 @@ namespace NewerDown.Infrastructure.Migrations
                 {
                     b.HasOne("NewerDown.Domain.Entities.FileAttachment", "FileAttachment")
                         .WithMany()
-                        .HasForeignKey("FileAttachmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("FileAttachmentId");
 
                     b.Navigation("FileAttachment");
                 });
