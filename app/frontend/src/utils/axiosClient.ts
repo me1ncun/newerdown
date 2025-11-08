@@ -10,7 +10,7 @@ function wait(delay: number) {
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json; charset=UTF-8',
@@ -122,10 +122,38 @@ async function request<T>(url: string, method: Method = 'GET', data: any = null)
   }
 }
 
+async function requestForm<T>(url: string, file: File, fieldName: string = 'file'): Promise<T> {
+  await wait(300);
+
+  const formData = new FormData();
+  formData.append(fieldName, file);
+
+  try {
+    const response = await instance.post<T>(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Request form error:', error.response.data);
+      throw new Error(JSON.stringify(error.response.data));
+    } else if (error.request) {
+      throw new Error('No response from server');
+    } else {
+      throw new Error(error.message);
+    }
+  }
+}
+
 export const client = {
   get: <T>(url: string) => request<T>(url, 'GET'),
   post: <T>(url: string, data?: any) => request<T>(url, 'POST', data),
   patch: <T>(url: string, data: any) => request<T>(url, 'PATCH', data),
   put: <T>(url: string, data?: any) => request<T>(url, 'PUT', data),
   delete: (url: string) => request(url, 'DELETE'),
+
+  postForm: <T>(url: string, file: File, fieldName?: string) =>
+    requestForm<T>(url, file, fieldName),
 };
