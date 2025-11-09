@@ -8,16 +8,29 @@
   },
   "loginPage": {
     "login": "Login",
+    "subtitle": "Enter your credentials to access your account",
     "email": "Email",
+    "emailPlaceholder": "Enter your email",
     "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Login",
+    "loggingIn": "Logging in...",
     "notAcc": "Don't have an account?",
     "Register": "Register"
   },
   "registerPage": {
     "register": "Register",
+    "subtitle": "Create a new account to get started",
     "name": "Name",
+    "namePlaceholder": "Enter your name",
     "email": "Email",
+    "emailPlaceholder": "Enter your email",
     "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "registerButton": "Register",
+    "registering": "Registering...",
     "have": "Already have an account?",
     "login": "Login"
   },
@@ -60,7 +73,11 @@
     "required": "This field is required.",
     "email": "Please enter a valid email address.",
     "minLength": "This field must be at least 8 characters long.",
-    "passwordMismatch": "New password and confirmation do not match.",
-    "phone": "Please enter a valid phone number."
+    "nameMinLength": "Name must be at least 2 characters long.",
+    "passwordMismatch": "Passwords do not match.",
+    "phone": "Please enter a valid phone number.",
+    "currentPasswordRequired": "Current password is required to set a new password.",
+    "newPasswordRequired": "New password is required.",
+    "passwordPattern": "Password must be at least 8 characters with 1 uppercase letter and 1 number."
   }
 }

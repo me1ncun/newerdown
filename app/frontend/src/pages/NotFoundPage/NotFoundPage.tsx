@@ -1,22 +1,25 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Home, AlertCircle } from 'lucide-react';
+import styles from './NotFoundPage.module.scss';
 
 export const NotFoundPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   return (
-    <section className="section has-text-centered">
-      <div className="container">
-        <h1 className="title is-1 has-text-danger">404</h1>
-        <p className="subtitle is-4">{t('notFoundPage.oops')}</p>
-        <p className="mb-5">{t('notFoundPage.doesNotExist')}</p>
-        <Link to="/home" className="button is-info is-large">
-          <span className="icon">
-            <i className="fas fa-home"></i>
-          </span>
+    <div className={styles.notFoundPage}>
+      <div className={styles.content}>
+        <div className={styles.illustration}>
+          <AlertCircle size={120} />
+        </div>
+        <h1 className={styles.errorCode}>404</h1>
+        <h2 className={styles.title}>{t('notFoundPage.oops')}</h2>
+        <p className={styles.description}>{t('notFoundPage.doesNotExist')}</p>
+        <Link to="/home" className={styles.homeButton}>
+          <Home size={24} />
           <span>{t('notFoundPage.goHome')}</span>
         </Link>
       </div>
-    </section>
+    </div>
   );
 };

@@ -1,26 +1,36 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../shared/hooks/reduxHooks';
 import { clearError, loginUser } from '../../features/authSlice';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { AlertCircle, Mail, Lock, LogIn } from 'lucide-react';
+import styles from './LoginPage.module.scss';
+
+interface LoginFormInputs {
+  email: string;
+  password: string;
+}
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const dispatch = useAppDispatch();
   const { loading, error, token } = useAppSelector((state) => state.auth);
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormInputs>();
 
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(loginUser({ email, password }));
+  const onSubmit = async (data: LoginFormInputs) => {
+    await dispatch(loginUser(data));
   };
 
   const redirectPath = useMemo(() => state?.pathname || '/account', [state?.pathname]);
@@ -32,62 +42,81 @@ export const LoginPage = () => {
   }, [token, navigate, redirectPath]);
 
   return (
-    <div
-      className="container is-flex is-justify-content-center is-align-items-center"
-      style={{ height: '100vh' }}
-    >
-      <div className="box" style={{ width: '400px' }}>
-        <h1 className="title has-text-centered">{t('loginPage.login')}</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label className="label">{t('loginPage.email')}</label>
-            <div className="control has-icons-left">
+    <div className={styles.loginPage}>
+      <div className={styles.loginCard}>
+        <div className={styles.header}>
+          <div className={styles.iconWrapper}>
+            <LogIn size={32} />
+          </div>
+          <h1 className={styles.title}>{t('loginPage.login')}</h1>
+          <p className={styles.subtitle}>{t('loginPage.subtitle')}</p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+          <div className={styles.field}>
+            <label className={styles.label}>{t('loginPage.email')}</label>
+            <div className={styles.inputWrapper}>
+              <Mail className={styles.inputIcon} size={20} />
               <input
-                className="input"
+                className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
                 type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                placeholder={t('loginPage.emailPlaceholder')}
+                {...register('email', {
+                  required: t('validation.required'),
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: t('validation.email'),
+                  },
+                })}
+                disabled={loading || isSubmitting}
               />
-              <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
             </div>
+            {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
           </div>
 
-          <div className="field">
-            <label className="label">{t('loginPage.password')}</label>
-            <div className="control has-icons-left">
+          <div className={styles.field}>
+            <label className={styles.label}>{t('loginPage.password')}</label>
+            <div className={styles.inputWrapper}>
+              <Lock className={styles.inputIcon} size={20} />
               <input
-                className="input"
+                className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
                 type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                placeholder={t('loginPage.passwordPlaceholder')}
+                {...register('password', {
+                  required: t('validation.required'),
+                  minLength: {
+                    value: 8,
+                    message: t('validation.minLength'),
+                  },
+                })}
+                disabled={loading || isSubmitting}
               />
-              <span className="icon is-small is-left">
-                <i className="fas fa-lock"></i>
-              </span>
             </div>
+            {errors.password && <span className={styles.errorText}>{errors.password.message}</span>}
           </div>
 
-          {error && <p className="has-text-danger has-text-centered">{error}</p>}
+          {error && (
+            <div className={styles.errorMessage}>
+              <AlertCircle size={18} />
+              <span>{error}</span>
+            </div>
+          )}
 
-          <div className="field mt-4">
-            <button className="button is-primary is-fullwidth" type="submit" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-          </div>
+          <button
+            className={styles.submitButton}
+            type="submit"
+            disabled={loading || isSubmitting}
+          >
+            {loading || isSubmitting ? t('loginPage.loggingIn') : t('loginPage.loginButton')}
+          </button>
         </form>
 
-        <p className="has-text-centered mt-3">
+        <div className={styles.footer}>
           {t('loginPage.notAcc')}{' '}
-          <Link to="/register" className="has-text-link">
+          <Link to="/register" className={styles.link}>
             {t('loginPage.Register')}
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
