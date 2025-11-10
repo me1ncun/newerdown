@@ -17,7 +17,7 @@ public class UserContextServiceTests
 {
     private Mock<IMapper> _mapperMock;
     private Mock<IHttpContextAccessor> _httpContextAccessorMock;
-    private Mock<Lazy<IUserPhotoProvider>> _userPhotoProviderMock;
+    private Mock<IUserPhotoProvider> _userPhotoProviderMock;
     
     private ApplicationDbContext _context;
     private UserContextService _userContextService;

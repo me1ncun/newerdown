@@ -22,12 +22,12 @@ public class UserContextService : IUserContextService
         ApplicationDbContext context,
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper,
-        Lazy<IUserPhotoProvider> userPhotoProvider)
+        IUserPhotoProvider userPhotoProvider)
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
         _context = context;
-        _userPhotoProvider = userPhotoProvider;
+        _userPhotoProvider = new Lazy<IUserPhotoProvider>(() => userPhotoProvider);
     }
 
     public Guid GetUserId()
