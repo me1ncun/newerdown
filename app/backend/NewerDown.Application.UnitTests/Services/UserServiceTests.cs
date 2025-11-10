@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using NewerDown.Application.Errors;
 using NewerDown.Application.MappingProfiles;
 using NewerDown.Application.Services;
 using NewerDown.Application.UnitTests.Helpers;
@@ -117,14 +118,14 @@ public class UserServiceTests
 
         // Assert
         Assert.That(result.IsSuccess);
-        Assert.That("NewName", Is.EqualTo(result.Value.UserName));
+        Assert.That(updateDto.UserName, Is.EqualTo(result.Value.UserName));
     }
 
     [Test]
     public async Task UpdateUserAsync_ShouldReturnFailure_WhenUserNotFound()
     {
         // Arrange
-        _userContextServiceMock.Setup(x => x.GetUserId()).Returns(_currentUserId);
+        _userContextServiceMock.Setup(x => x.GetUserId()).Returns(Guid.Empty);
 
         var updateDto = new UpdateUserDto
         {
@@ -136,7 +137,7 @@ public class UserServiceTests
 
         // Assert
         Assert.That(result.IsSuccess, Is.False);
-        Assert.That("Users.UserNotFound", Is.EqualTo(result.Error.Code));
+        Assert.That(UserErrors.UserNotFound.Code, Is.EqualTo(result.Error.Code));
     }
 
     [Test]
@@ -166,13 +167,13 @@ public class UserServiceTests
     public async Task DeleteUserAsync_ShouldReturnFailure_WhenUserNotFound()
     {
         // Arrange
-        _userContextServiceMock.Setup(x => x.GetUserId()).Returns(_currentUserId);
+        _userContextServiceMock.Setup(x => x.GetUserId()).Returns(Guid.Empty);
 
         // Act
         var result = await _userService.DeleteUserAsync();
 
         // Assert
         Assert.That(result.IsSuccess, Is.False);
-        Assert.That("Users.UserNotFound", Is.EqualTo(result.Error?.Code));
+        Assert.That(UserErrors.UserNotFound.Code, Is.EqualTo(result.Error?.Code));
     }
 }
