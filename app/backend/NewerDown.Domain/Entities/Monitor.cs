@@ -38,6 +38,6 @@ public sealed class MonitorConfiguration : IEntityTypeConfiguration<Monitor>
         builder.HasOne(m => m.User)
             .WithMany(u => u.Monitors)
             .HasForeignKey(m => m.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
