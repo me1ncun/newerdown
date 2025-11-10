@@ -12,8 +12,8 @@ using NewerDown.Infrastructure.Data;
 namespace NewerDown.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251110134821_FixedUserInMonitor")]
-    partial class FixedUserInMonitor
+    [Migration("20251110140642_FixDeleteBehavior")]
+    partial class FixDeleteBehavior
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

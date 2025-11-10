@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NewerDown.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class FixedUserInMonitor : Migration
+    public partial class FixDeleteBehavior : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,7 @@ namespace NewerDown.Infrastructure.Migrations
                 column: "UserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
