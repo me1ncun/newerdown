@@ -87,9 +87,9 @@ public class MonitorService : IMonitorService
             throw new EntityAlreadyExistsException($"Monitor with name {request.Name} already exists");
 
         var monitor = _mapper.Map<Monitor>(request);
-        monitor.UserId = _userContextService.GetUserId();
         monitor.Id = Guid.NewGuid();
         monitor.CreatedAt = _timeProvider.UtcNow();
+        monitor.UserId = _userContextService.GetUserId();
 
         if (!await IsTargetReachable(monitor.Target))
             return Result<Guid>.Failure(MonitorErrors.TargetNotReachable);
