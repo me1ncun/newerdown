@@ -1,69 +1,51 @@
-# React + TypeScript + Vite
+# NewerDown Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Translation Management
 
-Currently, two official plugins are available:
+This project supports both local and cloud-based translation management via Locize.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Quick start:
 
-## Expanding the ESLint configuration
+- **Local translations**: Set `VITE_TRANSLATION_SOURCE=local` in `.env`
+- **Locize**: Set `VITE_TRANSLATION_SOURCE=locize` in `.env`
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# API Documentation
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Authentication
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+- **POST `/api/auth/signup`** — register a new user
+- **POST `/api/auth/login`** — user login (returns access and refresh tokens)
+- **POST `/api/auth/token/refresh`** — refresh tokens (creates new ones and invalidates old ones)
+- **POST `/api/auth/change-password`** — change password
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## User
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+- **GET `/api/users/me`** — get current user information
+- **PATCH `/api/users/me`** — update user information
+- **DELETE `/api/users/me`** — delete user account
+- **POST `/api/users/me/upload-photo`** — upload user avatar
+- **DELETE `/api/users/me/delete-photo`** — delete user avatar
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+## Monitor
+
+- **POST `/api/monitors`** — Create a new monitor
+- **GET `/api/monitors`** — Get all monitors of the current user
+- **GET `/api/monitors/{id}`** — Get a specific monitor by ID
+- **PUT `/api/monitors/{id}`** — Update monitor information
+- **DELETE `/api/monitors/{id}`** — Delete a monitor by ID
+- **POST `/api/monitors/{id}/pause`** — Pause a monitor (`IsActive = false`)
+- **POST `/api/monitors/{id}/resume`** — Resume a monitor (`IsActive = true`)
+- **POST `/api/monitors/import`** — Import monitors via a CSV file
+- **GET `/api/monitors/{id}/export`** — Export a monitor by ID to a CSV file
+
+## Incident and IncidentComment (GraphQL)
+
+- **Query `incidents`** — Get all incidents
+- **Query `incident`** — Get incident by ID
+- **Mutation** `acknowledgeIncident` — Acknowledge incident by ID
+- **Mutation** `commentIncident` — Add comment to incident by ID
+
+Swagger API: https://app-newerdown.azurewebsites.net/swagger/index.html
+Тут представлена документація по всіх доступних API-ендпоінтах, з можливістю тестування запитів.

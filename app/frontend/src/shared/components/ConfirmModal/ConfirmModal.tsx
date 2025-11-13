@@ -1,4 +1,5 @@
-import './ConfirmModal.scss';
+import styles from './ConfirmModal.module.scss';
+import { X, AlertTriangle } from 'lucide-react';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface ConfirmModalProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  isDanger?: boolean;
 }
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -18,24 +20,33 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  isDanger = true,
 }) => {
   if (!isOpen) return null;
 
+  const confirmButtonClass = isDanger ? styles.buttonDanger : styles.buttonPrimary;
+
   return (
-    <div className="modal is-active">
-      <div className="modal-background" onClick={onCancel}></div>
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title">{title}</p>
-          <button className="delete" aria-label="close" onClick={onCancel}></button>
-        </header>
-        <section className="modal-card-body">{message}</section>
-        <footer className="modal-card-foot">
-          <button className="button is-danger" onClick={onConfirm}>
-            {confirmText}
+    <div className={styles.modalOverlay} onClick={onCancel}>
+      <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+        <header className={styles.modalHeader}>
+          <div className={styles.modalTitleWrapper}>
+            {isDanger && <AlertTriangle size={20} className={styles.dangerIcon} />}
+            <p className={styles.modalTitle}>{title}</p>
+          </div>
+          <button className={styles.closeButton} aria-label="close" onClick={onCancel}>
+            <X size={20} />
           </button>
-          <button className="button" onClick={onCancel}>
+        </header>
+
+        <section className={styles.modalBody}>{message}</section>
+
+        <footer className={styles.modalFooter}>
+          <button className={`${styles.button} ${styles.buttonLight}`} onClick={onCancel}>
             {cancelText}
+          </button>
+          <button className={`${styles.button} ${confirmButtonClass}`} onClick={onConfirm}>
+            {confirmText}
           </button>
         </footer>
       </div>

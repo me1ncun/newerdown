@@ -99,7 +99,7 @@ instance.interceptors.response.use(
 );
 
 async function request<T>(url: string, method: Method = 'GET', data: any = null): Promise<T> {
-  await wait(300);
+  await wait(0);
 
   const config: AxiosRequestConfig = {
     url,
@@ -123,7 +123,7 @@ async function request<T>(url: string, method: Method = 'GET', data: any = null)
 }
 
 async function requestForm<T>(url: string, file: File, fieldName: string = 'file'): Promise<T> {
-  await wait(300);
+  await wait(0);
 
   const formData = new FormData();
   formData.append(fieldName, file);
